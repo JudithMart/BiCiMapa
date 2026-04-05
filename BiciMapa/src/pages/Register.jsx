@@ -1,12 +1,12 @@
 import React from 'react'
 import RegisterC from '../components/RegisterC'
 
-function Register() {
+function Register({ onClose, onShowLogin, onAuthSuccess }) {
   return (
     <div>
-    <RegisterC />
+      <RegisterC onClose={onClose} onShowLogin={onShowLogin} onAuthSuccess={onAuthSuccess} />
     </div>
-  )
+  );
 }
 
 export default Register

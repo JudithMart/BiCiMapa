@@ -33,7 +33,7 @@ import { loginUser } from "../services/auth.service";
 // };
 
 
-function LoginC() {
+function LoginC({ onClose, onShowRegister, onAuthSuccess }) {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -106,11 +106,11 @@ function LoginC() {
         setTipoMensaje("error");
       }
       return;
-    } else{
+    } else {
       setMensaje("Inicio de sesión exitoso");
+      if (onAuthSuccess) onAuthSuccess();
       console.log("Usuario logeado:", user);
     }
- 
   };
 
   return (
@@ -119,6 +119,18 @@ function LoginC() {
         className="relative flex items-center flex-col w-80 md:w-[650px] md:h-[600px] lg:h-[600px] lg:w-[650px] h-[550px] rounded-2xl shadow-lg bg-cover bg-center"
         style={{ backgroundImage: "url('/Fondos/Login.jpeg')" }}
       >
+        {/* Botón de cerrar modal */}
+          {onClose && (
+            <button
+              onClick={onClose}
+              className="absolute top-2 right-3 text-primary
+              text-3xl font-bold z-30 transition-transform 
+              duration-200 hover:scale-125 hover:rotate-90 active:scale-95"
+              aria-label="Cerrar"
+            >
+              ×
+            </button>
+          )}
         {/* Overlay rosa */}
         <div className="absolute inset-0 bg-secundary opacity-25 rounded-2xl z-10 pointer-events-none"></div>
         <div className="relative z-20 w-full flex flex-col items-center">
@@ -186,7 +198,13 @@ function LoginC() {
           ) : (
             <>
               No tienes cuenta?
-              <a href="/register" className="text-primary hover:underline"> Regístrate aquí</a>
+              <button
+                type="button"
+                className="text-primary hover:underline ml-1"
+                onClick={onShowRegister}
+              >
+                Regístrate aquí
+              </button>
             </>
           )}
         </p>

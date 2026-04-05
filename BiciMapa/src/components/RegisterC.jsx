@@ -3,7 +3,7 @@ import { registerUser, loginUser } from "../services/auth.service";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import ButtonPink from "./ButtonPink";
 
-function RegisterC() {
+function RegisterC({ onClose, onShowLogin, onAuthSuccess }) {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -45,6 +45,7 @@ function RegisterC() {
     } else {
       setMensaje("Registro exitoso");
       setTipoMensaje("success");
+      if (onAuthSuccess) onAuthSuccess();
     }
   };
 
@@ -54,6 +55,19 @@ function RegisterC() {
         className="relative flex items-center flex-col w-80 md:w-[650px] lg:w-[650px] md:h-[680px] lg:h-[700px] h-[680px] rounded-2xl shadow-lg bg-cover bg-center"
         style={{ backgroundImage: "url('/Fondos/Login.jpeg')" }}
       >
+          {/* Botón de cerrar modal */}
+          {/* NOTA AL CERRAR EL MODAL QUE SE MUESTRE EL PERFIL */}
+          {onClose && (
+            <button
+              onClick={onClose}
+              className="absolute top-2 right-3 text-primary
+              text-3xl font-bold z-30 transition-transform 
+              duration-200 hover:scale-125 hover:rotate-90 active:scale-95"
+              aria-label="Cerrar"
+            >
+              ×
+            </button>
+          )}
         {/* Overlay rosa */}
         <div className="absolute inset-0 bg-secundary opacity-25 rounded-2xl z-10 pointer-events-none"></div>
         <div className="relative z-20 w-full flex flex-col items-center">
