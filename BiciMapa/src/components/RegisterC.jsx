@@ -3,7 +3,7 @@ import { registerUser, loginUser } from "../services/auth.service";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import ButtonPink from "./ButtonPink";
 
-function RegisterC({ onClose, onShowLogin, onAuthSuccess }) {
+function RegisterC({ onClose,  onAuthSuccess }) {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -50,9 +50,10 @@ function RegisterC({ onClose, onShowLogin, onAuthSuccess }) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-transparent">
+    <div className="  flex items-center justify-center bg-transparent">
       <div
-        className="relative flex items-center flex-col w-80 md:w-[650px] lg:w-[650px] md:h-[680px] lg:h-[700px] h-[680px] rounded-2xl shadow-lg bg-cover bg-center"
+        className="relative  flex items-center flex-col w-80 md:w-[650px] lg:w-[650px]  md:h-[680px] 
+        lg:h-[700px] h-[650px] rounded-2xl shadow-lg bg-cover bg-center"
         style={{ backgroundImage: "url('/Fondos/Login.jpeg')" }}
       >
           {/* Botón de cerrar modal */}
@@ -131,7 +132,7 @@ function RegisterC({ onClose, onShowLogin, onAuthSuccess }) {
               Mínimo 8 caracteres, una mayúscula, un número y un símbolo.
             </span>
           </div>
-          <div className="mt-2 w-full flex flex-col justify-start pl-6 px-5">
+          <div className="-mt-5 w-full flex flex-col justify-start pl-6 px-5">
             <ButtonPink texto="Iniciar sesión" onClick={handleRegister} />
             {mensaje && (
               <div className={`mt-1 px-3 py-2 rounded text-sm text-center font-semibold 
