@@ -17,7 +17,7 @@ export default function Navbar({ onPerfilClick, isLoggedIn }) {
 
   return (
     <div className="fixed bottom-4 left-0 right-0 flex justify-center z-50 ">
-      <div className="relative bg-[#AC687D] rounded-2xl px-6  py-3 flex gap-8 shadow-lg min-w-[320px]">
+      <div className="relative bg-[#AC687D] rounded-2xl px-4  py-3 flex gap-8 shadow-lg min-w-[320px]">
         {/* Floating active circle animada */}
         <div
           className="absolute -top-5 transition-all duration-300"

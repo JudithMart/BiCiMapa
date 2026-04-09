@@ -1,55 +1,83 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 import { createRoot } from "react-dom/client";
-import { LuToilet } from "react-icons/lu";
 import { MdDirectionsBike } from "react-icons/md";
+
+
+import { placeTypes } from "../config/placeTypes";
+import { getPlaces } from "../services/lugar.service";
 
 function MapView() {
   const mapRef = useRef(null);
   const mapContainerRef = useRef(null);
+  const [places, setPlaces] = useState([]);
+  const markersRef = useRef([]);
 
-  const locations = [
-    { lng: -101.195, lat: 19.7045 },
-    { lng: -101.19, lat: 19.7 },
-  ];
+  //PRUEBAS
+  // const locations = [
+  //   { lng: -101.195, lat: 19.7045 },
+  //   { lng: -101.19, lat: 19.7 },
+  // ];
 
   const allende = {
     name: "Allende 527",
     lng: -101.19633730177365,
     lat: 19.701918925746046,
   };
- 
 
-  const bathrooms = [
-    {
-      name: "Baños Públicos Pintor",
-      lng: -101.1935,
-      lat: 19.7038,
-    },
-    {
-      name: "Baños Antonio Alzate",
-      lng: -101.1927,
-      lat: 19.7042,
-    },
-    {
-      name: "Baños Mercado Revolución",
-      lng: -101.192,
-      lat: 19.7029,
-    },
-    {
-      name: "Baños Nicolás Bravo",
-      lng: -101.1942,
-      lat: 19.7051,
-    },
-    {
-      name: "Baños DIF Centro",
-      lng: -101.1939,
-      lat: 19.7049,
-    },
-  ];
+  //PRUEBAS
+  // const bathrooms = [
+  //   {
+  //     name: "Baños Públicos Pintor",
+  //     lng: -101.1935,
+  //     lat: 19.7038,
+  //   },
+  //   {
+  //     name: "Baños Antonio Alzate",
+  //     lng: -101.1927,
+  //     lat: 19.7042,
+  //   },
+  //   {
+  //     name: "Baños Mercado Revolución",
+  //     lng: -101.192,
+  //     lat: 19.7029,
+  //   },
+  //   {
+  //     name: "Baños Nicolás Bravo",
+  //     lng: -101.1942,
+  //     lat: 19.7051,
+  //   },
+  //   {
+  //     name: "Baños DIF Centro",
+  //     lng: -101.1939,
+  //     lat: 19.7049,
+  //   },
+  // ];
 
+  useEffect(() => {
+  const fetchPlaces = async () => {
+    const { places, error } = await getPlaces();
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    setPlaces(places);
+  };
+
+  fetchPlaces();
+}, []);
+
+ const getIcon = (type) => {
+  const Icon = placeTypes[type]?.icon;
+
+  if (!Icon) return <span>📍</span>; 
+
+  return <Icon />;
+};
   useEffect(() => {
     if (mapRef.current) return; // evita múltiples inicializaciones
 
@@ -57,81 +85,103 @@ function MapView() {
 
     const map = new mapboxgl.Map({
       container: mapContainerRef.current,
-      //   style: "mapbox://styles/mapbox/light-v11",
+      style: "mapbox://styles/jud16/cmnqlc1g0002201s8hxbi02wb",
       center: [-101.195, 19.7045], // Morelia
       zoom: 17,
     });
 
     mapRef.current = map;
 
-    //Por cada ubicación, crea un marcador
-    locations.forEach((loc) => {
-      const el = document.createElement("div");
-      el.className =
-        "w-6 h-6 bg-[#B57A86] rounded-full border-2 border-white shadow-md";
-      new mapboxgl.Marker(el)
-        .setLngLat([loc.lng, loc.lat])
-        .addTo(mapRef.current);
-    });
+    //Por cada ubicación, crea un marcador con el icono de café prueba
+    // locations.forEach((loc) => {
+    //   const el = document.createElement("div");
+    //   const root = createRoot(el);
+    //   root.render(
+    //     // <img className="w-8 h-10 flex items-center justify-center" src="/Ubicaciones/Cafe.png" alt="BiCita"></img>
+    //     <div className="text-[#B57A86] text-2xl bg-white rounded-full p-1 shadow-md flex items-center justify-center w-8 h-8">
+    //       <GiCoffeeCup />
+    //     </div>,
+    //     // text-[#6F4E37]
+    //   );
+    //   new mapboxgl.Marker(el)
+    //     .setLngLat([loc.lng, loc.lat])
+    //     .addTo(mapRef.current);
+    // });
 
-    // Por cada baño, crea un marcador personalizado
-    bathrooms.forEach((place) => {
-      const el = document.createElement("div");
 
-      const root = createRoot(el);
-      root.render(
-        <div className="text-[#B57A86] text-xl bg-white rounded-full p-1 shadow-md">
-          <LuToilet />
-        </div>,
-      );
 
-      new mapboxgl.Marker(el)
-        .setLngLat([place.lng, place.lat])
-        .addTo(mapRef.current);
-    });
+    // Por cada baño, crea un marcador personalizado PRUEBAS
+    // bathrooms.forEach((place) => {
+    //   const el = document.createElement("div");
 
-    // Obtener ubicación del usuario y marcarla
+    //   const root = createRoot(el);
+    //   root.render(
+    //     <div className="text-[#B57A86] text-xl bg-white rounded-full p-1 shadow-md">
+    //       <LuToilet />
+    //     </div>,
+    //   );
 
-    navigator.geolocation.getCurrentPosition((position) => {
-      const { latitude, longitude } = position.coords;
+    //   new mapboxgl.Marker(el)
+    //     .setLngLat([place.lng, place.lat])
+    //     .addTo(mapRef.current);
+    // });
 
-      const el = document.createElement("div");
+    // Solicitar permiso de ubicación al usuario solo una vez por sesión
+    if (
+      navigator.geolocation &&
+      !sessionStorage.getItem("ubicacionSolicitada")
+    ) {
+      sessionStorage.setItem("ubicacionSolicitada", "true");
+      if (
+        window.confirm(
+          "¿Permites que la aplicación acceda a tu ubicación para mostrarte en el mapa?",
+        )
+      ) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const { latitude, longitude } = position.coords;
 
-      const root = createRoot(el);
-      root.render(
-        <div className="text-white text-lg bg-[#B57A86] rounded-full p-2 shadow-lg">
-          <MdDirectionsBike />
-        </div>,
-      );
+            const el = document.createElement("div");
+            const root = createRoot(el);
+            root.render(
+              <>
+                <div className="absolute w-8 h-8 bg-[#B57A86] rounded-full animate-pulse"></div>
+                <div className="text-white text-lg bg-[#B57A86] rounded-full p-2 shadow-lg ">
+                  <MdDirectionsBike />
+                </div>
+              </>,
+            );
 
-      new mapboxgl.Marker(el)
-        .setLngLat([longitude, latitude])
-        .addTo(mapRef.current);
+            new mapboxgl.Marker(el)
+              .setLngLat([longitude, latitude])
+              .addTo(mapRef.current);
 
-      //  centrar mapa
-      mapRef.current.flyTo({
-        center: [longitude, latitude],
-        zoom: 17,
-      });
-    });
+            //  centrar mapa
+            mapRef.current.flyTo({
+              center: [longitude, latitude],
+              zoom: 17,
+            });
+          },
+          (error) => {
+            alert("No se pudo obtener la ubicación: " + error.message);
+          },
+        );
+      }
+    }
 
-    // Ocultar POIs para un mapa más limpio
+
     map.on("load", () => {
-      const layers = map.getStyle().layers;
-
-      layers.forEach((layer) => {
-        if (layer.type === "symbol" && !layer.id.includes("road")) {
-          map.setLayoutProperty(layer.id, "visibility", "none");
-        }
-      });
-
       //BiCitas
       const el = document.createElement("div");
       const root = createRoot(el);
 
       root.render(
-        <div className="bg-[#B57A86] text-white text-sm px-2 py-1 rounded-full shadow-md">
-          🚲
+        <div className="relative  ">
+          <img
+            className="w-8 h-10 flex items-center justify-center animate-soft-bounce"
+            src="/Logos/Ubicación-logo.png"
+            alt="BiCita"
+          ></img>
         </div>,
       );
 
@@ -146,8 +196,37 @@ function MapView() {
     };
   }, []);
 
+useEffect(() => {
+  if (!mapRef.current) return;
+
+  markersRef.current.forEach((marker) => marker.remove());
+  markersRef.current = [];
+
+ 
+  places.forEach((place) => {
+    const el = document.createElement("div");
+    const root = createRoot(el);
+    root.render(
+      <div
+        className={`w-8 h-8 rounded-full flex items-center justify-center shadow-md ${
+          place.es_convenio
+            ? "bg-[#B57A86] text-white"
+            : "bg-white text-[#B57A86] border"
+        }`}
+      >
+          {getIcon(place.id_tipo)}
+      </div>
+    );
+
+    const marker = new mapboxgl.Marker(el)
+      .setLngLat([place.longitud, place.latitud])
+      .addTo(mapRef.current);
+
+    markersRef.current.push(marker);
+  });
+}, [places]);
+
   return <div ref={mapContainerRef} className="w-full h-[100dvh]" />;
 }
 
 export default MapView;
-
