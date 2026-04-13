@@ -5,7 +5,6 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import { createRoot } from "react-dom/client";
 import { MdDirectionsBike } from "react-icons/md";
 
-
 import { placeTypes } from "../config/placeTypes";
 import { getPlaces } from "../services/lugar.service";
 
@@ -57,27 +56,27 @@ function MapView() {
   // ];
 
   useEffect(() => {
-  const fetchPlaces = async () => {
-    const { places, error } = await getPlaces();
+    const fetchPlaces = async () => {
+      const { places, error } = await getPlaces();
 
-    if (error) {
-      console.error(error);
-      return;
-    }
+      if (error) {
+        console.error(error);
+        return;
+      }
 
-    setPlaces(places);
+      setPlaces(places);
+    };
+
+    fetchPlaces();
+  }, []);
+
+  const getIcon = (type) => {
+    const Icon = placeTypes[type]?.icon;
+
+    if (!Icon) return <span>📍</span>;
+
+    return <Icon />;
   };
-
-  fetchPlaces();
-}, []);
-
- const getIcon = (type) => {
-  const Icon = placeTypes[type]?.icon;
-
-  if (!Icon) return <span>📍</span>; 
-
-  return <Icon />;
-};
   useEffect(() => {
     if (mapRef.current) return; // evita múltiples inicializaciones
 
@@ -85,7 +84,7 @@ function MapView() {
 
     const map = new mapboxgl.Map({
       container: mapContainerRef.current,
-      style: "mapbox://styles/jud16/cmnqlc1g0002201s8hxbi02wb",
+      style: import.meta.env.VITE_MAPBOX_STYLE,
       center: [-101.195, 19.7045], // Morelia
       zoom: 17,
     });
@@ -107,8 +106,6 @@ function MapView() {
     //     .setLngLat([loc.lng, loc.lat])
     //     .addTo(mapRef.current);
     // });
-
-
 
     // Por cada baño, crea un marcador personalizado PRUEBAS
     // bathrooms.forEach((place) => {
@@ -145,6 +142,7 @@ function MapView() {
             const root = createRoot(el);
             root.render(
               <>
+                {/* Ubicación del usuario */}
                 <div className="absolute w-8 h-8 bg-[#B57A86] rounded-full animate-pulse"></div>
                 <div className="text-white text-lg bg-[#B57A86] rounded-full p-2 shadow-lg ">
                   <MdDirectionsBike />
@@ -169,14 +167,13 @@ function MapView() {
       }
     }
 
-
     map.on("load", () => {
-      //BiCitas
       const el = document.createElement("div");
       const root = createRoot(el);
 
       root.render(
         <div className="relative  ">
+          {/* Ubicación BiCitas */}
           <img
             className="w-8 h-10 flex items-center justify-center animate-soft-bounce"
             src="/Logos/Ubicación-logo.png"
@@ -196,35 +193,56 @@ function MapView() {
     };
   }, []);
 
-useEffect(() => {
-  if (!mapRef.current) return;
+  useEffect(() => {
+    if (!mapRef.current) return;
 
-  markersRef.current.forEach((marker) => marker.remove());
-  markersRef.current = [];
+    markersRef.current.forEach((marker) => marker.remove());
+    markersRef.current = [];
 
- 
-  places.forEach((place) => {
-    const el = document.createElement("div");
-    const root = createRoot(el);
-    root.render(
-      <div
-        className={`w-8 h-8 rounded-full flex items-center justify-center shadow-md ${
-          place.es_convenio
-            ? "bg-[#B57A86] text-white"
-            : "bg-white text-[#B57A86] border"
-        }`}
-      >
-          {getIcon(place.id_tipo)}
-      </div>
-    );
+    places.forEach((place) => {
+      const el = document.createElement("div");
+      const root = createRoot(el);
+      root.render(
+        <div className="flex flex-col items-center">
+          <div
+            className={` rounded-full flex items-center justify-center${place.es_convenio ? " shadow-md w-7 h-7" : "w-11 h-11"}`}
+            style={
+              place.es_convenio
+                ? {
+                    backgroundColor: place.tipo?.color_hex,
+                    color: "#fff",
+                    border: `1px solid ${place.tipo?.color_hex}`,
+                  }
+                : {
+                    backgroundColor: "",
+                    color: place.tipo?.color_hex,
+                    border: "none",
+                  }
+            }
+          >
+            {getIcon(place.id_tipo)}
+          </div>
+          {place.es_convenio && (
+            <span
+              className="text-[8px] mt-[3px] px-2 py-[2px] rounded-full font-extralight shadow-sm whitespace-nowrap"
+              style={{
+                backgroundColor: "#fff",
+                color: place.tipo?.color_hex,
+              }}
+            >
+              {place.nombre}
+            </span>
+          )}
+        </div>
+      );
 
-    const marker = new mapboxgl.Marker(el)
-      .setLngLat([place.longitud, place.latitud])
-      .addTo(mapRef.current);
+      const marker = new mapboxgl.Marker(el)
+        .setLngLat([place.longitud, place.latitud])
+        .addTo(mapRef.current);
 
-    markersRef.current.push(marker);
-  });
-}, [places]);
+      markersRef.current.push(marker);
+    });
+  }, [places]);
 
   return <div ref={mapContainerRef} className="w-full h-[100dvh]" />;
 }

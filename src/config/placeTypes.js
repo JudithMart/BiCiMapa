@@ -1,4 +1,4 @@
-import { GiCoffeeCup,GiKnifeFork } from "react-icons/fa";
+import { GiCoffeeCup, GiKnifeFork } from "react-icons/gi";
 import { LuToilet } from "react-icons/lu";
 import { GiDutchBike } from "react-icons/gi";
 

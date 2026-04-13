@@ -31,7 +31,8 @@ export const addPlace = async (
 };
 
 export const getPlaces = async () => {
-  const { data, error } = await supabase.from('lugar').select('*');
+  const { data, error } = await supabase.from('lugar').select('*, tipo(*)');
+   console.log('lugares:', { data, error });
   return { places: data, error };
 };
 
