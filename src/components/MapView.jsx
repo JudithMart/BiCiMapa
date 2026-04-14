@@ -202,7 +202,9 @@ function MapView() {
     places.forEach((place) => {
       const el = document.createElement("div");
       const root = createRoot(el);
+    {/* Iconos por tipo */}
       root.render(
+      
         <div className="flex flex-col items-center">
           <div
             className={` rounded-full flex items-center justify-center${place.es_convenio ? " shadow-md w-7 h-7" : "w-11 h-11"}`}
