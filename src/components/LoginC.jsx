@@ -138,7 +138,7 @@ function LoginC({ onClose, onShowRegister, onAuthSuccess }) {
     <div className="min-h-screen flex items-center justify-center bg-transparent">
       <div
         className="relative flex items-center flex-col w-80 md:w-[650px] md:h-[600px] lg:h-[600px] lg:w-[650px] h-[550px] rounded-2xl shadow-lg bg-cover bg-center"
-        style={{ backgroundImage: "url('/Fondos/Login.jpeg')" }}
+        style={{ backgroundImage: "url('/Fondos/FondoBicis.jpeg')" }}
       >
         {/* Botón de cerrar modal */}
         {onClose && (
@@ -213,6 +213,7 @@ function LoginC({ onClose, onShowRegister, onAuthSuccess }) {
           <div className="mt-5 w-full flex flex-col justify-start pl-6 px-5">
             <ButtonPink
               texto="Iniciar sesión"
+              px="px-4"
               onClick={handleLogin}
               disabled={bloqueado}
             />

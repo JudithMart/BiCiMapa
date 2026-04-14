@@ -54,7 +54,7 @@ function RegisterC({ onClose,  onAuthSuccess }) {
       <div
         className="relative  flex items-center flex-col w-80 md:w-[650px] lg:w-[650px]  md:h-[680px] 
         lg:h-[700px] h-[650px] rounded-2xl shadow-lg bg-cover bg-center"
-        style={{ backgroundImage: "url('/Fondos/Login.jpeg')" }}
+        style={{ backgroundImage: "url('/Fondos/FondoBicis.jpeg')" }}
       >
           {/* Botón de cerrar modal */}
           {/* NOTA AL CERRAR EL MODAL QUE SE MUESTRE EL PERFIL */}
@@ -133,7 +133,7 @@ function RegisterC({ onClose,  onAuthSuccess }) {
             </span>
           </div>
           <div className="-mt-5 w-full flex flex-col justify-start pl-6 px-5">
-            <ButtonPink texto="Iniciar sesión" onClick={handleRegister} />
+            <ButtonPink px="px-4" texto="Iniciar sesión" onClick={handleRegister} />
             {mensaje && (
               <div className={`mt-1 px-3 py-2 rounded text-sm text-center font-semibold 
                 ${tipoMensaje === 'error' ? 'bg-red-100 text-red-700 border border-red-300' : ''}

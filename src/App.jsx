@@ -4,7 +4,7 @@ import "./App.css";
 import Navbar from "./components/Navbar";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import Profile from "./components/Profile";
+import Profile from "./components/ProfileC";
 import MapView from "./components/MapView";
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";

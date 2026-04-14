@@ -7,12 +7,15 @@ import { MdDirectionsBike } from "react-icons/md";
 
 import { placeTypes } from "../config/placeTypes";
 import { getPlaces } from "../services/lugar.service";
+import Card from "./Card";
 
 function MapView() {
   const mapRef = useRef(null);
   const mapContainerRef = useRef(null);
   const [places, setPlaces] = useState([]);
   const markersRef = useRef([]);
+
+  const [selectedPlace, setSelectedPlace] = useState(null);
 
   //PRUEBAS
   // const locations = [
@@ -202,40 +205,43 @@ function MapView() {
     places.forEach((place) => {
       const el = document.createElement("div");
       const root = createRoot(el);
-    {/* Iconos por tipo */}
+      {
+        /* Iconos por tipo */
+      }
       root.render(
-      
-        <div className="flex flex-col items-center">
-          <div
-            className={` rounded-full flex items-center justify-center${place.es_convenio ? " shadow-md w-7 h-7" : "w-11 h-11"}`}
-            style={
-              place.es_convenio
-                ? {
-                    backgroundColor: place.tipo?.color_hex,
-                    color: "#fff",
-                    border: `1px solid ${place.tipo?.color_hex}`,
-                  }
-                : {
-                    backgroundColor: "",
-                    color: place.tipo?.color_hex,
-                    border: "none",
-                  }
-            }
-          >
-            {getIcon(place.id_tipo)}
-          </div>
-          {place.es_convenio && (
-            <span
-              className="text-[8px] mt-[3px] px-2 py-[2px] rounded-full font-extralight shadow-sm whitespace-nowrap"
-              style={{
-                backgroundColor: "#fff",
-                color: place.tipo?.color_hex,
-              }}
+        <button onClick={() => setSelectedPlace(place)}>
+          <div className="flex flex-col items-center">
+            <div
+              className={`  flex items-center justify-center${place.es_convenio ? " shadow-md w-7 h-7 rounded-full" : "text-2xl"}`}
+              style={
+                place.es_convenio
+                  ? {
+                      backgroundColor: place.tipo?.color_hex,
+                      color: "#fff",
+                      border: `1px solid ${place.tipo?.color_hex}`,
+                    }
+                  : {
+                      backgroundColor: "",
+                      color: place.tipo?.color_hex,
+                      border: "none",
+                    }
+              }
             >
-              {place.nombre}
-            </span>
-          )}
-        </div>
+              {getIcon(place.id_tipo)}
+            </div>
+            {place.es_convenio && (
+              <span
+                className="text-[8px] mt-[3px] px-2 py-[2px] rounded-full font-extralight shadow-sm whitespace-nowrap"
+                style={{
+                  backgroundColor: "#fff",
+                  color: place.tipo?.color_hex,
+                }}
+              >
+                {place.nombre}
+              </span>
+            )}
+          </div>
+        </button>,
       );
 
       const marker = new mapboxgl.Marker(el)
@@ -246,7 +252,32 @@ function MapView() {
     });
   }, [places]);
 
-  return <div ref={mapContainerRef} className="w-full h-[100dvh]" />;
+  return (
+    <>
+      {/* MAPA */}
+      <div ref={mapContainerRef} className="w-full h-[100dvh]" />
+
+      {/* CARD OVERLAY */}
+      {selectedPlace && (
+        <div className="fixed bottom-28 left-0 right-0 z-50 flex justify-center px-4 animate-slide-up">
+          <Card
+            image={selectedPlace.imagen_url}
+            title={selectedPlace.nombre}
+            slogan={selectedPlace.slogan}
+            description={selectedPlace.descripcion}
+            tipo={selectedPlace.tipo?.nombre}
+            direction={selectedPlace.direccion}
+            promotion={
+              selectedPlace.promocion?.length
+                ? selectedPlace.promocion[0].descripcion
+                : null
+            }
+            onClose={() => setSelectedPlace(null)}
+          />
+        </div>
+      )}
+    </>
+  );
 }
 
 export default MapView;
