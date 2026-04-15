@@ -18,6 +18,7 @@ function MapView() {
   const userLocationRef = useRef(null);
 
   const [selectedPlace, setSelectedPlace] = useState(null);
+  const userMarkerRef = useRef(null);
 
   //PRUEBAS
   // const locations = [
@@ -185,48 +186,58 @@ function MapView() {
     // });
 
     // Solicitar permiso de ubicación al usuario solo una vez por sesión
-    if (
-      navigator.geolocation &&
-      !sessionStorage.getItem("ubicacionSolicitada")
-    ) {
-      sessionStorage.setItem("ubicacionSolicitada", "true");
-      if (
-        window.confirm(
-          "¿Permites que la aplicación acceda a tu ubicación para mostrarte en el mapa?",
-        )
-      ) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            const { latitude, longitude } = position.coords;
 
+    let watchId;
+
+    if (navigator.geolocation) {
+      watchId = navigator.geolocation.watchPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+
+          userLocationRef.current = [longitude, latitude];
+
+          // Si ya existe marcador → solo lo movemos
+          if (userMarkerRef.current) {
+            userMarkerRef.current.setLngLat([longitude, latitude]);
+          } else {
+            // Crear marcador solo una vez
             const el = document.createElement("div");
-            userLocationRef.current = [longitude, latitude];
             const root = createRoot(el);
+
             root.render(
               <>
-                {/* Ubicación del usuario */}
                 <div className="absolute w-8 h-8 bg-[#B57A86] rounded-full animate-pulse"></div>
-                <div className="text-white text-lg bg-[#B57A86] rounded-full p-2 shadow-lg ">
+                <div className="text-white text-lg bg-[#B57A86] rounded-full p-2 shadow-lg">
                   <MdDirectionsBike />
                 </div>
               </>,
             );
 
-            new mapboxgl.Marker(el)
+            userMarkerRef.current = new mapboxgl.Marker(el)
               .setLngLat([longitude, latitude])
               .addTo(mapRef.current);
-
-            //  centrar mapa
-            mapRef.current.flyTo({
+          }
+          const prev = userLocationRef.current;
+          if (
+            !prev ||
+            Math.abs(prev[0] - longitude) > 0.0001 ||
+            Math.abs(prev[1] - latitude) > 0.0001
+          ) {
+            mapRef.current.easeTo({
               center: [longitude, latitude],
-              zoom: 17,
+              duration: 1000,
             });
-          },
-          (error) => {
-            alert("No se pudo obtener la ubicación: " + error.message);
-          },
-        );
-      }
+          }
+        },
+        (error) => {
+          console.error("Error ubicación:", error);
+        },
+        {
+          enableHighAccuracy: true,
+          maximumAge: 0,
+          timeout: 5000,
+        },
+      );
     }
 
     map.on("load", () => {
@@ -250,6 +261,7 @@ function MapView() {
     });
 
     return () => {
+      if (watchId) navigator.geolocation.clearWatch(watchId);
       map.remove();
       mapRef.current = null;
     };
