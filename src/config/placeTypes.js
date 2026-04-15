@@ -8,12 +8,12 @@ export const placeTypes = {
     label: "Café",
   },
   2: {
-    icon: GiKnifeFork,
-    label: "Comida",
-  },
-  3: {
     icon: LuToilet,
     label: "Baño",
+  },
+  3: {
+    icon: GiKnifeFork,
+    label: "Comida",
   },
   4: {
     icon: GiDutchBike,

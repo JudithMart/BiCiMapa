@@ -4,6 +4,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 
 import { createRoot } from "react-dom/client";
 import { MdDirectionsBike } from "react-icons/md";
+import { GiDutchBike } from "react-icons/gi";
 
 import { placeTypes } from "../config/placeTypes";
 import { getPlaces } from "../services/lugar.service";
@@ -14,6 +15,7 @@ function MapView() {
   const mapContainerRef = useRef(null);
   const [places, setPlaces] = useState([]);
   const markersRef = useRef([]);
+  const userLocationRef = useRef(null);
 
   const [selectedPlace, setSelectedPlace] = useState(null);
 
@@ -58,6 +60,62 @@ function MapView() {
   //   },
   // ];
 
+  //Funcion para trazar ruta
+  const drawRoute = async (place) => {
+    if (!userLocationRef.current) {
+      alert("Ubicación no disponible");
+      return;
+    }
+
+    const start = userLocationRef.current;
+    const end = [place.longitud, place.latitud];
+
+    const url = `https://api.mapbox.com/directions/v5/mapbox/cycling/${start.join(",")};${end.join(",")}?geometries=geojson&access_token=${mapboxgl.accessToken}`;
+
+    const res = await fetch(url);
+    const data = await res.json();
+
+    const route = data.routes[0].geometry;
+
+    // Si ya existe una ruta, eliminarla
+    if (mapRef.current.getSource("route")) {
+      mapRef.current.removeLayer("route");
+      mapRef.current.removeSource("route");
+    }
+
+    // Agregar ruta
+    mapRef.current.addSource("route", {
+      type: "geojson",
+      data: {
+        type: "Feature",
+        geometry: route,
+      },
+    });
+
+    mapRef.current.addLayer({
+      id: "route",
+      type: "line",
+      source: "route",
+      layout: {
+        "line-join": "round",
+        "line-cap": "round",
+      },
+      paint: {
+        "line-color": place.tipo?.color_hex || "#B57A86",
+        "line-width": 4,
+        "line-opacity": 0.8,
+      },
+    });
+
+    // Ajustar vista
+    const bounds = new mapboxgl.LngLatBounds();
+    route.coordinates.forEach((coord) => bounds.extend(coord));
+
+    mapRef.current.fitBounds(bounds, {
+      padding: 80,
+    });
+  };
+
   useEffect(() => {
     const fetchPlaces = async () => {
       const { places, error } = await getPlaces();
@@ -88,8 +146,8 @@ function MapView() {
     const map = new mapboxgl.Map({
       container: mapContainerRef.current,
       style: import.meta.env.VITE_MAPBOX_STYLE,
-      center: [-101.195, 19.7045], // Morelia
-      zoom: 17,
+      center: allende, // Morelia
+      zoom: 16,
     });
 
     mapRef.current = map;
@@ -142,6 +200,7 @@ function MapView() {
             const { latitude, longitude } = position.coords;
 
             const el = document.createElement("div");
+            userLocationRef.current = [longitude, latitude];
             const root = createRoot(el);
             root.render(
               <>
@@ -210,28 +269,44 @@ function MapView() {
       }
       root.render(
         <button onClick={() => setSelectedPlace(place)}>
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center transition-all duration-200">
+            {/* CÍRCULO PRINCIPAL */}
             <div
-              className={`  flex items-center justify-center${place.es_convenio ? " shadow-md w-7 h-7 rounded-full" : "text-2xl"}`}
-              style={
-                place.es_convenio
-                  ? {
-                      backgroundColor: place.tipo?.color_hex,
-                      color: "#fff",
-                      border: `1px solid ${place.tipo?.color_hex}`,
-                    }
-                  : {
-                      backgroundColor: "",
-                      color: place.tipo?.color_hex,
-                      border: "none",
-                    }
-              }
+              className={`relative flex items-center justify-center rounded-full ${
+                place.es_convenio ? "w-9 h-9 shadow-md" : "w-7 h-7 opacity-80"
+              }`}
+              style={{
+                backgroundColor: place.es_convenio
+                  ? place.tipo?.color_hex
+                  : "#fff",
+                color: place.es_convenio ? "#fff" : place.tipo?.color_hex,
+                border: `1px solid ${place.tipo?.color_hex}40`, // más sutil en no convenio
+              }}
             >
               {getIcon(place.id_tipo)}
+
+              {/*  SOLO CONVENIO */}
+              {place.es_convenio && (
+                <span className="absolute font-semibold -top-1 -right-1 text-[12px] bg-white text-[#B57A86] rounded-full px-1 shadow-sm">
+                  <GiDutchBike />
+                </span>
+              )}
             </div>
+
+            {/* PUNTA TIPO PIN */}
+            <div
+              className={`rotate-45 -mt-1 ${
+                place.es_convenio ? "w-2 h-2" : "w-1.5 h-1.5 opacity-60"
+              }`}
+              style={{
+                backgroundColor: place.tipo?.color_hex,
+              }}
+            />
+
+            {/* NOMBRE SOLO PARA CONVENIO */}
             {place.es_convenio && (
               <span
-                className="text-[8px] mt-[3px] px-2 py-[2px] rounded-full font-extralight shadow-sm whitespace-nowrap"
+                className="text-[9px] mt-[3px] px-2 py-[1px] rounded-full shadow-sm whitespace-nowrap"
                 style={{
                   backgroundColor: "#fff",
                   color: place.tipo?.color_hex,
@@ -256,6 +331,8 @@ function MapView() {
     <>
       {/* MAPA */}
       <div ref={mapContainerRef} className="w-full h-[100dvh]" />
+      {/* TEXTURA (overlay) */}
+      <div className="pointer-events-none absolute inset-0 bg-noise opacity-[100]" />
 
       {/* CARD OVERLAY */}
       {selectedPlace && (
@@ -273,6 +350,7 @@ function MapView() {
                 : null
             }
             onClose={() => setSelectedPlace(null)}
+            onRouteClick={() => drawRoute(selectedPlace)}
           />
         </div>
       )}

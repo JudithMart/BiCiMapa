@@ -75,3 +75,7 @@
 .animate-soft-bounce {
   animation: softBounce 2.5s ease-in-out infinite;
 }
+
+.bg-noise {
+  background-image: url('/noise.png'); /* textura sutil */
+}
