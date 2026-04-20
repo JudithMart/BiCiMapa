@@ -19,12 +19,69 @@ function MapView() {
 
   const [selectedPlace, setSelectedPlace] = useState(null);
   const userMarkerRef = useRef(null);
+  const routeCoordinatesRef = useRef(null);
 
-  //PRUEBAS
-  // const locations = [
-  //   { lng: -101.195, lat: 19.7045 },
-  //   { lng: -101.19, lat: 19.7 },
-  // ];
+  const lastRecalcRef = useRef(0);
+
+  const selectedPlaceRef = useRef(null);
+  useEffect(() => {
+    selectedPlaceRef.current = selectedPlace;
+  }, [selectedPlace]);
+
+  //------------
+  // Animación de rutas
+
+  let progress = 0;
+
+  const animateRoute = (coordinates, place) => {
+    const partialRoute = {
+      type: "Feature",
+      geometry: {
+        type: "LineString",
+        coordinates: [],
+      },
+    };
+
+    // Eliminar si ya existe
+    if (mapRef.current.getSource("route")) {
+      mapRef.current.removeLayer("route");
+      mapRef.current.removeSource("route");
+    }
+
+    mapRef.current.addSource("route", {
+      type: "geojson",
+      data: partialRoute,
+    });
+
+    mapRef.current.addLayer({
+      id: "route",
+      type: "line",
+      source: "route",
+      paint: {
+        "line-color": place.tipo?.color_hex || "#B57A86",
+        "line-width": 4,
+        "line-opacity": 0.8,
+      },
+    });
+
+    function step() {
+      if (progress < coordinates.length) {
+        partialRoute.geometry.coordinates.push(coordinates[progress]);
+
+        mapRef.current.getSource("route").setData(partialRoute);
+
+        progress++;
+        requestAnimationFrame(step);
+      }
+    }
+
+    step();
+  };
+
+  //------------
+
+  // Estado para minutos y km de la ruta
+  const [routeInfo, setRouteInfo] = useState({ minutes: null, km: null });
 
   const allende = {
     name: "Allende 527",
@@ -32,36 +89,8 @@ function MapView() {
     lat: 19.701918925746046,
   };
 
-  //PRUEBAS
-  // const bathrooms = [
-  //   {
-  //     name: "Baños Públicos Pintor",
-  //     lng: -101.1935,
-  //     lat: 19.7038,
-  //   },
-  //   {
-  //     name: "Baños Antonio Alzate",
-  //     lng: -101.1927,
-  //     lat: 19.7042,
-  //   },
-  //   {
-  //     name: "Baños Mercado Revolución",
-  //     lng: -101.192,
-  //     lat: 19.7029,
-  //   },
-  //   {
-  //     name: "Baños Nicolás Bravo",
-  //     lng: -101.1942,
-  //     lat: 19.7051,
-  //   },
-  //   {
-  //     name: "Baños DIF Centro",
-  //     lng: -101.1939,
-  //     lat: 19.7049,
-  //   },
-  // ];
-
-  //Funcion para trazar ruta
+  //------------
+  // Solo dibuja la ruta visual, no calcula minutos/km
   const drawRoute = async (place) => {
     if (!userLocationRef.current) {
       alert("Ubicación no disponible");
@@ -75,8 +104,12 @@ function MapView() {
 
     const res = await fetch(url);
     const data = await res.json();
-
     const route = data.routes[0].geometry;
+    routeCoordinatesRef.current = route.coordinates;
+
+    // ANIMACIÓN
+    progress = 0;
+    animateRoute(route.coordinates);
 
     // Si ya existe una ruta, eliminarla
     if (mapRef.current.getSource("route")) {
@@ -116,6 +149,51 @@ function MapView() {
       padding: 80,
     });
   };
+  //------------
+  //------------
+  // Función para detectar si el usuario se salió de la ruta (umbral de ~30m)
+  const isUserOffRoute = (userCoords) => {
+    if (!routeCoordinatesRef.current) return false;
+
+    const threshold = 0.0003; // ≈ 30 metros
+
+    return !routeCoordinatesRef.current.some((coord) => {
+      const distance = Math.sqrt(
+        Math.pow(coord[0] - userCoords[0], 2) +
+          Math.pow(coord[1] - userCoords[1], 2),
+      );
+      return distance < threshold;
+    });
+  };
+  //------------
+  //------------
+  // Calcular minutos/km automáticamente al abrir la Card
+  useEffect(() => {
+    const fetchRouteInfo = async () => {
+      if (!selectedPlace || !userLocationRef.current) {
+        setRouteInfo({ minutes: null, km: null });
+        return;
+      }
+      const start = userLocationRef.current;
+      const end = [selectedPlace.longitud, selectedPlace.latitud];
+      const url = `https://api.mapbox.com/directions/v5/mapbox/cycling/${start.join(",")};${end.join(",")}?geometries=geojson&access_token=${mapboxgl.accessToken}`;
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        const duration = data.routes[0].duration; // segundos
+        const distance = data.routes[0].distance; // metros
+        const minutes = Math.ceil(duration / 60);
+        const km = (distance / 1000).toFixed(2);
+        setRouteInfo({ minutes, km });
+      } catch (e) {
+        setRouteInfo({ minutes: null, km: null });
+      }
+    };
+    fetchRouteInfo();
+  }, [selectedPlace]);
+  //------------
+
+  //------------
 
   useEffect(() => {
     const fetchPlaces = async () => {
@@ -132,6 +210,9 @@ function MapView() {
     fetchPlaces();
   }, []);
 
+  //------------
+  //------------
+
   const getIcon = (type) => {
     const Icon = placeTypes[type]?.icon;
 
@@ -139,6 +220,8 @@ function MapView() {
 
     return <Icon />;
   };
+
+  //------------
   useEffect(() => {
     if (mapRef.current) return; // evita múltiples inicializaciones
 
@@ -153,61 +236,29 @@ function MapView() {
 
     mapRef.current = map;
 
-    //Por cada ubicación, crea un marcador con el icono de café prueba
-    // locations.forEach((loc) => {
-    //   const el = document.createElement("div");
-    //   const root = createRoot(el);
-    //   root.render(
-    //     // <img className="w-8 h-10 flex items-center justify-center" src="/Ubicaciones/Cafe.png" alt="BiCita"></img>
-    //     <div className="text-[#B57A86] text-2xl bg-white rounded-full p-1 shadow-md flex items-center justify-center w-8 h-8">
-    //       <GiCoffeeCup />
-    //     </div>,
-    //     // text-[#6F4E37]
-    //   );
-    //   new mapboxgl.Marker(el)
-    //     .setLngLat([loc.lng, loc.lat])
-    //     .addTo(mapRef.current);
-    // });
-
-    // Por cada baño, crea un marcador personalizado PRUEBAS
-    // bathrooms.forEach((place) => {
-    //   const el = document.createElement("div");
-
-    //   const root = createRoot(el);
-    //   root.render(
-    //     <div className="text-[#B57A86] text-xl bg-white rounded-full p-1 shadow-md">
-    //       <LuToilet />
-    //     </div>,
-    //   );
-
-    //   new mapboxgl.Marker(el)
-    //     .setLngLat([place.lng, place.lat])
-    //     .addTo(mapRef.current);
-    // });
-
-    // Solicitar permiso de ubicación al usuario solo una vez por sesión
-
     let watchId;
 
     if (navigator.geolocation) {
       watchId = navigator.geolocation.watchPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
+          const newCoords = [longitude, latitude];
 
-          userLocationRef.current = [longitude, latitude];
+          const prev = userLocationRef.current;
+          userLocationRef.current = newCoords;
 
           // Si ya existe marcador → solo lo movemos
           if (userMarkerRef.current) {
-            userMarkerRef.current.setLngLat([longitude, latitude]);
+            userMarkerRef.current.setLngLat(newCoords);
           } else {
             // Crear marcador solo una vez
             const el = document.createElement("div");
             const root = createRoot(el);
-
+            // Ubicación
             root.render(
               <>
-                <div className="absolute w-8 h-8 bg-[#B57A86] rounded-full animate-pulse"></div>
-                <div className="text-white text-lg bg-[#B57A86] rounded-full p-2 shadow-lg">
+                <div className="absolute w-7 h-7 bg-[#B57A86] rounded-full animate-pulse"></div>
+                <div className="text-white text-sm bg-[#B57A86] rounded-full p-2 shadow-lg">
                   <MdDirectionsBike />
                 </div>
               </>,
@@ -217,7 +268,22 @@ function MapView() {
               .setLngLat([longitude, latitude])
               .addTo(mapRef.current);
           }
-          const prev = userLocationRef.current;
+
+          if (routeCoordinatesRef.current && selectedPlaceRef.current) {
+            const offRoute = isUserOffRoute(newCoords);
+
+            if (offRoute) {
+              const now = Date.now();
+
+              if (now - lastRecalcRef.current > 5000) {
+                // 5 segundos
+                console.log("Recalculando ruta...");
+                drawRoute(selectedPlaceRef.current);
+                lastRecalcRef.current = now;
+              }
+            }
+          }
+          if (!mapRef.current) return;
           if (
             !prev ||
             Math.abs(prev[0] - longitude) > 0.0001 ||
@@ -225,7 +291,7 @@ function MapView() {
           ) {
             mapRef.current.easeTo({
               center: [longitude, latitude],
-              duration: 1000,
+              duration: 500,
             });
           }
         },
@@ -234,7 +300,7 @@ function MapView() {
         },
         {
           enableHighAccuracy: true,
-          maximumAge: 0,
+          maximumAge: 1000,
           timeout: 5000,
         },
       );
@@ -243,15 +309,14 @@ function MapView() {
     map.on("load", () => {
       const el = document.createElement("div");
       const root = createRoot(el);
-
+      // Ubicación BiCitas
       root.render(
-        <div className="relative  ">
-          {/* Ubicación BiCitas */}
+        <div className="marker-content w-8 h-10">
           <img
-            className="w-8 h-10 flex items-center justify-center animate-soft-bounce"
+            className="w-full h-full animate-soft-bounce"
             src="/Logos/Ubicación-logo.png"
             alt="BiCita"
-          ></img>
+          />
         </div>,
       );
 
@@ -267,32 +332,35 @@ function MapView() {
     };
   }, []);
 
+  //------------
+  //------------
+
   useEffect(() => {
     if (!mapRef.current) return;
 
     markersRef.current.forEach((marker) => marker.remove());
     markersRef.current = [];
 
+    // Crear marcadores de lugares
     places.forEach((place) => {
       const el = document.createElement("div");
       const root = createRoot(el);
-      {
-        /* Iconos por tipo */
-      }
       root.render(
         <button onClick={() => setSelectedPlace(place)}>
-          <div className="flex flex-col items-center transition-all duration-200">
+          <div className="flex flex-col items-center transition-all duration-200 marker-content">
             {/* CÍRCULO PRINCIPAL */}
             <div
               className={`relative flex items-center justify-center rounded-full ${
-                place.es_convenio ? "w-9 h-9 shadow-md" : "w-7 h-7 opacity-80"
+                place.es_convenio
+                  ? " w-8 h-8 shadow-md"
+                  : " 7 w-7 h-7 opacity-80"
               }`}
               style={{
                 backgroundColor: place.es_convenio
                   ? place.tipo?.color_hex
                   : "#fff",
                 color: place.es_convenio ? "#fff" : place.tipo?.color_hex,
-                border: `1px solid ${place.tipo?.color_hex}40`, // más sutil en no convenio
+                border: `1px solid ${place.tipo?.color_hex}40`,
               }}
             >
               {getIcon(place.id_tipo)}
@@ -337,7 +405,30 @@ function MapView() {
 
       markersRef.current.push(marker);
     });
+
+    // Función para actualizar el scale de todos los marcadores .marker-content
+    const updateAllMarkerScale = () => {
+      if (!mapRef.current) return;
+      const zoom = mapRef.current.getZoom();
+      const scale = Math.max(1, zoom / 12);
+      // Selecciona todos los marker-content (lugares y BiCitas)
+      const allMarkers = document.querySelectorAll(".marker-content");
+      allMarkers.forEach((content) => {
+        content.style.transform = `scale(${scale})`;
+        content.style.transformOrigin = "center";
+      });
+    };
+
+    mapRef.current.on("zoom", updateAllMarkerScale);
+    updateAllMarkerScale();
+
+    return () => {
+      if (mapRef.current) {
+        mapRef.current.off("zoom", updateAllMarkerScale);
+      }
+    };
   }, [places]);
+  //------------
 
   return (
     <>
@@ -363,6 +454,8 @@ function MapView() {
             }
             onClose={() => setSelectedPlace(null)}
             onRouteClick={() => drawRoute(selectedPlace)}
+            minutes={routeInfo.minutes}
+            km={routeInfo.km}
           />
         </div>
       )}

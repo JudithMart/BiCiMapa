@@ -17,6 +17,8 @@ function Card({
   cupon,
   onClose,
   onRouteClick,
+  minutes, 
+  km
 }) {
   const navigate = useNavigate();
 
@@ -57,8 +59,14 @@ function Card({
           {/* TIPO  */}
           <p className="text-gray-400 text-xs mt-2 tracking-wide">
             {tipo?.toUpperCase()}
+            
           </p>
-          {/* Tiempo */}
+          {/* TIEMPO */}
+            <p className="text-gray-400 text-xs mt-1 tracking-wide">
+            {minutes} minutos | {km} km
+            
+          </p>
+          
         </div>
       </div>
       {/* PUEDEN SER VARIAS PROMOCIONES  */}
