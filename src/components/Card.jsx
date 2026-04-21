@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 
 import { MdOutlineDiscount, MdOutlineDirections } from "react-icons/md";
+import { TbLock } from "react-icons/tb";
 import { Heart, Ticket } from "lucide-react";
 import ButtonPink from "./ButtonPink";
 import ButtonGray from "./ButtonGray";
@@ -17,8 +18,9 @@ function Card({
   cupon,
   onClose,
   onRouteClick,
-  minutes, 
-  km
+  minutes,
+  km,
+  es_premium,
 }) {
   const navigate = useNavigate();
 
@@ -59,26 +61,34 @@ function Card({
           {/* TIPO  */}
           <p className="text-gray-400 text-xs mt-2 tracking-wide">
             {tipo?.toUpperCase()}
-            
           </p>
           {/* TIEMPO */}
-            <p className="text-gray-400 text-xs mt-1 tracking-wide">
+          <p className="text-gray-400 text-xs mt-1 tracking-wide">
             {minutes} minutos | {km} km
-            
           </p>
-          
         </div>
       </div>
       {/* PUEDEN SER VARIAS PROMOCIONES  */}
+
       {promotion && (
-        <div className="z-10 flex gap-4 mt-5 px-4 py-1 rounded-xl  bg-secundary border-2 border-[#F6B4B7]">
+        <div className="relative z-10 flex gap-4 mt-5 px-4 py-1 rounded-xl bg-secundary border-2 border-[#F6B4B7]">
+          {/* Overlay solo sobre la promoción */}
+          {!es_premium && (
+            <div className="absolute inset-0 flex items-center justify-center z-20">
+            
+              <span className="flex gap-2 text-gray-200 text-xs bg-opacity-70 py-2 rounded-xl bg-black px-10 font-bold mb-1">
+                  <TbLock  className="text-[13px]"/>
+                Visita Bicitas para ver la promo
+              </span>
+            </div>
+          )}
           <div className=" flex mt-1 items-center justify-center rounded-full bg-primary/20  h-8 w-8">
             <span className="text-primary text-lg">
               <MdOutlineDiscount />
             </span>
           </div>
           <div className="flex flex-col ">
-            <p className="text-text font-normal text-base">{promotion}</p>
+            <p className="text-texto font-normal text-base">{promotion}</p>
             {/* LOGICA DEL TIEMPO */}
             <p className="text-gray-500 font-light text-[12px]">
               Tiempo: 3 días
@@ -86,11 +96,17 @@ function Card({
           </div>
         </div>
       )}
-      <div className="z-10  flex justify-between py-5  -mt-8 shadow-sm">
+      <div
+        className={`z-10 flex justify-between py-5 -mt-8 shadow-sm ${!es_premium ? "opacity-50 pointer-events-none" : ""}`}
+      >
         <ButtonGray
           texto={
             <span className="flex items-center gap-2">
-              <MdOutlineDirections className="w-5 h-5" />
+              {es_premium ? (
+                <MdOutlineDirections className="w-5 h-5" />
+              ) : (
+                <TbLock className="w-4 h-4 text-gray-400" />
+              )}
               Dirección
             </span>
           }
@@ -98,15 +114,17 @@ function Card({
           onClick={() => onRouteClick()}
         />
         <ButtonPink
-          //Abrir page de coupons
-
           texto={
             <span className="flex items-center gap-2">
-              <Ticket className="w-4 h-4" />
-               Cupón
+              {es_premium ? (
+                <Ticket className="w-4 h-4 text-white" />
+              ) : (
+                <TbLock className="w-4 h-4 text-white" />
+              )}
+              Promociones
             </span>
           }
-          px="px-11"
+          px="px-5"
           onClick={() => {
             const slug = title.toLowerCase().replace(/\s+/g, "-");
             navigate(`/lugar/${slug}/cupones`);

@@ -8,6 +8,7 @@ import { GiDutchBike } from "react-icons/gi";
 
 import { placeTypes } from "../config/placeTypes";
 import { getPlaces } from "../services/lugar.service";
+import { getCurrentUser } from "../services/auth.service";
 import Card from "./Card";
 
 function MapView() {
@@ -24,10 +25,18 @@ function MapView() {
   const lastRecalcRef = useRef(0);
 
   const selectedPlaceRef = useRef(null);
+  // Estado para el usuario
+  //--------
+  const [user, setUser] = useState(null);
+    // Obtener usuario solo una vez al montar
+    useEffect(() => {
+      const currentUser = getCurrentUser();
+      setUser(currentUser);
+    }, []);
   useEffect(() => {
     selectedPlaceRef.current = selectedPlace;
   }, [selectedPlace]);
-
+  //------------
   //------------
   // Animación de rutas
 
@@ -456,6 +465,7 @@ function MapView() {
             onRouteClick={() => drawRoute(selectedPlace)}
             minutes={routeInfo.minutes}
             km={routeInfo.km}
+            es_premium={user?.user?.user_metadata?.es_premium}
           />
         </div>
       )}
