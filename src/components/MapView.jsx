@@ -7,8 +7,8 @@ import { MdDirectionsBike } from "react-icons/md";
 import { GiDutchBike } from "react-icons/gi";
 
 import { placeTypes } from "../config/placeTypes";
-import { getPlaces } from "../services/lugar.service";
-import { getCurrentUser } from "../services/auth.service";
+import { getPlaces, isFavorito } from "../services/lugar.service";
+import { getCurrentUser, getUsuario } from "../services/auth.service";
 import Card from "./Card";
 
 function MapView() {
@@ -25,21 +25,58 @@ function MapView() {
   const lastRecalcRef = useRef(0);
 
   const selectedPlaceRef = useRef(null);
+
+  const [usuarioData, setUsuarioData] = useState(null);
+
   // Estado para el usuario
   //--------
   const [user, setUser] = useState(null);
-    // Obtener usuario solo una vez al montar
-    useEffect(() => {
-      const currentUser = getCurrentUser();
+  const [isFavorite, setIsFavorite] = useState(false);
+  // Obtener usuario solo una vez al montar
+  useEffect(() => {
+    const fetchUser = async () => {
+      const currentUser = await getCurrentUser();
       setUser(currentUser);
-    }, []);
+    };
+    fetchUser();
+  }, []);
   useEffect(() => {
     selectedPlaceRef.current = selectedPlace;
   }, [selectedPlace]);
   //------------
   //------------
-  // Animación de rutas
+  // Actualizar isFavorite cuando cambie el usuario o el lugar seleccionado
+  useEffect(() => {
+    console.log("USER:", user);
+    console.log("SELECTED:", selectedPlace);
 
+    const checkFavorite = async () => {
+      if (user?.user?.id && selectedPlace?.id) {
+        const { favorito } = await isFavorito(user.user.id, selectedPlace.id);
+        setIsFavorite(favorito);
+      } else {
+        setIsFavorite(false);
+      }
+    };
+
+    checkFavorite();
+  }, [user, selectedPlace]);
+  //------------
+  //------------
+  // Obtener datos usuario
+  //------------
+  useEffect(() => {
+    const fetchUsuario = async () => {
+      if (user?.user?.id) {
+        const { data } = await getUsuario(user.user.id);
+        setUsuarioData(data);
+      }
+    };
+
+    fetchUsuario();
+  }, [user]);
+  //------------
+  // Animación de rutas
   let progress = 0;
 
   const animateRoute = (coordinates, place) => {
@@ -116,15 +153,15 @@ function MapView() {
     const route = data.routes[0].geometry;
     routeCoordinatesRef.current = route.coordinates;
 
-    // ANIMACIÓN
-    progress = 0;
-    animateRoute(route.coordinates);
-
     // Si ya existe una ruta, eliminarla
     if (mapRef.current.getSource("route")) {
       mapRef.current.removeLayer("route");
       mapRef.current.removeSource("route");
     }
+
+    // ANIMACIÓN
+    progress = 0;
+    animateRoute(route.coordinates, place);
 
     // Agregar ruta
     mapRef.current.addSource("route", {
@@ -310,7 +347,7 @@ function MapView() {
         {
           enableHighAccuracy: true,
           maximumAge: 1000,
-          timeout: 5000,
+          timeout: 10000,
         },
       );
     }
@@ -448,26 +485,41 @@ function MapView() {
 
       {/* CARD OVERLAY */}
       {selectedPlace && (
-        <div className="fixed bottom-28 left-0 right-0 z-50 flex justify-center px-4 animate-slide-up">
-          <Card
-            image={selectedPlace.imagen_url}
-            title={selectedPlace.nombre}
-            slogan={selectedPlace.slogan}
-            description={selectedPlace.descripcion}
-            tipo={selectedPlace.tipo?.nombre}
-            direction={selectedPlace.direccion}
-            promotion={
-              selectedPlace.promocion?.length
-                ? selectedPlace.promocion[0].descripcion
-                : null
-            }
-            onClose={() => setSelectedPlace(null)}
-            onRouteClick={() => drawRoute(selectedPlace)}
-            minutes={routeInfo.minutes}
-            km={routeInfo.km}
-            es_premium={user?.user?.user_metadata?.es_premium}
+        <>
+          {/* Overlay para cerrar la Card al hacer click fuera */}
+          <div
+            className="fixed inset-0 z-40 "
+            onClick={() => setSelectedPlace(null)}
           />
-        </div>
+          <div className="fixed bottom-28 left-0 right-0 z-50 flex justify-center px-4 animate-slide-up">
+            <div
+              className="w-full flex justify-center"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Card
+                image={selectedPlace.imagen_url}
+                title={selectedPlace.nombre}
+                slogan={selectedPlace.slogan}
+                description={selectedPlace.descripcion}
+                tipo={selectedPlace.tipo || {}}
+                direction={selectedPlace.direccion}
+                promotion={
+                  selectedPlace.promocion?.length
+                    ? selectedPlace.promocion[0].descripcion
+                    : null
+                }
+                onClose={() => setSelectedPlace(null)}
+                onRouteClick={() => drawRoute(selectedPlace)}
+                minutes={routeInfo.minutes}
+                km={routeInfo.km}
+                es_premium={usuarioData?.es_premium}
+                id_usuario={user?.user?.id}
+                id_lugar={selectedPlace.id}
+                favorite={isFavorite}
+              />
+            </div>
+          </div>
+        </>
       )}
     </>
   );
