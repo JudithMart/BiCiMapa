@@ -6,6 +6,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Profile from "./components/ProfileC";
 import MapView from "./components/MapView";
+import Coupons from "./pages/Coupons";
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useEffect } from "react";
@@ -49,9 +50,10 @@ function App() {
         <MapView />
         <Navbar onPerfilClick={handleShowLogin} isLoggedIn={isLoggedIn} />
         {/* Rutas para profile y otras páginas si es necesario */}
-        {/* <Routes>
-          <Route path="/profile" element={<Profile />} />
-        </Routes> */}
+        <Routes>
+          {/* <Route path="/profile" element={<Profile />} /> */}
+          <Route path="/lugar/:slug/cupones" element={<Coupons />} />
+        </Routes>
       </BrowserRouter>
       {showLogin && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-end justify-center">

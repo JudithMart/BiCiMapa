@@ -210,7 +210,7 @@ function LoginC({ onClose, onShowRegister, onAuthSuccess }) {
               </span>
             </div>
           </div>
-          <div className="mt-5 w-full flex flex-col justify-start pl-6 px-5">
+          <div className="mt-5  w-full flex flex-col justify-start pl-6 px-5">
             <ButtonPink
               texto="Iniciar sesión"
               px="px-4"

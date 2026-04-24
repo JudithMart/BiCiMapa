@@ -4,9 +4,11 @@ import "mapbox-gl/dist/mapbox-gl.css";
 
 import { createRoot } from "react-dom/client";
 import { MdDirectionsBike } from "react-icons/md";
+import { GiDutchBike } from "react-icons/gi";
 
 import { placeTypes } from "../config/placeTypes";
-import { getPlaces } from "../services/lugar.service";
+import { getPlaces, isFavorito } from "../services/lugar.service";
+import { getCurrentUser, getUsuario } from "../services/auth.service";
 import Card from "./Card";
 
 function MapView() {
@@ -14,14 +16,118 @@ function MapView() {
   const mapContainerRef = useRef(null);
   const [places, setPlaces] = useState([]);
   const markersRef = useRef([]);
+  const userLocationRef = useRef(null);
 
   const [selectedPlace, setSelectedPlace] = useState(null);
+  const userMarkerRef = useRef(null);
+  const routeCoordinatesRef = useRef(null);
 
-  //PRUEBAS
-  // const locations = [
-  //   { lng: -101.195, lat: 19.7045 },
-  //   { lng: -101.19, lat: 19.7 },
-  // ];
+  const lastRecalcRef = useRef(0);
+
+  const selectedPlaceRef = useRef(null);
+
+  const [usuarioData, setUsuarioData] = useState(null);
+
+  // Estado para el usuario
+  //--------
+  const [user, setUser] = useState(null);
+  const [isFavorite, setIsFavorite] = useState(false);
+  // Obtener usuario solo una vez al montar
+  useEffect(() => {
+    const fetchUser = async () => {
+      const currentUser = await getCurrentUser();
+      setUser(currentUser);
+    };
+    fetchUser();
+  }, []);
+  useEffect(() => {
+    selectedPlaceRef.current = selectedPlace;
+  }, [selectedPlace]);
+  //------------
+  //------------
+  // Actualizar isFavorite cuando cambie el usuario o el lugar seleccionado
+  useEffect(() => {
+    console.log("USER:", user);
+    console.log("SELECTED:", selectedPlace);
+
+    const checkFavorite = async () => {
+      if (user?.user?.id && selectedPlace?.id) {
+        const { favorito } = await isFavorito(user.user.id, selectedPlace.id);
+        setIsFavorite(favorito);
+      } else {
+        setIsFavorite(false);
+      }
+    };
+
+    checkFavorite();
+  }, [user, selectedPlace]);
+  //------------
+  //------------
+  // Obtener datos usuario
+  //------------
+  useEffect(() => {
+    const fetchUsuario = async () => {
+      if (user?.user?.id) {
+        const { data } = await getUsuario(user.user.id);
+        setUsuarioData(data);
+      }
+    };
+
+    fetchUsuario();
+  }, [user]);
+  //------------
+  // Animación de rutas
+  let progress = 0;
+
+  const animateRoute = (coordinates, place) => {
+    const partialRoute = {
+      type: "Feature",
+      geometry: {
+        type: "LineString",
+        coordinates: [],
+      },
+    };
+
+    // Eliminar si ya existe
+    if (mapRef.current.getSource("route")) {
+      mapRef.current.removeLayer("route");
+      mapRef.current.removeSource("route");
+    }
+
+    mapRef.current.addSource("route", {
+      type: "geojson",
+      data: partialRoute,
+    });
+
+    mapRef.current.addLayer({
+      id: "route",
+      type: "line",
+      source: "route",
+      paint: {
+        "line-color": place.tipo?.color_hex || "#B57A86",
+        "line-width": 4,
+        "line-opacity": 0.8,
+      },
+    });
+
+    function step() {
+      if (progress < coordinates.length) {
+        partialRoute.geometry.coordinates.push(coordinates[progress]);
+
+        mapRef.current.getSource("route").setData(partialRoute);
+
+        progress++;
+        requestAnimationFrame(step);
+      }
+    }
+
+    step();
+  };
+
+  //------------
+
+  // Estado para minutos y km de la ruta
+  const [routeInfo, setRouteInfo] = useState({ minutes: null, km: null });
 
   const allende = {
     name: "Allende 527",
@@ -29,34 +135,111 @@ function MapView() {
     lat: 19.701918925746046,
   };
 
-  //PRUEBAS
-  // const bathrooms = [
-  //   {
-  //     name: "Baños Públicos Pintor",
-  //     lng: -101.1935,
-  //     lat: 19.7038,
-  //   },
-  //   {
-  //     name: "Baños Antonio Alzate",
-  //     lng: -101.1927,
-  //     lat: 19.7042,
-  //   },
-  //   {
-  //     name: "Baños Mercado Revolución",
-  //     lng: -101.192,
-  //     lat: 19.7029,
-  //   },
-  //   {
-  //     name: "Baños Nicolás Bravo",
-  //     lng: -101.1942,
-  //     lat: 19.7051,
-  //   },
-  //   {
-  //     name: "Baños DIF Centro",
-  //     lng: -101.1939,
-  //     lat: 19.7049,
-  //   },
-  // ];
+  //------------
+  // Solo dibuja la ruta visual, no calcula minutos/km
+  const drawRoute = async (place) => {
+    if (!userLocationRef.current) {
+      alert("Ubicación no disponible");
+      return;
+    }
+
+    const start = userLocationRef.current;
+    const end = [place.longitud, place.latitud];
+
+    const url = `https://api.mapbox.com/directions/v5/mapbox/cycling/${start.join(",")};${end.join(",")}?geometries=geojson&access_token=${mapboxgl.accessToken}`;
+
+    const res = await fetch(url);
+    const data = await res.json();
+    const route = data.routes[0].geometry;
+    routeCoordinatesRef.current = route.coordinates;
+
+    // Si ya existe una ruta, eliminarla
+    if (mapRef.current.getSource("route")) {
+      mapRef.current.removeLayer("route");
+      mapRef.current.removeSource("route");
+    }
+
+    // ANIMACIÓN
+    progress = 0;
+    animateRoute(route.coordinates, place);
+
+    // Agregar ruta
+    mapRef.current.addSource("route", {
+      type: "geojson",
+      data: {
+        type: "Feature",
+        geometry: route,
+      },
+    });
+
+    mapRef.current.addLayer({
+      id: "route",
+      type: "line",
+      source: "route",
+      layout: {
+        "line-join": "round",
+        "line-cap": "round",
+      },
+      paint: {
+        "line-color": place.tipo?.color_hex || "#B57A86",
+        "line-width": 4,
+        "line-opacity": 0.8,
+      },
+    });
+
+    // Ajustar vista
+    const bounds = new mapboxgl.LngLatBounds();
+    route.coordinates.forEach((coord) => bounds.extend(coord));
+
+    mapRef.current.fitBounds(bounds, {
+      padding: 80,
+    });
+  };
+  //------------
+  //------------
+  // Función para detectar si el usuario se salió de la ruta (umbral de ~30m)
+  const isUserOffRoute = (userCoords) => {
+    if (!routeCoordinatesRef.current) return false;
+
+    const threshold = 0.0003; // ≈ 30 metros
+
+    return !routeCoordinatesRef.current.some((coord) => {
+      const distance = Math.sqrt(
+        Math.pow(coord[0] - userCoords[0], 2) +
+          Math.pow(coord[1] - userCoords[1], 2),
+      );
+      return distance < threshold;
+    });
+  };
+  //------------
+  //------------
+  // Calcular minutos/km automáticamente al abrir la Card
+  useEffect(() => {
+    const fetchRouteInfo = async () => {
+      if (!selectedPlace || !userLocationRef.current) {
+        setRouteInfo({ minutes: null, km: null });
+        return;
+      }
+      const start = userLocationRef.current;
+      const end = [selectedPlace.longitud, selectedPlace.latitud];
+      const url = `https://api.mapbox.com/directions/v5/mapbox/cycling/${start.join(",")};${end.join(",")}?geometries=geojson&access_token=${mapboxgl.accessToken}`;
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        const duration = data.routes[0].duration; // segundos
+        const distance = data.routes[0].distance; // metros
+        const minutes = Math.ceil(duration / 60);
+        const km = (distance / 1000).toFixed(2);
+        setRouteInfo({ minutes, km });
+      } catch (e) {
+        setRouteInfo({ minutes: null, km: null });
+      }
+    };
+    fetchRouteInfo();
+  }, [selectedPlace]);
+  //------------
+
+  //------------
 
   useEffect(() => {
     const fetchPlaces = async () => {
@@ -73,6 +256,9 @@ function MapView() {
     fetchPlaces();
   }, []);
 
+  //------------
+  //------------
+
   const getIcon = (type) => {
     const Icon = placeTypes[type]?.icon;
 
@@ -80,6 +266,8 @@ function MapView() {
 
     return <Icon />;
   };
+
+  //------------
   useEffect(() => {
     if (mapRef.current) return; // evita múltiples inicializaciones
 
@@ -88,100 +276,93 @@ function MapView() {
     const map = new mapboxgl.Map({
       container: mapContainerRef.current,
       style: import.meta.env.VITE_MAPBOX_STYLE,
-      center: [-101.195, 19.7045], // Morelia
-      zoom: 17,
+      center: allende, // Morelia
+      zoom: 16,
     });
 
     mapRef.current = map;
 
-    //Por cada ubicación, crea un marcador con el icono de café prueba
-    // locations.forEach((loc) => {
-    //   const el = document.createElement("div");
-    //   const root = createRoot(el);
-    //   root.render(
-    //     // <img className="w-8 h-10 flex items-center justify-center" src="/Ubicaciones/Cafe.png" alt="BiCita"></img>
-    //     <div className="text-[#B57A86] text-2xl bg-white rounded-full p-1 shadow-md flex items-center justify-center w-8 h-8">
-    //       <GiCoffeeCup />
-    //     </div>,
-    //     // text-[#6F4E37]
-    //   );
-    //   new mapboxgl.Marker(el)
-    //     .setLngLat([loc.lng, loc.lat])
-    //     .addTo(mapRef.current);
-    // });
+    let watchId;
 
-    // Por cada baño, crea un marcador personalizado PRUEBAS
-    // bathrooms.forEach((place) => {
-    //   const el = document.createElement("div");
+    if (navigator.geolocation) {
+      watchId = navigator.geolocation.watchPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          const newCoords = [longitude, latitude];
 
-    //   const root = createRoot(el);
-    //   root.render(
-    //     <div className="text-[#B57A86] text-xl bg-white rounded-full p-1 shadow-md">
-    //       <LuToilet />
-    //     </div>,
-    //   );
+          const prev = userLocationRef.current;
+          userLocationRef.current = newCoords;
 
-    //   new mapboxgl.Marker(el)
-    //     .setLngLat([place.lng, place.lat])
-    //     .addTo(mapRef.current);
-    // });
-
-    // Solicitar permiso de ubicación al usuario solo una vez por sesión
-    if (
-      navigator.geolocation &&
-      !sessionStorage.getItem("ubicacionSolicitada")
-    ) {
-      sessionStorage.setItem("ubicacionSolicitada", "true");
-      if (
-        window.confirm(
-          "¿Permites que la aplicación acceda a tu ubicación para mostrarte en el mapa?",
-        )
-      ) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            const { latitude, longitude } = position.coords;
-
+          // Si ya existe marcador → solo lo movemos
+          if (userMarkerRef.current) {
+            userMarkerRef.current.setLngLat(newCoords);
+          } else {
+            // Crear marcador solo una vez
             const el = document.createElement("div");
             const root = createRoot(el);
+            // Ubicación
             root.render(
               <>
-                {/* Ubicación del usuario */}
-                <div className="absolute w-8 h-8 bg-[#B57A86] rounded-full animate-pulse"></div>
-                <div className="text-white text-lg bg-[#B57A86] rounded-full p-2 shadow-lg ">
+                <div className="absolute w-7 h-7 bg-[#B57A86] rounded-full animate-pulse"></div>
+                <div className="text-white text-sm bg-[#B57A86] rounded-full p-2 shadow-lg">
                   <MdDirectionsBike />
                 </div>
               </>,
             );
 
-            new mapboxgl.Marker(el)
+            userMarkerRef.current = new mapboxgl.Marker(el)
               .setLngLat([longitude, latitude])
               .addTo(mapRef.current);
+          }
 
-            //  centrar mapa
-            mapRef.current.flyTo({
+          if (routeCoordinatesRef.current && selectedPlaceRef.current) {
+            const offRoute = isUserOffRoute(newCoords);
+
+            if (offRoute) {
+              const now = Date.now();
+
+              if (now - lastRecalcRef.current > 5000) {
+                // 5 segundos
+                console.log("Recalculando ruta...");
+                drawRoute(selectedPlaceRef.current);
+                lastRecalcRef.current = now;
+              }
+            }
+          }
+          if (!mapRef.current) return;
+          if (
+            !prev ||
+            Math.abs(prev[0] - longitude) > 0.0001 ||
+            Math.abs(prev[1] - latitude) > 0.0001
+          ) {
+            mapRef.current.easeTo({
               center: [longitude, latitude],
-              zoom: 17,
+              duration: 500,
             });
-          },
-          (error) => {
-            alert("No se pudo obtener la ubicación: " + error.message);
-          },
-        );
-      }
+          }
+        },
+        (error) => {
+          console.error("Error ubicación:", error);
+        },
+        {
+          enableHighAccuracy: true,
+          maximumAge: 1000,
+          timeout: 10000,
+        },
+      );
     }
 
     map.on("load", () => {
       const el = document.createElement("div");
       const root = createRoot(el);
-
+      // Ubicación BiCitas
       root.render(
-        <div className="relative  ">
-          {/* Ubicación BiCitas */}
+        <div className="marker-content w-8 h-10">
           <img
-            className="w-8 h-10 flex items-center justify-center animate-soft-bounce"
+            className="w-full h-full animate-soft-bounce"
             src="/Logos/Ubicación-logo.png"
             alt="BiCita"
-          ></img>
+          />
         </div>,
       );
 
@@ -191,10 +372,14 @@ function MapView() {
     });
 
     return () => {
+      if (watchId) navigator.geolocation.clearWatch(watchId);
       map.remove();
       mapRef.current = null;
     };
   }, []);
+
+  //------------
+  //------------
 
   useEffect(() => {
     if (!mapRef.current) return;
@@ -202,36 +387,52 @@ function MapView() {
     markersRef.current.forEach((marker) => marker.remove());
     markersRef.current = [];
 
+    // Crear marcadores de lugares
     places.forEach((place) => {
       const el = document.createElement("div");
       const root = createRoot(el);
-      {
-        /* Iconos por tipo */
-      }
       root.render(
         <button onClick={() => setSelectedPlace(place)}>
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center transition-all duration-200 marker-content">
+            {/* CÍRCULO PRINCIPAL */}
             <div
-              className={`  flex items-center justify-center${place.es_convenio ? " shadow-md w-7 h-7 rounded-full" : "text-2xl"}`}
-              style={
+              className={`relative flex items-center justify-center rounded-full ${
                 place.es_convenio
-                  ? {
-                      backgroundColor: place.tipo?.color_hex,
-                      color: "#fff",
-                      border: `1px solid ${place.tipo?.color_hex}`,
-                    }
-                  : {
-                      backgroundColor: "",
-                      color: place.tipo?.color_hex,
-                      border: "none",
-                    }
-              }
+                  ? " w-8 h-8 shadow-md"
+                  : " 7 w-7 h-7 opacity-80"
+              }`}
+              style={{
+                backgroundColor: place.es_convenio
+                  ? place.tipo?.color_hex
+                  : "#fff",
+                color: place.es_convenio ? "#fff" : place.tipo?.color_hex,
+                border: `1px solid ${place.tipo?.color_hex}40`,
+              }}
             >
               {getIcon(place.id_tipo)}
+
+              {/*  SOLO CONVENIO */}
+              {place.es_convenio && (
+                <span className="absolute font-semibold -top-1 -right-1 text-[12px] bg-white text-[#B57A86] rounded-full px-1 shadow-sm">
+                  <GiDutchBike />
+                </span>
+              )}
             </div>
+
+            {/* PUNTA TIPO PIN */}
+            <div
+              className={`rotate-45 -mt-1 ${
+                place.es_convenio ? "w-2 h-2" : "w-1.5 h-1.5 opacity-60"
+              }`}
+              style={{
+                backgroundColor: place.tipo?.color_hex,
+              }}
+            />
+
+            {/* NOMBRE SOLO PARA CONVENIO */}
             {place.es_convenio && (
               <span
-                className="text-[8px] mt-[3px] px-2 py-[2px] rounded-full font-extralight shadow-sm whitespace-nowrap"
+                className="text-[9px] mt-[3px] px-2 py-[1px] rounded-full shadow-sm whitespace-nowrap"
                 style={{
                   backgroundColor: "#fff",
                   color: place.tipo?.color_hex,
@@ -250,31 +451,75 @@ function MapView() {
 
       markersRef.current.push(marker);
     });
+
+    // Función para actualizar el scale de todos los marcadores .marker-content
+    const updateAllMarkerScale = () => {
+      if (!mapRef.current) return;
+      const zoom = mapRef.current.getZoom();
+      const scale = Math.max(1, zoom / 12);
+      // Selecciona todos los marker-content (lugares y BiCitas)
+      const allMarkers = document.querySelectorAll(".marker-content");
+      allMarkers.forEach((content) => {
+        content.style.transform = `scale(${scale})`;
+        content.style.transformOrigin = "center";
+      });
+    };
+
+    mapRef.current.on("zoom", updateAllMarkerScale);
+    updateAllMarkerScale();
+
+    return () => {
+      if (mapRef.current) {
+        mapRef.current.off("zoom", updateAllMarkerScale);
+      }
+    };
   }, [places]);
+  //------------
 
   return (
     <>
       {/* MAPA */}
       <div ref={mapContainerRef} className="w-full h-[100dvh]" />
+      {/* TEXTURA (overlay) */}
+      <div className="pointer-events-none absolute inset-0 bg-noise opacity-[100]" />
 
       {/* CARD OVERLAY */}
       {selectedPlace && (
-        <div className="fixed bottom-28 left-0 right-0 z-50 flex justify-center px-4 animate-slide-up">
-          <Card
-            image={selectedPlace.imagen_url}
-            title={selectedPlace.nombre}
-            slogan={selectedPlace.slogan}
-            description={selectedPlace.descripcion}
-            tipo={selectedPlace.tipo?.nombre}
-            direction={selectedPlace.direccion}
-            promotion={
-              selectedPlace.promocion?.length
-                ? selectedPlace.promocion[0].descripcion
-                : null
-            }
-            onClose={() => setSelectedPlace(null)}
+        <>
+          {/* Overlay para cerrar la Card al hacer click fuera */}
+          <div
+            className="fixed inset-0 z-40 "
+            onClick={() => setSelectedPlace(null)}
           />
-        </div>
+          <div className="fixed bottom-28 left-0 right-0 z-50 flex justify-center px-4 animate-slide-up">
+            <div
+              className="w-full flex justify-center"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Card
+                image={selectedPlace.imagen_url}
+                title={selectedPlace.nombre}
+                slogan={selectedPlace.slogan}
+                description={selectedPlace.descripcion}
+                tipo={selectedPlace.tipo || {}}
+                direction={selectedPlace.direccion}
+                promotion={
+                  selectedPlace.promocion?.length
+                    ? selectedPlace.promocion[0].descripcion
+                    : null
+                }
+                onClose={() => setSelectedPlace(null)}
+                onRouteClick={() => drawRoute(selectedPlace)}
+                minutes={routeInfo.minutes}
+                km={routeInfo.km}
+                es_premium={usuarioData?.es_premium}
+                id_usuario={user?.user?.id}
+                id_lugar={selectedPlace.id}
+                favorite={isFavorite}
+              />
+            </div>
+          </div>
+        </>
       )}
     </>
   );
