@@ -5,13 +5,13 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import { createRoot } from "react-dom/client";
 import { MdDirectionsBike } from "react-icons/md";
 import { GiDutchBike } from "react-icons/gi";
-
+import { useAuth } from "../context/AuthContext";
 import { placeTypes } from "../config/placeTypes";
 import { getPlaces, isFavorito } from "../services/lugar.service";
-import { getCurrentUser, getUsuario } from "../services/auth.service";
+
 import Card from "./Card";
 
-function MapView() {
+function MapView( ) {
   const mapRef = useRef(null);
   const mapContainerRef = useRef(null);
   const [places, setPlaces] = useState([]);
@@ -26,20 +26,14 @@ function MapView() {
 
   const selectedPlaceRef = useRef(null);
 
-  const [usuarioData, setUsuarioData] = useState(null);
+
 
   // Estado para el usuario
   //--------
-  const [user, setUser] = useState(null);
+  const { userAuth, userData } = useAuth();
   const [isFavorite, setIsFavorite] = useState(false);
   // Obtener usuario solo una vez al montar
-  useEffect(() => {
-    const fetchUser = async () => {
-      const currentUser = await getCurrentUser();
-      setUser(currentUser);
-    };
-    fetchUser();
-  }, []);
+
   useEffect(() => {
     selectedPlaceRef.current = selectedPlace;
   }, [selectedPlace]);
@@ -47,12 +41,12 @@ function MapView() {
   //------------
   // Actualizar isFavorite cuando cambie el usuario o el lugar seleccionado
   useEffect(() => {
-    console.log("USER:", user);
+    console.log("USER:", userAuth);
     console.log("SELECTED:", selectedPlace);
 
     const checkFavorite = async () => {
-      if (user?.user?.id && selectedPlace?.id) {
-        const { favorito } = await isFavorito(user.user.id, selectedPlace.id);
+      if (userAuth?.id && selectedPlace?.id) {
+        const { favorito } = await isFavorito(userAuth.id, selectedPlace.id);
         setIsFavorite(favorito);
       } else {
         setIsFavorite(false);
@@ -60,21 +54,12 @@ function MapView() {
     };
 
     checkFavorite();
-  }, [user, selectedPlace]);
+  }, [userAuth, selectedPlace]);
   //------------
   //------------
   // Obtener datos usuario
   //------------
-  useEffect(() => {
-    const fetchUsuario = async () => {
-      if (user?.user?.id) {
-        const { data } = await getUsuario(user.user.id);
-        setUsuarioData(data);
-      }
-    };
 
-    fetchUsuario();
-  }, [user]);
   //------------
   // Animación de rutas
   let progress = 0;
@@ -512,8 +497,8 @@ function MapView() {
                 onRouteClick={() => drawRoute(selectedPlace)}
                 minutes={routeInfo.minutes}
                 km={routeInfo.km}
-                es_premium={usuarioData?.es_premium}
-                id_usuario={user?.user?.id}
+                es_premium={userData?.es_premium}
+                id_usuario={userAuth?.id}
                 id_lugar={selectedPlace.id}
                 favorite={isFavorite}
               />

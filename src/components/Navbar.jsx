@@ -1,16 +1,19 @@
 
 import { Home, Heart, Ticket, User } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 
-export default function Navbar({ onPerfilClick, isLoggedIn }) {
+
+export default function Navbar({ onPerfilClick }) {
+  const { userAuth } = useAuth();
+  const isLoggedIn = !!userAuth;
   const tabs = [
     { name: "Explorar", icon: Home, route: "/" },
     { name: "Guardados", icon: Heart, route: "/guardados" },
     { name: "Cupón", icon: Ticket, route: "/cupon" },
     { name: "Perfil", icon: User, route: isLoggedIn ? "/profile" : "/login" },
   ];
-
   const navigate = useNavigate();
   const location = useLocation();
   const active = tabs.findIndex(tab => tab.route === location.pathname);

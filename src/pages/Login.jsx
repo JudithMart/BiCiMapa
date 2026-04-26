@@ -4,7 +4,7 @@ import LoginC from '../components/LoginC'
 
 function Login({ onClose, onShowRegister, onAuthSuccess }) {
   return (
-    <div>
+   <div>
       <LoginC onClose={onClose} onShowRegister={onShowRegister} onAuthSuccess={onAuthSuccess} />
     </div>
   );
