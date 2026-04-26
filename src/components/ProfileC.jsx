@@ -1,16 +1,33 @@
 import React from "react";
 import { LuBike } from "react-icons/lu";
+import BoxPlace from "./BoxPlace";
 
 function ProfileC({
-  id_usuario,
   nombre,
   visitas_completadas,
   visitas_restantes,
+  lugares_visitados,
+  lugares_reto,
 }) {
   // Calcular el porcentaje de progreso
   const total = Number(visitas_restantes) || 1;
   const completadas = Number(visitas_completadas) || 0;
   const porcentaje = Math.min((completadas / total) * 100, 100);
+
+  // Unificar lugares del reto y marcar si han sido visitados
+  const lugaresCombinados = (lugares_reto || []).map((lugar) => {
+    const id = lugar.id_lugar || lugar.lugar?.id || lugar.id;
+    const nombre = lugar.lugar?.nombre || lugar.nombre;
+    const imagen_url = lugar.lugar?.imagen_url || lugar.imagen_url;
+    const visitadoObj = (lugares_visitados || []).find((v) => v.id_lugar === id);
+    return {
+      id,
+      nombre_lugar: nombre,
+      imagen_lugar: imagen_url,
+      visitado: !!visitadoObj,
+      fecha_visita: visitadoObj?.fecha_visita || null,
+    };
+  });
 
   return (
     <div
@@ -32,7 +49,7 @@ function ProfileC({
           <p className="text-texto -ml-7 text-2xl font-bold">{nombre}</p>
         </div>
       </div>
-      <div className=" flex flex-col justify-center  px-3 py-10 w-full  bg-black">
+      <div className=" flex flex-col justify-center  px-3 py-10 w-full  ">
         {/* Progreso del usuario */}
         <div className="flex flex-col px-5 py-4 bg-[#FEF7F7]  rounded-md shadow-lg">
           <div className="flex gap-20 ">
@@ -60,11 +77,34 @@ function ProfileC({
               <LuBike size={32} className="text-primary drop-shadow-lg" />
             </div>
           </div>
-          <p className="font-light text-texto mt-3 text-sm"> 
-            Visita <span className="font-semibold"> {visitas_restantes} lugares más</span> y obten una promo en 
-            <span className="text-primary font-semibold "> BiCitas</span></p>
+          <p className="font-light text-texto mt-3 text-sm">
+            Visita{" "}
+            <span className="font-semibold">
+              {" "}
+              {visitas_restantes} lugares más
+            </span>{" "}
+            y obten una promo en
+            <span className="text-primary font-semibold "> BiCitas</span>
+          </p>
         </div>
-        <p>Lugares Visitados</p>
+        {/* Lugares */}
+        <div className="flex flex-col gap-y-2 mt-6">
+          <p className="text-texto font-bold text-lg">Lugares</p>
+
+          {lugaresCombinados.length > 0 ? (
+            lugaresCombinados.map((lugar, idx) => (
+              <BoxPlace
+                key={lugar.id || idx}
+                nombre_lugar={lugar.nombre_lugar}
+                imagen_lugar={lugar.imagen_lugar}
+                visitado={lugar.visitado}
+                fecha_visita={lugar.fecha_visita}
+              />
+            ))
+          ) : (
+            <p className="text-gray-400">No hay lugares.</p>
+          )}
+        </div>
       </div>
     </div>
   );

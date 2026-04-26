@@ -8,7 +8,8 @@ export const getVisitedLugares = async (userId) => {
       id_lugar,
       lugar (
         id,
-        nombre
+        nombre,
+        imagen_url
       )
     `)
     .eq("id_usuario", userId)
