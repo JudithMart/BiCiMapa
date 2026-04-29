@@ -6,6 +6,7 @@ export const getVisitedLugares = async (userId) => {
     .from("visita")
     .select(`
       id_lugar,
+      fecha_visita,
       lugar (
         id,
         nombre,

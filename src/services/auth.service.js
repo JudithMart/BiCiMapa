@@ -47,3 +47,4 @@ export const getUsuario = async (id) => {
 
   return { data, error };
 };
+

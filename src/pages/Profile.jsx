@@ -3,6 +3,7 @@ import ProfileC from "../components/ProfileC";
 import { useAuth } from "../context/AuthContext";
 import { getUserProgress, getRetoActivo, getRetoLugares } from "../services/reto.service";
 import {getVisitedLugares} from "../services/visita.service";
+import { getVisitasValidas } from "../services/user_premium.service";
 
 function Profile() {
   const { userAuth, userData } = useAuth();
@@ -10,6 +11,11 @@ function Profile() {
   const [retoActivo, setRetoActivo] = useState(null);
   const [lugaresVisitados, setLugaresVisitados] = useState([]);
   const [retoLugares, setRetoLugares] = useState([]);
+
+  const visitasValidas = getVisitasValidas(
+  lugaresVisitados,
+  userData?.fecha_inicio_membresia
+);
 
   // UseEffect para obtener el reto activo y el progreso del usuario al cargar el componente
   useEffect(() => {
@@ -89,8 +95,9 @@ function Profile() {
         nombre={userAuth?.user_metadata?.nombre}
         visitas_completadas={userProgress?.visitas_completadas}
         visitas_restantes={retoActivo?.visitas_requeridas}
-        lugares_visitados={lugaresVisitados}
+        lugares_visitados={visitasValidas}
         lugares_reto={retoLugares}
+        fecha_expiracion={userData?.fecha_expiracion}
       />
     </>
   );
