@@ -1,42 +1,34 @@
-
 import "./App.css";
 
 import Navbar from "./components/Navbar";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import Profile from "./components/ProfileC";
+import Profile from "./pages/Profile";
 import MapView from "./components/MapView";
 import Coupons from "./pages/Coupons";
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { useEffect } from "react";
-import { useState, useCallback } from "react";
-import { getCurrentUser } from "./services/auth.service";
+import { useState } from "react";
+import { useAuth } from "./context/AuthContext";
 
 function App() {
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  // Checar si el usuario está logueado al montar la app
-  useEffect(() => {
-    getCurrentUser().then(({ user }) => {
-      setIsLoggedIn(!!user);
-    });
-  }, []);
+  const {  refreshUser } = useAuth();
 
   // Función para actualizar el estado de login tras login/registro
-  const handleAuthSuccess = useCallback(() => {
-    setIsLoggedIn(true);
+  const handleAuthSuccess = () => {
+    refreshUser();
     setShowLogin(false);
     setShowRegister(false);
-  }, []);
+  };
 
   // Función para mostrar el modal de login
   const handleShowLogin = () => {
     setShowLogin(true);
     setShowRegister(false);
   };
+
   const handleShowRegister = () => {
     setShowRegister(true);
     setShowLogin(false);
@@ -47,11 +39,10 @@ function App() {
   return (
     <>
       <BrowserRouter>
-        <MapView />
-        <Navbar onPerfilClick={handleShowLogin} isLoggedIn={isLoggedIn} />
-        {/* Rutas para profile y otras páginas si es necesario */}
+        <Navbar onPerfilClick={handleShowLogin}  />
         <Routes>
-          {/* <Route path="/profile" element={<Profile />} /> */}
+          <Route path="/" element={<MapView />} />
+          <Route path="/profile" element={<Profile />} />
           <Route path="/lugar/:slug/cupones" element={<Coupons />} />
         </Routes>
       </BrowserRouter>

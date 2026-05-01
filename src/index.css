@@ -8,3 +8,8 @@
     @apply font-playfair;
   }
 }
+
+html, body {
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+}

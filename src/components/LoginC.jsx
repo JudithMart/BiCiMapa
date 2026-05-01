@@ -2,35 +2,7 @@ import React, { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import ButtonPink from "./ButtonPink";
 import { loginUser } from "../services/auth.service";
-//import { registerUser, loginUser, logoutUser, getCurrentUser } from '../services/auth.service';
-// Registrar usuario
-// const handleRegister = async () => {
-//   // Datos de prueba
-//   const email = 'aguimtz.2003@gmail.com';
-//   const password = 'password123';
-
-//Login
-//   const loginResult = await loginUser(email, password);
-//   if (loginResult.user) {
-//     alert('El usuario ya está registrado.');
-//     return;
-//   }
-
-// Si el login falla, intentar registrar
-//   const { user, error } = await registerUser(email, password);
-//   console.log('Respuesta de Supabase al registrar:', { user, error });
-//   if (error) {
-//     alert('Error al registrar: ' + error.message);
-//   } else {
-//     alert('Registro exitoso');
-//   }
-// };
-
-// Cerrar sesión
-// const handleLogout = async () => {
-//   const { error } = await logoutUser();
-//   console.log('Logout:', error);
-// };
+import { useAuth } from "../context/AuthContext";
 
 function LoginC({ onClose, onShowRegister, onAuthSuccess }) {
   const [showPassword, setShowPassword] = useState(false);
@@ -50,6 +22,7 @@ function LoginC({ onClose, onShowRegister, onAuthSuccess }) {
   });
   const [mensaje, setMensaje] = useState("");
   const [tipoMensaje, setTipoMensaje] = useState(""); // 'error', 'success', 'block'
+  const { setUserAuth } = useAuth();
 
   // Guardar en localStorage cuando cambian los valores
 
@@ -128,6 +101,7 @@ function LoginC({ onClose, onShowRegister, onAuthSuccess }) {
         return newIntentos;
       });
     } else {
+      setUserAuth(user);
       setMensaje("Inicio de sesión exitoso");
       if (onAuthSuccess) onAuthSuccess();
       console.log("Usuario logeado:", user);
@@ -135,9 +109,13 @@ function LoginC({ onClose, onShowRegister, onAuthSuccess }) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-transparent">
-      <div
-        className="relative flex items-center flex-col w-80 md:w-[650px] md:h-[600px] lg:h-[600px] lg:w-[650px] h-[550px] rounded-2xl shadow-lg bg-cover bg-center"
+    <div className="h-dvh flex items-center justify-center bg-transparent overflow-hidden">
+     <div
+  className="relative flex flex-col
+  w-80 md:w-[650px]
+  max-h-[90dvh] overflow-y-auto
+  rounded-2xl shadow-lg bg-cover bg-center"
+
         style={{ backgroundImage: "url('/Fondos/FondoBicis.jpeg')" }}
       >
         {/* Botón de cerrar modal */}
@@ -176,7 +154,7 @@ function LoginC({ onClose, onShowRegister, onAuthSuccess }) {
               )}
             </div>
           )}
-          <div className="mt-10 w-full flex flex-col justify-start pl-6 px-5">
+          <div className="mt-10 w-full flex flex-col justify-start pl-6 px-5 ">
             <p className=" text-texto font-semibold text-base md:text-lg lg:text-xl ">
               Email
             </p>
@@ -218,7 +196,7 @@ function LoginC({ onClose, onShowRegister, onAuthSuccess }) {
               disabled={bloqueado}
             />
           </div>
-          <p className="font-thin text-[11px] mt-3">
+          <p className="font-thin text-[11px] py-3">
             {bloqueado ? (
               <span className="text-red-500">
                 Demasiados intentos. Intenta de nuevo en 5 min.
