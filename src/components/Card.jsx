@@ -182,7 +182,7 @@ function Card({
             px="px-5"
             onClick={() => {
               const slug = title.toLowerCase().replace(/\s+/g, "-");
-              navigate(`/lugar/${slug}/cupones`);
+              navigate(`/promociones/${slug}`);
             }}
           />
         )}
