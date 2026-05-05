@@ -58,6 +58,8 @@ export const getPromocionesPorLugar = async (slug) => {
     .select(`
       id,
       descripcion,
+      descuento,
+      codigo_qr,
       lugar (
         id,
         nombre,
