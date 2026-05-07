@@ -22,6 +22,7 @@ function Card({
   id_lugar,
   id_usuario,
   favorite,
+  slug
 }) {
   const navigate = useNavigate();
   // Estado local para saber si es favorito
@@ -181,7 +182,6 @@ function Card({
             }
             px="px-5"
             onClick={() => {
-              const slug = title.toLowerCase().replace(/\s+/g, "-");
               navigate(`/promociones/${slug}`);
             }}
           />

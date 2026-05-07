@@ -501,6 +501,7 @@ function MapView( ) {
                 id_usuario={userAuth?.id}
                 id_lugar={selectedPlace.id}
                 favorite={isFavorite}
+                slug={selectedPlace.slug}
               />
             </div>
           </div>

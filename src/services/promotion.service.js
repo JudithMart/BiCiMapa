@@ -46,7 +46,7 @@ export const getPromocionesPorLugar = async (slug) => {
     .from("lugar")
     .select("id, nombre, slug")
     .eq("slug", slug)
-    .single();
+    .maybeSingle();
 
   if (errorLugar || !lugar) {
     return { promociones: [], error: errorLugar };
