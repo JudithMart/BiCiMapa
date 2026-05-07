@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { registerUser, loginUser } from "../services/auth.service";
+import { registerUser, loginUser } from "../../services/auth.service";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import ButtonPink from "./ButtonPink";
+
 
 function RegisterC({ onClose,  onAuthSuccess }) {
   const [showPassword, setShowPassword] = useState(false);

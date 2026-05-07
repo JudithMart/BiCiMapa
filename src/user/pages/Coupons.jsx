@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import CouponsC from "../components/CouponsC";
 import { useParams } from "react-router-dom";
-import { getPromocionesPorLugar } from "../services/promotion.service";
+import { getPromocionesPorLugar } from "../../services/promotion.service";
 
 function Coupons() {
   const [promociones, setPromociones] = useState([]);

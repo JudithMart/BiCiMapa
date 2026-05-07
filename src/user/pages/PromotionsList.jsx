@@ -1,7 +1,7 @@
 import React from "react";
 import PromotionsListC from "../components/PromotionsListC";
-import { getLugaresConPromociones } from "../services/promotion.service";
-import { useAuth } from "../context/AuthContext";
+import { getLugaresConPromociones } from "../../services/promotion.service";
+import { useAuth } from "../../context/AuthContext";
 import { useState, useEffect } from "react";
 
 function PromotionsList() {

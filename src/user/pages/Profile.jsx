@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import ProfileC from "../components/ProfileC";
-import { useAuth } from "../context/AuthContext";
-import { getUserProgress, getRetoActivo, getRetoLugares } from "../services/reto.service";
-import {getVisitedLugares} from "../services/visita.service";
-import { getVisitasValidas } from "../services/user_premium.service";
+import { useAuth } from "../../context/AuthContext";
+import { getUserProgress, getRetoActivo, getRetoLugares } from "../../services/reto.service";
+import {getVisitedLugares} from "../../services/visita.service";
+import { getVisitasValidas } from "../../services/user_premium.service";
 
 function Profile() {
   const { userAuth, userData } = useAuth();

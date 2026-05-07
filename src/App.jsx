@@ -1,12 +1,12 @@
 import "./App.css";
 
-import Navbar from "./components/Navbar";
+import Navbar from "./user/components/Navbar";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import Profile from "./pages/Profile";
-import MapView from "./components/MapView";
-import Coupons from "./pages/Coupons";
-import PromotionsList from "./pages/PromotionsList";
+import Profile from "./user/pages/Profile";
+import MapView from "./user/components/MapView";
+import Coupons from "./user/pages/Coupons";
+import PromotionsList from "./user/pages/PromotionsList";
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useState } from "react";

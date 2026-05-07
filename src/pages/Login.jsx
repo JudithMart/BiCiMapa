@@ -1,5 +1,6 @@
 import React from 'react'
-import LoginC from '../components/LoginC'
+import LoginC from '../shared/components/LoginC';
+
 
 
 function Login({ onClose, onShowRegister, onAuthSuccess }) {
