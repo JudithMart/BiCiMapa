@@ -39,6 +39,6 @@ function BoxPlace({ nombre_lugar, imagen_lugar, visitado, fecha_visita, fecha_ex
     </div>
   );
 }
-// FALTA PONER LA FECHA EN QUE SE VA A CERRAR EL PERFIL
+
 
 export default BoxPlace

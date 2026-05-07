@@ -11,13 +11,16 @@ export default function Navbar({ onPerfilClick }) {
   const tabs = [
     { name: "Explorar", icon: Home, route: "/" },
     { name: "Guardados", icon: Heart, route: "/guardados" },
-    { name: "Cupón", icon: Ticket, route: "/cupon" },
+    { name: "Promociones", icon: Ticket, route: "/promociones" },
     { name: "Perfil", icon: User, route: isLoggedIn ? "/profile" : "/login" },
   ];
   const navigate = useNavigate();
   const location = useLocation();
-  const active = tabs.findIndex(tab => tab.route === location.pathname);
-
+  const active = tabs.findIndex(tab =>
+  tab.route !== "/" 
+    ? location.pathname.startsWith(tab.route)
+    : location.pathname === "/"
+);
   return (
     <div className="fixed bottom-4 left-0 right-0 flex justify-center z-50 ">
       <div className="relative bg-[#AC687D] rounded-2xl px-4  py-3 flex gap-8 shadow-lg min-w-[320px]">

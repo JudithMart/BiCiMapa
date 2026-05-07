@@ -6,15 +6,17 @@ import Register from "./pages/Register";
 import Profile from "./pages/Profile";
 import MapView from "./components/MapView";
 import Coupons from "./pages/Coupons";
+import PromotionsList from "./pages/PromotionsList";
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "./context/AuthContext";
 
+
 function App() {
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
-  const {  refreshUser } = useAuth();
+  const { refreshUser } = useAuth();
 
   // Función para actualizar el estado de login tras login/registro
   const handleAuthSuccess = () => {
@@ -39,11 +41,14 @@ function App() {
   return (
     <>
       <BrowserRouter>
-        <Navbar onPerfilClick={handleShowLogin}  />
+        <Navbar onPerfilClick={handleShowLogin} />
         <Routes>
           <Route path="/" element={<MapView />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/lugar/:slug/cupones" element={<Coupons />} />
+          {/* LISTA GENERAL */}
+          <Route path="/promociones" element={<PromotionsList />} />
+          {/*  DETALLE POR LUGAR (desde navbar o card) */}
+          <Route path="/promociones/:slug" element={<Coupons />} />
         </Routes>
       </BrowserRouter>
       {showLogin && (
