@@ -11,6 +11,7 @@ import PromotionsList from "./user/pages/PromotionsList";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "./context/AuthContext";
+import Validation from "./user/pages/Validation";
 
 
 function App() {
@@ -49,6 +50,7 @@ function App() {
           <Route path="/promociones" element={<PromotionsList />} />
           {/*  DETALLE POR LUGAR (desde navbar o card) */}
           <Route path="/promociones/:slug" element={<Coupons />} />
+          <Route path="/validacion/:promocionId" element={<Validation />} />
         </Routes>
       </BrowserRouter>
       {showLogin && (

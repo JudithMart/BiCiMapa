@@ -22,7 +22,7 @@ function CouponsC({ promociones }) {
           </p>
         </div>
       </div>
-      <p className="text-xs mt-2 text-center text-gray-500 italic">
+      <p className="text-xs mt-2 text-center text-red-600 italic">
        *Las promociones pueden modificarse dependiendo del lugar
       </p>
       {/* LISTA */}
@@ -32,6 +32,7 @@ function CouponsC({ promociones }) {
             promociones.map((promocion) => (
               <BoxCuopon
                 key={promocion.id}
+                id={promocion.id}
                 nombre={promocion.lugar?.nombre || "Promoción sin nombre"}
                 imagen_lugar={promocion.lugar?.imagen_url || "/placeholder.png"}
                 descripcion={promocion.descripcion || "Sin descripción"}
