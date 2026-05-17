@@ -10,7 +10,7 @@ export default function Navbar({ onPerfilClick }) {
   const isLoggedIn = !!userAuth;
   const tabs = [
     { name: "Explorar", icon: Home, route: "/" },
-    { name: "Guardados", icon: Heart, route: "/guardados" },
+    { name: "Favoritos", icon: Heart, route: "/favoritos" },
     { name: "Promociones", icon: Ticket, route: "/promociones" },
     { name: "Perfil", icon: User, route: isLoggedIn ? "/profile" : "/login" },
   ];
