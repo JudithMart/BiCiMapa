@@ -1,39 +1,58 @@
-import { Html5QrcodeScanner } from "html5-qrcode";
-import { useEffect } from "react";
+import { Html5Qrcode } from "html5-qrcode";
+import { useEffect, useRef } from "react";
 
 function QRScanner({ onScanSuccess }) {
+  const html5QrCodeRef = useRef(null);
+
   useEffect(() => {
-    const scanner = new Html5QrcodeScanner(
-      "reader",
-      {
-        fps: 10,
-        qrbox: {
-          width: 250,
-          height: 250,
-        },
-      },
-      false
-    );
+    const html5QrCode = new Html5Qrcode("reader");
+    html5QrCodeRef.current = html5QrCode;
 
-    scanner.render(
-      (decodedText) => {
-        onScanSuccess(decodedText);
+    const startScanner = async () => {
+      try {
+        await html5QrCode.start(
+          { facingMode: "environment" },
+          {
+            fps: 10,
+            qrbox: {
+              width: 220,
+              height: 220,
+            },
+            aspectRatio: 1,
+          },
+          (decodedText) => {
+            onScanSuccess(decodedText);
 
-        scanner.clear().catch((error) => {
-          console.error(error);
-        });
-      },
-      (err) => {
-        // errores normales de lectura
+            html5QrCode.stop().catch(() => {});
+          },
+          () => {}
+        );
+      } catch (err) {
+        console.error(err);
       }
-    );
+    };
+
+    startScanner();
 
     return () => {
-      scanner.clear().catch(() => {});
+      if (html5QrCodeRef.current?.isScanning) {
+        html5QrCodeRef.current.stop().catch(() => {});
+      }
     };
-  }, []);
+  }, [onScanSuccess]);
 
-  return <div id="reader" className="w-full" />;
+  return (
+    <div className="flex justify-center">
+      <div
+        id="reader"
+        className="overflow-hidden rounded-[28px]"
+        style={{
+          width: "240px",
+          height: "240px",
+        }}
+      />
+    </div>
+  );
 }
 
 export default QRScanner;

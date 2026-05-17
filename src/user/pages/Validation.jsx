@@ -1,10 +1,12 @@
 import React from "react";
 import ValidationC from "../components/ValidationC";
+import { useAuth } from "../../context/AuthContext";
 import { useParams, useLocation } from "react-router-dom";
 
 function Validation() {
   const { promocionId } = useParams();
   const location = useLocation();
+  const { userAuth } = useAuth();
 
   const { nombreLugar, descripcion, descuento, imagenLugar } =
     location.state || {};
@@ -20,6 +22,7 @@ function Validation() {
         descripcion={descripcion}
         descuento={descuento}
         imagenLugar={imagenLugar}
+        userId={userAuth?.id}
       />
     </>
   );
