@@ -5,14 +5,15 @@ import { TbLock } from "react-icons/tb";
 function BoxPromotion({ nombre, imagen_lugar, total_promociones, slug, es_premium }) {
   const navigate = useNavigate();
   const handleClick = () => {
-    console.log("Clicked place with slug:", slug);
+    // console.log("Clicked place with slug:", slug);
     navigate(`/promociones/${slug}`);
   };
 
   return (
     <div className="relative w-full">
       <button
-        className="relative flex items-center gap-4 rounded-xl shadow-md p-3 bg-white/90 transition-transform duration-150 active:scale-90
+        className="relative flex items-center gap-4 rounded-xl shadow-md p-3
+         bg-white/90 transition-transform duration-150 active:scale-90
          focus:outline-none w-full "
         onClick={handleClick}
         type="button"

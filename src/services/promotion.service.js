@@ -4,7 +4,7 @@ Funciones relacionadas con promociones y lugares con promociones
 
 import { supabase } from "../lib/supabase";
 
-//Lugaes con promociones activas
+//Lugares con promociones activas
 export const getLugaresConPromociones = async () => {
   const { data, error } = await supabase
     .from("promocion")

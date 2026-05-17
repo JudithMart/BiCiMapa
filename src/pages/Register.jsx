@@ -1,5 +1,6 @@
 import React from 'react'
-import RegisterC from '../components/RegisterC'
+import RegisterC from '../shared/components/RegisterC';
+
 
 function Register({ onClose, onShowLogin, onAuthSuccess }) {
   return (

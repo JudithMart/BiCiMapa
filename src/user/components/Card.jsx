@@ -3,11 +3,11 @@ import React, { useState, useEffect } from "react";
 import { MdOutlineDiscount, MdOutlineDirections } from "react-icons/md";
 import { TbLock } from "react-icons/tb";
 import { Heart, Ticket } from "lucide-react";
-import ButtonPink from "./ButtonPink";
-import ButtonGray from "./ButtonGray";
+import ButtonPink from "../../shared/components/ButtonPink";
+import ButtonGray from "../../shared/components/ButtonGray";
 import { useNavigate } from "react-router-dom";
 import { FaHeart } from "react-icons/fa6";
-import { addFavorito, removeFavorito } from "../services/lugar.service";
+import { addFavorito, removeFavorito } from "../../services/lugar.service";
 
 function Card({
   image,

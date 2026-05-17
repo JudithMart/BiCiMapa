@@ -1,7 +1,7 @@
 import React from "react";
 import { LuBike } from "react-icons/lu";
 import BoxPlace from "./BoxPlace";
-import { getDaysLeft } from "../services/user_premium.service";
+import { getDaysLeft } from "../../services/user_premium.service";
 
 function ProfileC({
   nombre,

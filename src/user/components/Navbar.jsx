@@ -1,7 +1,7 @@
 
 import { Home, Heart, Ticket, User } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 
 
 
@@ -16,11 +16,14 @@ export default function Navbar({ onPerfilClick }) {
   ];
   const navigate = useNavigate();
   const location = useLocation();
-  const active = tabs.findIndex(tab =>
-  tab.route !== "/" 
-    ? location.pathname.startsWith(tab.route)
-    : location.pathname === "/"
-);
+  const active = tabs.findIndex((tab) => {
+    if (tab.name === "Promociones") {
+      return location.pathname.startsWith("/promociones") || location.pathname.startsWith("/validacion");
+    }
+    return tab.route !== "/"
+      ? location.pathname.startsWith(tab.route)
+      : location.pathname === "/";
+  });
   return (
     <div className="fixed bottom-4 left-0 right-0 flex justify-center z-50 ">
       <div className="relative bg-[#AC687D] rounded-2xl px-4  py-3 flex gap-8 shadow-lg min-w-[320px]">

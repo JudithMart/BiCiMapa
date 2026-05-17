@@ -5,9 +5,9 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import { createRoot } from "react-dom/client";
 import { MdDirectionsBike } from "react-icons/md";
 import { GiDutchBike } from "react-icons/gi";
-import { useAuth } from "../context/AuthContext";
-import { placeTypes } from "../config/placeTypes";
-import { getPlaces, isFavorito } from "../services/lugar.service";
+import { useAuth } from "../../context/AuthContext";
+import { placeTypes } from "../../config/placeTypes";
+import { getPlaces, isFavorito } from "../../services/lugar.service";
 
 import Card from "./Card";
 
