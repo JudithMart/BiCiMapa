@@ -12,6 +12,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "./context/AuthContext";
 import Validation from "./user/pages/Validation";
+import Favorites from "./user/pages/Favorites";
 
 
 function App() {
@@ -46,6 +47,7 @@ function App() {
         <Routes>
           <Route path="/" element={<MapView />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/favoritos" element={<Favorites />} />
           {/* LISTA GENERAL */}
           <Route path="/promociones" element={<PromotionsList />} />
           {/*  DETALLE POR LUGAR (desde navbar o card) */}

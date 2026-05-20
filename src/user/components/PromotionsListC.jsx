@@ -16,7 +16,7 @@ function PromotionsListC({ places, es_premium }) {
           <img className="h-full w-full" src="\Avatar\Avatar.png" />
         </div>
         <div>
-          <p className="text-texto -ml-5 text-2xl font-bold">Promociones</p>
+          <p className="text-texto -ml-5 text-2xl font-bold tracking-wider">Promociones</p>
         </div>
       </div>
 
@@ -30,10 +30,14 @@ function PromotionsListC({ places, es_premium }) {
                 nombre={lugar.nombre || "Lugar sin nombre"}
                 imagen_lugar={lugar.imagen_url || "/placeholder.png"}
                 total_promociones={lugar.total_promociones || 0}
+                tipo={lugar.tipo?.nombre || "Sin tipo"}
+                tipoColor={lugar.tipo?.color_hex || ""}
                 slug={lugar.slug || ""}
                 es_premium={es_premium}
               />
+              
             ))
+            
           ) : (
             <p className="text-gray-500">No hay lugares con promociones.</p>
           )}

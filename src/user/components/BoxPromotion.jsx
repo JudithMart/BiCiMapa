@@ -1,13 +1,30 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React from "react";
+import { useNavigate } from "react-router-dom";
 import { TbLock } from "react-icons/tb";
 
-function BoxPromotion({ nombre, imagen_lugar, total_promociones, slug, es_premium }) {
+function BoxPromotion({
+  nombre,
+  imagen_lugar,
+  total_promociones,
+  slug,
+  es_premium,
+  tipo,
+  tipoColor,
+}) {
   const navigate = useNavigate();
   const handleClick = () => {
-    // console.log("Clicked place with slug:", slug);
     navigate(`/promociones/${slug}`);
   };
+
+  // Lógica para tipos usando tipo como string
+  const tipoNombre = tipo?.toLowerCase?.() || "";
+  const esBaño = tipoNombre === "baño";
+  const esCiclopuerto = tipoNombre === "ciclopuerto";
+
+  // Imagen por tipo
+  let imagenMostrar = imagen_lugar;
+  if (esBaño) imagenMostrar = "/Tipos/2/tipo2_baño.jpg";
+  if (esCiclopuerto) imagenMostrar = "/Tipos/4/tipo4_ciclopuerto.jpg";
 
   return (
     <div className="relative w-full">
@@ -18,7 +35,7 @@ function BoxPromotion({ nombre, imagen_lugar, total_promociones, slug, es_premiu
         onClick={handleClick}
         type="button"
         disabled={!es_premium}
-        style={!es_premium ? { opacity: 0.7, cursor: 'not-allowed' } : {}}
+        style={!es_premium ? { opacity: 0.7, cursor: "not-allowed" } : {}}
       >
         {/* Overlay solo si no es premium */}
         {!es_premium && (
@@ -29,12 +46,22 @@ function BoxPromotion({ nombre, imagen_lugar, total_promociones, slug, es_premiu
             </span>
           </div>
         )}
-        {imagen_lugar && (
-          <img src={imagen_lugar} alt={nombre} className="w-16 h-16 object-cover rounded-lg flex-shrink-0" />
+        {imagenMostrar && (
+          <img
+            src={imagenMostrar}
+            alt={nombre}
+            className="w-16 h-16 object-cover rounded-lg flex-shrink-0"
+          />
         )}
         <div className="flex justify-between w-full items-center">
-          <div className="mt-2">
+          <div className="mt-2 flex flex-col items-start">
             <p className="text-texto font-semibold text-base">{nombre}</p>
+            <p
+              className="text-sm  font-light  uppercase"
+              style={tipoColor ? { color: tipoColor } : {}}
+            >
+              {tipo}
+            </p>
           </div>
           <div className="flex flex-col items-end ml-8 bg-[#F0FDF4]">
             <span className="px-2 py-1 text-xs text-[#16A34A] font-medium rounded">

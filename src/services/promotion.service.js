@@ -15,10 +15,14 @@ export const getLugaresConPromociones = async () => {
       id,
       nombre,
       imagen_url,
-      slug
+      slug,
+      tipo:tipo (
+        id,
+        nombre,
+        color_hex
+      )
     )
-  `,
-    )
+  `,)
     .eq("activa", true);
   const grouped = {};
 
@@ -55,7 +59,8 @@ export const getPromocionesPorLugar = async (slug) => {
   // 2. Obtener promociones
   const { data, error } = await supabase
     .from("promocion")
-    .select(`
+    .select(
+      `
       id,
       descripcion,
       descuento,
@@ -64,9 +69,16 @@ export const getPromocionesPorLugar = async (slug) => {
         id,
         nombre,
         imagen_url,
-        slug
+        slug,
+          tipo:tipo (
+      id,
+      nombre,
+      color_hex
+    )
       )
-    `)
+     
+    `,
+    )
     .eq("id_lugar", lugar.id)
     .eq("activa", true);
 
