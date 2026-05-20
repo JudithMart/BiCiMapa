@@ -10,8 +10,9 @@ import { placeTypes } from "../../config/placeTypes";
 import { getPlaces, isFavorito } from "../../services/lugar.service";
 
 import Card from "./Card";
+import CardBicitas from "./CardBicitas";
 
-function MapView( ) {
+function MapView() {
   const mapRef = useRef(null);
   const mapContainerRef = useRef(null);
   const [places, setPlaces] = useState([]);
@@ -26,7 +27,7 @@ function MapView( ) {
 
   const selectedPlaceRef = useRef(null);
 
-
+  const [showBicitasCard, setShowBicitasCard] = useState(false);
 
   // Estado para el usuario
   //--------
@@ -342,13 +343,15 @@ function MapView( ) {
       const root = createRoot(el);
       // Ubicación BiCitas
       root.render(
-        <div className="marker-content w-8 h-10">
-          <img
-            className="w-full h-full animate-soft-bounce"
-            src="/Logos/Ubicación-logo.png"
-            alt="BiCita"
-          />
-        </div>,
+        <button onClick={() => setShowBicitasCard(true)}>
+          <div className="marker-content w-8 h-10">
+            <img
+              className="w-full h-full animate-soft-bounce"
+              src="/Logos/Ubicación-logo.png"
+              alt="BiCita"
+            />
+          </div>
+        </button>,
       );
 
       new mapboxgl.Marker(el)
@@ -503,6 +506,23 @@ function MapView( ) {
                 favorite={isFavorite}
                 slug={selectedPlace.slug}
               />
+            </div>
+          </div>
+        </>
+      )}
+      {/* CARD BiCitas */}
+      {showBicitasCard && (
+        <>
+          <div
+            className="fixed inset-0 z-40"
+            onClick={() => setShowBicitasCard(false)}
+          />
+          <div className="fixed bottom-28 left-0 right-0 z-50 flex justify-center px-4 animate-slide-up">
+            <div
+              className="w-full flex justify-center"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <CardBicitas onClose={() => setShowBicitasCard(false)} />
             </div>
           </div>
         </>
