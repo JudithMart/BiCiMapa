@@ -92,11 +92,8 @@ export const deletePlace = async (id) => {
 
 export const addFavorito = async (id_usuario, id_lugar) => {
   return await supabase
-    .from('usuario_favorito')
-    .upsert(
-      [{ id_usuario, id_lugar }],
-      { onConflict: 'id_usuario,id_lugar' }
-    );
+    .from("usuario_favorito")
+    .upsert([{ id_usuario, id_lugar }], { onConflict: "id_usuario,id_lugar" });
 };
 
 export const removeFavorito = async (id_usuario, id_lugar) => {
@@ -124,4 +121,39 @@ export const isFavorito = async (id_usuario, id_lugar) => {
   }
 
   return { favorito: !!data, error: null };
+};
+
+export const getLugaresFavoritosPorUsuario = async (id_usuario) => {
+  const { data, error } = await supabase
+    .from("usuario_favorito")
+    .select(
+      `
+      id_lugar,
+      lugar (
+        id,
+        nombre,
+        imagen_url,
+        slug,
+        tipo:tipo (
+          id,
+          nombre,
+          color_hex
+        ),
+        promocion (
+          id
+        )
+      )
+    `,
+    )
+    .eq("id_usuario", id_usuario);
+  if (error) {
+    console.error(error);
+    return { favoritos: [], error };
+  }
+  // Total de promociones a cada lugar
+  const favoritos = data.map((item) => ({
+    ...item.lugar,
+    total_promociones: item.lugar.promocion ? item.lugar.promocion.length : 0,
+  }));
+  return { favoritos, error: null };
 };
