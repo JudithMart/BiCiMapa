@@ -1,7 +1,7 @@
 import React from "react";
 import BoxRoad from "./BoxRoad";
 
-function CardBicitas() {
+function CardBicitas({ rutas }) {
   return (
     <div
       className="relative flex flex-col rounded-3xl px-5
@@ -14,7 +14,7 @@ function CardBicitas() {
     >
       {/* Overlay gris semitransparente */}
       <div className="absolute inset-0 bg-secundary bg-opacity-10 rounded-3xl pointer-events-none z-0" />
-        <div className="flex gap-4 mt-8 w-full  rounded-2xl z-10 relative">
+      <div className="flex gap-4 mt-8 w-full  rounded-2xl z-10 relative">
         <img
           src="/Logos/logoB2.png"
           alt="BiCitas Historicas"
@@ -22,19 +22,27 @@ function CardBicitas() {
         />
         <div>
           {/* TÍTULO */}
-          <p className="text-texto font-semibold text-xl">BiCitas Historicas</p>
+          <p className="text-texto font-semibold text-2xl">
+            BiCitas Historicas
+          </p>
 
           {/* SLOGAN (highlight emocional) */}
-          <p className="text-[#B57A86]  text-base mt-1 leading-snug line-clamp-2">
-           No hay Morelia bonita, sin una BiCita
+          <p className="text-[#B57A86] font-thin  text-lg mt-1 leading-snug line-clamp-2">
+            No hay Morelia bonita, sin una BiCita
           </p>
         </div>
       </div>
       <div className="py-5">
-        <BoxRoad />
-         <BoxRoad />
+        {rutas.map((ruta) => (
+          <BoxRoad
+            key={ruta.id}
+            nombre={ruta.nombre}
+            descripcion={ruta.descripcion}
+            tiempo={ruta.tiempo_estimado}
+            distancia={ruta.distancia_km}
+          />
+        ))}
       </div>
-      
     </div>
   );
 }

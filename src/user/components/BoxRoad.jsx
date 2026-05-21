@@ -1,7 +1,7 @@
 import React from "react";
 import { MdOutlineDirections } from "react-icons/md";
 
-function BoxRoad() {
+function BoxRoad({ nombre, descripcion, tiempo, distancia }) {
   return (
     <div className="relative z-10 flex gap-4 mt-2 px-4 py-1 rounded-xl bg-secundary border-2 border-[#F6B4B7]">
       {" "}
@@ -11,9 +11,10 @@ function BoxRoad() {
         </span>
       </div>
       <div className="flex flex-col ">
-        <p className="text-texto font-medium text-base">11 barrios</p>
-        {/* LOGICA DEL TIEMPO */}
-        <p className="text-gray-500 font-light text-[12px]">Tiempo: 3 días</p>
+        <p className="text-texto font-medium text-base">{nombre}</p>
+        <p className="text-gray-500 font-light text-[12px]">{descripcion}</p>
+        <p className="text-gray-500 font-light text-[12px]">Tiempo: {tiempo}</p>
+        <p className="text-gray-500 font-light text-[12px]">Distancia: {distancia} km</p>
       </div>
     </div>
   );

@@ -8,6 +8,7 @@ import { GiDutchBike } from "react-icons/gi";
 import { useAuth } from "../../context/AuthContext";
 import { placeTypes } from "../../config/placeTypes";
 import { getPlaces, isFavorito } from "../../services/lugar.service";
+import { getRutas } from "../../services/bicitas.service";
 
 import Card from "./Card";
 import CardBicitas from "./CardBicitas";
@@ -28,6 +29,30 @@ function MapView() {
   const selectedPlaceRef = useRef(null);
 
   const [showBicitasCard, setShowBicitasCard] = useState(false);
+
+  // Estado para rutas BiCitas
+   const [rutas, setRutas] = useState([]);
+
+    useEffect(() => {
+
+    const fetchRutas = async () => {
+
+      const { rutas, error } = await getRutas();
+
+      if (error) {
+        console.error(error);
+        return;
+      }
+
+      setRutas(rutas);
+    };
+
+    fetchRutas();
+
+  }, []);
+
+
+//------------
 
   // Estado para el usuario
   //--------
@@ -522,7 +547,7 @@ function MapView() {
               className="w-full flex justify-center"
               onClick={(e) => e.stopPropagation()}
             >
-              <CardBicitas onClose={() => setShowBicitasCard(false)} />
+              <CardBicitas  rutas={rutas} />
             </div>
           </div>
         </>
