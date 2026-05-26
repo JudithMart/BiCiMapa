@@ -12,7 +12,7 @@ function BoxRoad({ nombre, descripcion, tiempo, distancia }) {
       </div>
       <div className="flex flex-col ">
         <p className="text-texto font-medium text-base">{nombre}</p>
-        <p className="text-gray-500 font-light text-[12px]">{descripcion}</p>
+        {/* <p className="text-gray-500 font-light text-[12px]">{descripcion}</p> */}
         <p className="text-gray-500 font-light text-[12px]">Tiempo: {tiempo}</p>
         <p className="text-gray-500 font-light text-[12px]">Distancia: {distancia} km</p>
       </div>

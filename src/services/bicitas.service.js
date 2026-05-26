@@ -2,20 +2,29 @@ import { supabase } from "../lib/supabase";
 
 // Rutas BICITAS
 export const getRutas = async () => {
-  return await supabase
+
+  const { data, error } = await supabase
     .from("ruta")
     .select(`
-      *,
+      id,
+      nombre,
+      descripcion,
       ruta_lugar (
         orden,
         lugar (
           id,
           nombre,
-          imagen_url,
           latitud,
           longitud
-        ),
+        )
       )
     `)
     .eq("activa", true);
+
+  console.log(data);
+
+  return {
+    rutas: data,
+    error,
+  };
 };

@@ -1,7 +1,7 @@
 import React from "react";
 import BoxRoad from "./BoxRoad";
 
-function CardBicitas({ rutas }) {
+function CardBicitas({ rutas = [] }) {
   return (
     <div
       className="relative flex flex-col rounded-3xl px-5
@@ -38,8 +38,8 @@ function CardBicitas({ rutas }) {
             key={ruta.id}
             nombre={ruta.nombre}
             descripcion={ruta.descripcion}
-            tiempo={ruta.tiempo_estimado}
-            distancia={ruta.distancia_km}
+            tiempo={ruta.minutos ?? ruta.tiempo_estimado}
+  distancia={ruta.km ?? ruta.distancia_km}
           />
         ))}
       </div>

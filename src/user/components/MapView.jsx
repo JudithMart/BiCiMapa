@@ -34,11 +34,12 @@ function MapView() {
    const [rutas, setRutas] = useState([]);
 
     useEffect(() => {
+  
 
     const fetchRutas = async () => {
 
       const { rutas, error } = await getRutas();
-
+ console.log("RUTAS:", rutas);
       if (error) {
         console.error(error);
         return;
@@ -488,6 +489,43 @@ function MapView() {
     };
   }, [places]);
   //------------
+  //------------
+  // Calcular minutos y km para cada ruta de BiCitas cuando se abre la Card y hay ubicación
+     const [bicitasRutasInfo, setBicitasRutasInfo] = useState([]);
+  
+  useEffect(() => {
+        const calcularInfoRutas = async () => {
+          if (!showBicitasCard || !userLocationRef.current || !rutas.length) {
+            setBicitasRutasInfo([]);
+            return;
+          }
+          const start = userLocationRef.current;
+          const token = mapboxgl.accessToken;
+          const promesas = rutas.map(async (ruta) => {
+            // Suponiendo que cada ruta tiene destino en ruta.longitud, ruta.latitud
+            // Si no, ajusta aquí los nombres de las propiedades
+            if (!ruta.longitud || !ruta.latitud) return { ...ruta, minutos: null, km: null };
+            const end = [ruta.longitud, ruta.latitud];
+            const url = `https://api.mapbox.com/directions/v5/mapbox/cycling/${start.join(",")};${end.join(",")}?geometries=geojson&access_token=${token}`;
+            try {
+              const res = await fetch(url);
+              const data = await res.json();
+              if (!data.routes || !data.routes[0]) return { ...ruta, minutos: null, km: null };
+              const duration = data.routes[0].duration;
+              const distance = data.routes[0].distance;
+              const minutos = Math.ceil(duration / 60);
+              const km = (distance / 1000).toFixed(2);
+              return { ...ruta, minutos, km };
+            } catch {
+              return { ...ruta, minutos: null, km: null };
+            }
+          });
+          const rutasConInfo = await Promise.all(promesas);
+          setBicitasRutasInfo(rutasConInfo);
+        };
+        calcularInfoRutas();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+      }, [showBicitasCard, rutas, userLocationRef.current]);
 
   return (
     <>
@@ -547,7 +585,7 @@ function MapView() {
               className="w-full flex justify-center"
               onClick={(e) => e.stopPropagation()}
             >
-              <CardBicitas  rutas={rutas} />
+              <CardBicitas  rutas={bicitasRutasInfo.length ? bicitasRutasInfo : rutas} />
             </div>
           </div>
         </>
