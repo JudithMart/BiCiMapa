@@ -109,3 +109,74 @@ export const isUserOffRoute = (
     return distance < threshold;
   });
 };
+
+export const drawBicitasRoute = async ({
+  map,
+  start,
+  ruta,
+  routeCoordinatesRef,
+}) => {
+  try {
+    // Ordenar lugares
+    const lugaresOrdenados = [...ruta.ruta_lugar]
+      .sort((a, b) => a.orden - b.orden)
+      .map((item) => [
+        item.lugar.longitud,
+        item.lugar.latitud,
+      ]);
+
+    // Inicio usuario + puntos ruta
+    const coordinates = [
+      start,
+      ...lugaresOrdenados,
+    ];
+
+    const coordsString = coordinates
+      .map((coord) => coord.join(","))
+      .join(";");
+
+    const url = `https://api.mapbox.com/directions/v5/mapbox/cycling/${coordsString}?geometries=geojson&access_token=${mapboxgl.accessToken}`;
+
+    const res = await fetch(url);
+    const data = await res.json();
+
+    if (!data.routes?.length) return;
+
+    const route = data.routes[0].geometry.coordinates;
+
+    routeCoordinatesRef.current = route;
+
+    // borrar anterior
+    if (map.getSource("route")) {
+      map.removeLayer("route");
+      map.removeSource("route");
+    }
+
+    map.addSource("route", {
+      type: "geojson",
+      data: {
+        type: "Feature",
+        geometry: {
+          type: "LineString",
+          coordinates: route,
+        },
+      },
+    });
+
+    map.addLayer({
+      id: "route",
+      type: "line",
+      source: "route",
+      layout: {
+        "line-join": "round",
+        "line-cap": "round",
+      },
+      paint: {
+        "line-color": "#B57A86",
+        "line-width": 5,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+  }
+};

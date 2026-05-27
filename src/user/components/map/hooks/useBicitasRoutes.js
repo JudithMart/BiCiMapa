@@ -16,7 +16,16 @@ export const useBicitasRoutes = ({
       }
 
       const promesas = rutas.map(async (ruta) => {
-        if (!ruta.longitud || !ruta.latitud) {
+
+        // ordenar lugares
+        const lugaresOrdenados = [...ruta.ruta_lugar].sort(
+          (a, b) => a.orden - b.orden
+        );
+
+        // primer punto
+        const primerLugar = lugaresOrdenados[0]?.lugar;
+
+        if (!primerLugar) {
           return {
             ...ruta,
             minutos: null,
@@ -24,10 +33,10 @@ export const useBicitasRoutes = ({
           };
         }
 
-        const info = await calculateRouteInfo(userLocation, [
-          ruta.longitud,
-          ruta.latitud,
-        ]);
+        const info = await calculateRouteInfo(
+          userLocation,
+          [primerLugar.longitud, primerLugar.latitud]
+        );
 
         return {
           ...ruta,

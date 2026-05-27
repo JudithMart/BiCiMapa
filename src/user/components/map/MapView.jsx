@@ -14,12 +14,13 @@ import CardBicitas from "./../CardBicitas";
 
 import { useBicitasRoutes } from "./hooks/useBicitasRoutes";
 
-import { drawRoute, isUserOffRoute } from "./utils/mapRoutes";
+import { drawRoute, isUserOffRoute,drawBicitasRoute, } from "./utils/mapRoutes";
 import { calculateRouteInfo } from "./utils/calculateRouteInfo";
 import { useMapInitialization } from "./hooks/useMapInitialization";
 import { useUserLocation } from "./hooks/useUserLocation.jsx";
 import { usePlaceMarkers } from "./hooks/usePlaceMarkers.jsx";
 import { useBicitasMarker } from "./hooks/useBicitasMarker.jsx";
+// import { drawBicitasRoute } from "./utils/drawBicitasRoute";
 
 function MapView() {
   const mapRef = useRef(null);
@@ -116,6 +117,20 @@ function MapView() {
       routeCoordinatesRef,
     });
   };
+  //------------
+const handleDrawBicitasRoute = async (ruta) => {
+  if (!userLocationRef.current || !mapRef.current) {
+    alert("Ubicación no disponible");
+    return;
+  }
+
+  await drawBicitasRoute({
+    map: mapRef.current,
+    start: userLocationRef.current,
+    ruta,
+    routeCoordinatesRef,
+  });
+};
 
   //------------
   const [routeInfo, setRouteInfo] = useState({ minutes: null, km: null });
@@ -158,10 +173,10 @@ function MapView() {
 
   //------------
   useBicitasMarker({
-  mapRef,
-  coordinates: [allende.lng, allende.lat],
-  onClick: () => setShowBicitasCard(true),
-});
+    mapRef,
+    coordinates: [allende.lng, allende.lat],
+    onClick: () => setShowBicitasCard(true),
+  });
   //------------
 
   useUserLocation({
@@ -200,7 +215,6 @@ function MapView() {
   }, []);
 
   //------------
-
 
   return (
     <>
@@ -264,7 +278,7 @@ function MapView() {
             >
               <CardBicitas
                 rutas={bicitasRutasInfo.length ? bicitasRutasInfo : rutas}
-                onRouteClick={handleDrawRoute}
+                  onRouteClick={handleDrawBicitasRoute}
               />
             </div>
           </div>
