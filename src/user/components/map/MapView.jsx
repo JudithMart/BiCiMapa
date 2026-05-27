@@ -20,7 +20,7 @@ import { useMapInitialization } from "./hooks/useMapInitialization";
 import { useUserLocation } from "./hooks/useUserLocation.jsx";
 import { usePlaceMarkers } from "./hooks/usePlaceMarkers.jsx";
 import { useBicitasMarker } from "./hooks/useBicitasMarker.jsx";
-// import { drawBicitasRoute } from "./utils/drawBicitasRoute";
+
 
 function MapView() {
   const mapRef = useRef(null);
