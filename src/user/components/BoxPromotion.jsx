@@ -10,6 +10,7 @@ function BoxPromotion({
   es_premium,
   tipo,
   tipoColor,
+  es_convenio,
 }) {
   const navigate = useNavigate();
   const handleClick = () => {
@@ -63,11 +64,13 @@ function BoxPromotion({
               {tipo}
             </p>
           </div>
-          <div className="flex flex-col items-end ml-8 bg-[#F0FDF4]">
-            <span className="px-2 py-1 text-xs text-[#16A34A] font-medium rounded ">
-              {total_promociones} promociones
-            </span>
-          </div>
+          {es_convenio && (
+            <div className="flex flex-col items-end ml-8 bg-[#F0FDF4]">
+              <span className="px-2 py-1 text-xs text-[#16A34A] font-medium rounded ">
+                {total_promociones} promociones
+              </span>
+            </div>
+          )}
         </div>
       </button>
     </div>

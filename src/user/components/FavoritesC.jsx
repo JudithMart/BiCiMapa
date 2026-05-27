@@ -38,6 +38,7 @@ function FavoritesC({ lugaresFavoritos, es_premium }) {
                   tipoColor={lugar.tipo?.color_hex || "#000"}
                   slug={lugar.slug || ""}
                   es_premium={es_premium}
+                  es_convenio={lugar.es_convenio}
                 />
               );
             })

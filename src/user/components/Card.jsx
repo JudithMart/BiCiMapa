@@ -22,7 +22,8 @@ function Card({
   id_lugar,
   id_usuario,
   favorite,
-  slug
+  slug,
+  es_convenio,
 }) {
   const navigate = useNavigate();
   // Estado local para saber si es favorito
@@ -154,8 +155,8 @@ function Card({
         </div>
       )}
       <div
-        className={`z-10 py-5 -mt-8 shadow-sm ${!es_premium && !esBaño && !esCiclopuerto ? "opacity-50 pointer-events-none" : ""} 
-        ${esBaño || esCiclopuerto ? "flex justify-center" : "flex justify-between"}`}
+        className={`z-10 py-5 -mt-8 shadow-sm ${!es_premium  && !esBaño && !esCiclopuerto ? "opacity-50 pointer-events-none" : ""} 
+        ${esBaño || esCiclopuerto || !es_convenio? "flex justify-center" : "flex justify-between"}`}
       >
         <ButtonGray
           texto={
@@ -165,10 +166,11 @@ function Card({
             </span>
           }
           px="px-7"
+          mt="mt-10"
           onClick={() => onRouteClick()}
         />
         {/* Solo mostrar promociones si NO es baño ni ciclopuerto */}
-        {!(esBaño || esCiclopuerto) && (
+        {!(esBaño || esCiclopuerto || !es_convenio) && (
           <ButtonPink
             texto={
               <span className="flex items-center gap-2">

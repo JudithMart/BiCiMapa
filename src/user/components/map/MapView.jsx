@@ -38,6 +38,7 @@ function MapView() {
   const selectedPlaceRef = useRef(null);
 
   const [showBicitasCard, setShowBicitasCard] = useState(false);
+  const [selectedRuta, setSelectedRuta] = useState(null);
 
   const getIcon = (type) => {
     const Icon = placeTypes[type]?.icon;
@@ -118,19 +119,20 @@ function MapView() {
     });
   };
   //------------
-const handleDrawBicitasRoute = async (ruta) => {
-  if (!userLocationRef.current || !mapRef.current) {
-    alert("Ubicación no disponible");
-    return;
-  }
+  const handleDrawBicitasRoute = async (ruta) => {
+    setSelectedRuta(ruta); // Guardar la ruta seleccionada
+    if (!userLocationRef.current || !mapRef.current) {
+      alert("Ubicación no disponible");
+      return;
+    }
 
-  await drawBicitasRoute({
-    map: mapRef.current,
-    start: userLocationRef.current,
-    ruta,
-    routeCoordinatesRef,
-  });
-};
+    await drawBicitasRoute({
+      map: mapRef.current,
+      start: userLocationRef.current,
+      ruta,
+      routeCoordinatesRef,
+    });
+  };
 
   //------------
   const [routeInfo, setRouteInfo] = useState({ minutes: null, km: null });
@@ -244,6 +246,7 @@ const handleDrawBicitasRoute = async (ruta) => {
                 slogan={selectedPlace.slogan}
                 description={selectedPlace.descripcion}
                 tipo={selectedPlace.tipo || {}}
+                es_convenio={selectedPlace.es_convenio}
                 direction={selectedPlace.direccion}
                 promotion={
                   selectedPlace.promocion?.length
@@ -269,16 +272,20 @@ const handleDrawBicitasRoute = async (ruta) => {
         <>
           <div
             className="fixed inset-0 z-40"
-            onClick={() => setShowBicitasCard(false)}
+            onClick={() => {
+              setShowBicitasCard(false);
+              setSelectedRuta(null);
+            }}
           />
-          <div className="fixed bottom-28 left-0 right-0 z-50 flex justify-center px-4 animate-slide-up">
+       <div className="fixed inset-0 z-50 flex justify-center px-4 pt-4 pb-28 overflow-hidden pointer-events-none">
             <div
-              className="w-full flex justify-center"
+                className="w-full flex justify-center items-end overflow-y-auto pointer-events-auto"
               onClick={(e) => e.stopPropagation()}
             >
               <CardBicitas
                 rutas={bicitasRutasInfo.length ? bicitasRutasInfo : rutas}
-                  onRouteClick={handleDrawBicitasRoute}
+                onRouteClick={handleDrawBicitasRoute}
+                lugares={selectedRuta ? (selectedRuta.ruta_lugar?.map(rl => rl.lugar) || []) : []}
               />
             </div>
           </div>

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { MdOutlineDirections } from "react-icons/md";
 import { ChevronDown } from "lucide-react";
+import ButtonGray from "../../shared/components/ButtonGray";
 
 function BoxRoad({
   nombre,
@@ -8,7 +9,6 @@ function BoxRoad({
   tiempo,
   distancia,
   lugares = [],
-  ruta,
   onClick,
 }) {
   const [open, setOpen] = useState(false);
@@ -19,7 +19,10 @@ function BoxRoad({
         onClick={() => setOpen(!open)}
         className="w-full text-left rounded-xl transition-all"
       >
-        <div className="relative z-10 flex justify-between gap-4 px-4 py-3 rounded-xl bg-secundary border-2 border-[#F6B4B7]">
+        <div
+          className="relative z-10 flex justify-between gap-4 px-4 py-3 rounded-xl
+         bg-secundary border-2 border-[#F6B4B7]"
+        >
           <div className="flex gap-4">
             <div className="flex mt-1 items-center justify-center rounded-full bg-primary/20 h-8 w-8">
               <MdOutlineDirections className="w-5 h-5 text-primary" />
@@ -37,33 +40,39 @@ function BoxRoad({
           </div>
 
           <ChevronDown
-            className={`transition-transform ${open ? "rotate-180" : ""}`}
+            className={`transition-transform text-[#F6B4B7] ${open ? "rotate-180" : ""}`}
           />
         </div>
       </button>
 
       {/* DETALLE */}
       {open && (
-        <div className="bg-white/80 rounded-b-2xl px-4 py-3 mx-2 shadow-md">
-          <p className="text-sm text-gray-700">{descripcion}</p>
-
-          <div className="mt-3 flex flex-wrap gap-2">
-            {lugares.map((lugar) => (
-              <span
-                key={lugar.id}
-                className="bg-primary/10 text-primary text-xs px-2 py-1 rounded-full"
-              >
-                {lugar.nombre}
+        <div className=" px-1 py-3 mx-2  ">
+          <p className="text-sm text-texto">{descripcion}</p>
+          <div className="mt-3 flex flex-wrap gap-2 ">
+            {lugares
+              .slice() // para no mutar el array original
+              .sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0))
+              .map((lugar) => (
+                <span
+                  key={lugar.id}
+                  className="bg-primary/20 text-primary text-xs px-2 py-1 rounded-full"
+                >
+                  {lugar.orden}.- {lugar.nombre}
+                </span>
+              ))}
+          </div>{" "}
+          <ButtonGray
+            onClick={onClick}
+            texto={
+              <span className="flex justify-center  gap-2">
+                <MdOutlineDirections className="w-5 h-5" />
+                Ruta
               </span>
-            ))}
-          </div>
-
-          <button
-           onClick={onClick}
-            className="mt-4 w-full bg-primary text-white py-2 rounded-xl"
-          >
-            Ver ruta
-          </button>
+            }
+            px="px-7"
+            mt="mt-4"
+          ></ButtonGray>
         </div>
       )}
     </div>
