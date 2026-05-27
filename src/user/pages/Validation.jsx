@@ -21,7 +21,7 @@ function Validation() {
         nombreLugar={nombreLugar}
         descripcion={descripcion}
         descuento={descuento}
-        imagenLugar={imagenLugar}
+        imagenLugar={imagenLugar || "/Tipos/sinTipo/lugarMorelia.png"}
         userId={userAuth?.id}
       />
     </>

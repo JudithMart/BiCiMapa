@@ -4,7 +4,7 @@ import Navbar from "./user/components/Navbar";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Profile from "./user/pages/Profile";
-import MapView from "./user/components/MapView";
+import MapView from "./user/components/map/MapView";
 import Coupons from "./user/pages/Coupons";
 import PromotionsList from "./user/pages/PromotionsList";
 

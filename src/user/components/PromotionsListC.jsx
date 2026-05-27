@@ -28,7 +28,7 @@ function PromotionsListC({ places, es_premium }) {
               <BoxPromotion
                 key={lugar.id}
                 nombre={lugar.nombre || "Lugar sin nombre"}
-                imagen_lugar={lugar.imagen_url || "/placeholder.png"}
+                imagen_lugar={lugar.imagen_url || "/Tipos/sinTipo/lugarMorelia.jpg"}
                 total_promociones={lugar.total_promociones || 0}
                 tipo={lugar.tipo?.nombre || "Sin tipo"}
                 tipoColor={lugar.tipo?.color_hex || ""}

@@ -54,8 +54,8 @@ function BoxPromotion({
           />
         )}
         <div className="flex justify-between w-full items-center">
-          <div className="mt-2 flex flex-col items-start">
-            <p className="text-texto font-semibold text-base">{nombre}</p>
+          <div className="mt-2 flex flex-col items-start ">
+            <p className="text-texto font-semibold text-base text-left line-clamp-2">{nombre}</p>
             <p
               className="text-sm  font-light  uppercase"
               style={tipoColor ? { color: tipoColor } : {}}
@@ -64,7 +64,7 @@ function BoxPromotion({
             </p>
           </div>
           <div className="flex flex-col items-end ml-8 bg-[#F0FDF4]">
-            <span className="px-2 py-1 text-xs text-[#16A34A] font-medium rounded">
+            <span className="px-2 py-1 text-xs text-[#16A34A] font-medium rounded ">
               {total_promociones} promociones
             </span>
           </div>

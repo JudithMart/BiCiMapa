@@ -548,7 +548,7 @@ function MapView() {
               onClick={(e) => e.stopPropagation()}
             >
               <Card
-                image={selectedPlace.imagen_url}
+                image={selectedPlace.imagen_url || "/Tipos/sinTipo/lugarMorelia.jpg"}
                 title={selectedPlace.nombre}
                 slogan={selectedPlace.slogan}
                 description={selectedPlace.descripcion}

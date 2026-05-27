@@ -25,16 +25,16 @@ function FavoritesC({ lugaresFavoritos, es_premium }) {
               const tipoNombre = lugar.tipo?.nombre?.toLowerCase?.() || "";
               const esBaño = tipoNombre === "baño";
               const esCiclopuerto = tipoNombre === "ciclopuerto";
-              let imagenMostrar = lugar.imagen_url || "/placeholder.png";
+              let imagenMostrar = lugar.imagen_url || "/Tipos/sinTipo/lugarMorelia.jpg";
               if (esBaño) imagenMostrar = "/Tipos/2/tipo2_baño.jpg";
               if (esCiclopuerto) imagenMostrar = "/Tipos/4/tipo4_ciclopuerto.jpg";
               return (
                 <BoxPromotion
                   key={lugar.id}
                   nombre={lugar.nombre || "Lugar sin nombre"}
-                  imagen_lugar={imagenMostrar}
+                  imagen_lugar={imagenMostrar }
                   total_promociones={lugar.total_promociones || 0}
-                  tipo={lugar.tipo?.nombre || "Sin tipo"}
+                  tipo={lugar.tipo?.nombre || ""}
                   tipoColor={lugar.tipo?.color_hex || "#000"}
                   slug={lugar.slug || ""}
                   es_premium={es_premium}

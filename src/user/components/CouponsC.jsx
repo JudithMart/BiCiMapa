@@ -34,7 +34,7 @@ function CouponsC({ promociones }) {
                 key={promocion.id}
                 id={promocion.id}
                 nombre={promocion.lugar?.nombre || "Promoción sin nombre"}
-                imagen_lugar={promocion.lugar?.imagen_url || "/placeholder.png"}
+                imagen_lugar={promocion.lugar?.imagen_url || "/Tipos/sinTipo/lugarMorelia.jpg"}
                 descripcion={promocion.descripcion || "Sin descripción"}
                 descuento={promocion.descuento || 0}
                 codigo_qr={promocion.codigo_qr || ""}
