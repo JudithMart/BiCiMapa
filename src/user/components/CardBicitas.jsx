@@ -7,9 +7,9 @@ function CardBicitas({ rutas = [], onRouteClick, lugares = [] }) {
   return (
     <div
       className="relative flex flex-col rounded-3xl px-5
-   w-full max-w-[650px]
-   max-h-[75vh]
-   shadow-lg bg-cover bg-center overflow-hidden "
+w-full max-w-[650px]
+max-h-[70dvh]
+shadow-lg bg-cover bg-center "
       style={{
         backgroundImage: "url('/Fondos/FondoBicis.jpeg')",
         fontFamily: "Plus Jakarta Sans, sans-serif",
@@ -21,7 +21,7 @@ function CardBicitas({ rutas = [], onRouteClick, lugares = [] }) {
         <img
           src="/Logos/logoB2.png"
           alt="BiCitas Historicas"
-          className="w-20 h-20 md:w-32 md:h-32 object-cover rounded-xlflex-shrink-0 "
+          className="w-20 h-20 md:w-32 md:h-32 object-cover rounded-xlflex-shrink-0 rounded-xl"
         />
 
         <div className="min-w-0 flex-1 ">
@@ -30,13 +30,7 @@ function CardBicitas({ rutas = [], onRouteClick, lugares = [] }) {
           </p>
 
           <p
-            className="
-        text-[#B57A86]
-        font-light
-        text-sm md:text-lg
-        mt-1
-        leading-snug
-      "
+            className="text-[#B57A86] font-light text-sm md:text-lg mt-1 leading-snug"
           >
             No hay Morelia bonita,
             <br />
@@ -44,7 +38,9 @@ function CardBicitas({ rutas = [], onRouteClick, lugares = [] }) {
           </p>
         </div>
       </div>
-      <div className="py-5 pr-2 overflow-y-auto flex-1 min-h-0 bg-black">
+      <div
+        className="py-5 pb-8 pr-1 overflow-y-auto touch-pan-y custom-scroll "
+      >
         {mostrarSoloRutaSeleccionada ? (
           <BoxRoad
             key={rutas[0].id}

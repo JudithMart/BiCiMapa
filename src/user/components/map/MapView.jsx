@@ -1,5 +1,4 @@
 import { useRef, useEffect, useState } from "react";
-import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 import { MdDirectionsBike } from "react-icons/md";
@@ -268,29 +267,44 @@ function MapView() {
         </>
       )}
       {/* CARD BiCitas */}
-      {showBicitasCard && (
-        <>
-          <div
-            className="fixed inset-0 z-40"
-            onClick={() => {
-              setShowBicitasCard(false);
-              setSelectedRuta(null);
-            }}
-          />
-       <div className="fixed inset-0 z-50 flex justify-center px-4 pt-4 pb-28 overflow-hidden pointer-events-none">
-            <div
-                className="w-full flex justify-center items-end overflow-y-auto pointer-events-auto"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <CardBicitas
-                rutas={bicitasRutasInfo.length ? bicitasRutasInfo : rutas}
-                onRouteClick={handleDrawBicitasRoute}
-                lugares={selectedRuta ? (selectedRuta.ruta_lugar?.map(rl => rl.lugar) || []) : []}
-              />
-            </div>
-          </div>
-        </>
-      )}
+{showBicitasCard && (
+  <div
+    className="fixed inset-0 z-50"
+    onClick={() => {
+      setShowBicitasCard(false);
+      setSelectedRuta(null);
+    }}
+  >
+    {/* Overlay */}
+    <div className="absolute inset-0 bg-black/10" />
+
+    {/* CONTENEDOR */}
+    <div
+      className="
+        absolute inset-x-0 bottom-0
+        flex justify-center
+        px-3
+        pb-28
+        pt-4
+      "
+    >
+      <div
+        className="w-full max-w-[650px]"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <CardBicitas
+          rutas={bicitasRutasInfo.length ? bicitasRutasInfo : rutas}
+          onRouteClick={handleDrawBicitasRoute}
+          lugares={
+            selectedRuta
+              ? selectedRuta.ruta_lugar?.map((rl) => rl.lugar) || []
+              : []
+          }
+        />
+      </div>
+    </div>
+  </div>
+)}
     </>
   );
 }
