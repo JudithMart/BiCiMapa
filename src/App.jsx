@@ -46,6 +46,7 @@ function App() {
         <Navbar onPerfilClick={handleShowLogin} />
         <Routes>
           <Route path="/" element={<MapView />} />
+          <Route path="/mapa" element={<MapView />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/favoritos" element={<Favorites />} />
           {/* LISTA GENERAL */}

@@ -20,6 +20,10 @@ export default function Navbar({ onPerfilClick }) {
     if (tab.name === "Promociones") {
       return location.pathname.startsWith("/promociones") || location.pathname.startsWith("/validacion");
     }
+    if (tab.name === "Explorar") {
+      // Activo en '/' o en '/mapa' (con o sin query)
+      return location.pathname === "/" || (location.pathname === "/mapa");
+    }
     return tab.route !== "/"
       ? location.pathname.startsWith(tab.route)
       : location.pathname === "/";
@@ -55,7 +59,15 @@ export default function Navbar({ onPerfilClick }) {
               key={index}
               className={`flex flex-col items-center text-xs tracking-widest 
                 focus:outline-none transition-colors duration-300 ${isActive ? "text-white" : "text-white"}`}
-              onClick={() => isPerfil && !isLoggedIn && onPerfilClick ? onPerfilClick() : navigate(tab.route)}
+              onClick={() => {
+                if (isPerfil && !isLoggedIn && onPerfilClick) {
+                  onPerfilClick();
+                } else if (tab.name === "Explorar" && location.pathname === "/") {
+                  navigate("/mapa?goto=allende");
+                } else {
+                  navigate(tab.route);
+                }
+              }}
               type="button"
               style={{ minWidth: 60 }}
             >

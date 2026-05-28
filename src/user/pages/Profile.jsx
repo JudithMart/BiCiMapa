@@ -98,6 +98,7 @@ function Profile() {
         lugares_visitados={visitasValidas}
         lugares_reto={retoLugares}
         fecha_expiracion={userData?.fecha_expiracion}
+        es_premium={userData?.es_premium}
       />
     </>
   );
