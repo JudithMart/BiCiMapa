@@ -8,10 +8,12 @@ import { GiDutchBike } from "react-icons/gi";
 import { useAuth } from "../../context/AuthContext";
 import { placeTypes } from "../../config/placeTypes";
 import { getPlaces, isFavorito } from "../../services/lugar.service";
+import { getRutas } from "../../services/bicitas.service";
 
 import Card from "./Card";
+import CardBicitas from "./CardBicitas";
 
-function MapView( ) {
+function MapView() {
   const mapRef = useRef(null);
   const mapContainerRef = useRef(null);
   const [places, setPlaces] = useState([]);
@@ -26,7 +28,32 @@ function MapView( ) {
 
   const selectedPlaceRef = useRef(null);
 
+  const [showBicitasCard, setShowBicitasCard] = useState(false);
 
+  // Estado para rutas BiCitas
+   const [rutas, setRutas] = useState([]);
+
+    useEffect(() => {
+  
+
+    const fetchRutas = async () => {
+
+      const { rutas, error } = await getRutas();
+ console.log("RUTAS:", rutas);
+      if (error) {
+        console.error(error);
+        return;
+      }
+
+      setRutas(rutas);
+    };
+
+    fetchRutas();
+
+  }, []);
+
+
+//------------
 
   // Estado para el usuario
   //--------
@@ -342,13 +369,15 @@ function MapView( ) {
       const root = createRoot(el);
       // Ubicación BiCitas
       root.render(
-        <div className="marker-content w-8 h-10">
-          <img
-            className="w-full h-full animate-soft-bounce"
-            src="/Logos/Ubicación-logo.png"
-            alt="BiCita"
-          />
-        </div>,
+        <button onClick={() => setShowBicitasCard(true)}>
+          <div className="marker-content w-8 h-10">
+            <img
+              className="w-full h-full animate-soft-bounce"
+              src="/Logos/Ubicación-logo.png"
+              alt="BiCita"
+            />
+          </div>
+        </button>,
       );
 
       new mapboxgl.Marker(el)
@@ -460,6 +489,43 @@ function MapView( ) {
     };
   }, [places]);
   //------------
+  //------------
+  // Calcular minutos y km para cada ruta de BiCitas cuando se abre la Card y hay ubicación
+     const [bicitasRutasInfo, setBicitasRutasInfo] = useState([]);
+  
+  useEffect(() => {
+        const calcularInfoRutas = async () => {
+          if (!showBicitasCard || !userLocationRef.current || !rutas.length) {
+            setBicitasRutasInfo([]);
+            return;
+          }
+          const start = userLocationRef.current;
+          const token = mapboxgl.accessToken;
+          const promesas = rutas.map(async (ruta) => {
+            // Suponiendo que cada ruta tiene destino en ruta.longitud, ruta.latitud
+            // Si no, ajusta aquí los nombres de las propiedades
+            if (!ruta.longitud || !ruta.latitud) return { ...ruta, minutos: null, km: null };
+            const end = [ruta.longitud, ruta.latitud];
+            const url = `https://api.mapbox.com/directions/v5/mapbox/cycling/${start.join(",")};${end.join(",")}?geometries=geojson&access_token=${token}`;
+            try {
+              const res = await fetch(url);
+              const data = await res.json();
+              if (!data.routes || !data.routes[0]) return { ...ruta, minutos: null, km: null };
+              const duration = data.routes[0].duration;
+              const distance = data.routes[0].distance;
+              const minutos = Math.ceil(duration / 60);
+              const km = (distance / 1000).toFixed(2);
+              return { ...ruta, minutos, km };
+            } catch {
+              return { ...ruta, minutos: null, km: null };
+            }
+          });
+          const rutasConInfo = await Promise.all(promesas);
+          setBicitasRutasInfo(rutasConInfo);
+        };
+        calcularInfoRutas();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+      }, [showBicitasCard, rutas, userLocationRef.current]);
 
   return (
     <>
@@ -482,7 +548,7 @@ function MapView( ) {
               onClick={(e) => e.stopPropagation()}
             >
               <Card
-                image={selectedPlace.imagen_url}
+                image={selectedPlace.imagen_url || "/Tipos/sinTipo/lugarMorelia.jpg"}
                 title={selectedPlace.nombre}
                 slogan={selectedPlace.slogan}
                 description={selectedPlace.descripcion}
@@ -503,6 +569,23 @@ function MapView( ) {
                 favorite={isFavorite}
                 slug={selectedPlace.slug}
               />
+            </div>
+          </div>
+        </>
+      )}
+      {/* CARD BiCitas */}
+      {showBicitasCard && (
+        <>
+          <div
+            className="fixed inset-0 z-40"
+            onClick={() => setShowBicitasCard(false)}
+          />
+          <div className="fixed bottom-28 left-0 right-0 z-50 flex justify-center px-4 animate-slide-up">
+            <div
+              className="w-full flex justify-center"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <CardBicitas  rutas={bicitasRutasInfo.length ? bicitasRutasInfo : rutas} />
             </div>
           </div>
         </>

@@ -134,6 +134,7 @@ export const getLugaresFavoritosPorUsuario = async (id_usuario) => {
         nombre,
         imagen_url,
         slug,
+        es_convenio,
         tipo:tipo (
           id,
           nombre,

@@ -5,8 +5,6 @@ import { getDaysLeft } from "../../services/user_premium.service";
 
 function ProfileC({
   nombre,
-
-
   lugares_visitados,
   lugares_reto,
   fecha_expiracion,
