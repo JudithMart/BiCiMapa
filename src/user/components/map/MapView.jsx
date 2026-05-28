@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 import { MdDirectionsBike } from "react-icons/md";
@@ -22,6 +23,7 @@ import { useBicitasMarker } from "./hooks/useBicitasMarker.jsx";
 
 
 function MapView() {
+  const location = useLocation();
   const mapRef = useRef(null);
   const mapContainerRef = useRef(null);
   const [places, setPlaces] = useState([]);
@@ -178,6 +180,28 @@ function MapView() {
     coordinates: [allende.lng, allende.lat],
     onClick: () => setShowBicitasCard(true),
   });
+
+  // Si la URL tiene ?goto=allende, centrar y mostrar la card
+  // Detectar query param y activar estado
+// Detectar query param
+useEffect(() => {
+  const params = new URLSearchParams(location.search);
+
+  if (params.get("goto") === "allende") {
+    setShowBicitasCard(true);
+
+    // Esperar un poco para asegurar que el mapa ya montó
+    setTimeout(() => {
+      if (mapRef.current) {
+        mapRef.current.flyTo({
+          center: [allende.lng, allende.lat],
+          zoom: 17,
+          speed: 1.2,
+        });
+      }
+    }, 500);
+  }
+}, [location.search]);
   //------------
 
   useUserLocation({

@@ -155,7 +155,7 @@ function Card({
         </div>
       )}
       <div
-        className={`z-10 py-5 -mt-8 shadow-sm ${!es_premium  && !esBaño && !esCiclopuerto ? "opacity-50 pointer-events-none" : ""} 
+        className={`z-10 py-5 -mt-8 shadow-sm ${!es_premium  && !esBaño && !esCiclopuerto && es_convenio? "opacity-50 pointer-events-none" : ""} 
         ${esBaño || esCiclopuerto || !es_convenio? "flex justify-center" : "flex justify-between"}`}
       >
         <ButtonGray

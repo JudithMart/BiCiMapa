@@ -29,18 +29,14 @@ shadow-lg bg-cover bg-center "
             BiCitas Historicas
           </p>
 
-          <p
-            className="text-[#B57A86] font-light text-sm md:text-lg mt-1 leading-snug"
-          >
+          <p className="text-[#B57A86] font-light text-sm md:text-lg mt-1 leading-snug">
             No hay Morelia bonita,
             <br />
             sin una BiCita
           </p>
         </div>
       </div>
-      <div
-        className="py-5 pb-8 pr-1 overflow-y-auto touch-pan-y custom-scroll "
-      >
+      <div className="py-5 pb-8 pr-1 overflow-y-auto touch-pan-y custom-scroll ">
         {mostrarSoloRutaSeleccionada ? (
           <BoxRoad
             key={rutas[0].id}
