@@ -6,7 +6,6 @@ import { getDaysLeft } from "../../services/user_premium.service";
 import { MdOutlineDirections } from "react-icons/md";
 import ButtonPink from "../../shared/components/ButtonPink";
 
-
 function ProfileC({
   nombre,
   lugares_visitados,
@@ -105,16 +104,16 @@ function ProfileC({
                 Morelia de una forma diferente.
               </p>
 
-              <ButtonPink 
+              <ButtonPink
                 texto={
-                  <span className="flex justify-center  gap-2"> 
+                  <span className="flex justify-center  gap-2">
                     <MdOutlineDirections className="w-5 h-5" />
-                     Ir a BiCitas
+                    Ir a BiCitas
                   </span>
                 }
                 px="px-7"
                 mt="mt-2"
-                onClick={() => navigate('/mapa?goto=allende')}
+                onClick={() => navigate("/mapa?goto=allende")}
               />
             </div>
           </div>
@@ -147,20 +146,31 @@ function ProfileC({
               <LuBike size={32} className="text-primary drop-shadow-lg" />
             </div>
           </div>
-          <p className="font-light text-texto mt-3 text-sm">
-            Visita{" "}
-            <span className="font-semibold">
-              {" "}
-              {total - completadas} lugares más
-            </span>{" "}
-            y obten una promo en
-            <span className="text-primary font-semibold "> BiCitas</span>
-          </p>
+          {total - completadas === 0 ? (
+            <p className="font-light text-texto mt-3 text-sm text-center">
+              Felicidades completaste el reto ve a{" "}
+              <span className="text-primary font-semibold">BiCitas</span> y
+              reclama tu premio
+            </p>
+          ) : (
+            <p className="font-light text-texto mt-3 text-sm">
+              Visita{" "}
+              <span className="font-semibold">
+                {" "}
+                {total - completadas} lugares más
+              </span>{" "}
+              y obten una promo en
+              <span className="text-primary font-semibold "> BiCitas</span>
+            </p>
+          )}
         </div>
         {fecha_expiracion && (
-          <p className="text-xs text-center text-gray-500">
-            Tienes {getDaysLeft(fecha_expiracion)} días restantes para completar
-            el reto.
+          <p className="text-sm text-center text-gray-500 mt-2">
+            Tienes{" "}
+            <span className="text-primary font-bold">
+              {getDaysLeft(fecha_expiracion)} días
+            </span>{" "}
+            restantes para completar el reto.
           </p>
         )}
         {/* Lugares */}

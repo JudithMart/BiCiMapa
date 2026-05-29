@@ -1,11 +1,12 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { getCurrentUser, getUsuario } from "../services/auth.service";
+import { validatePremiumStatus } from "../services/user_premium.service";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [userAuth, setUserAuth] = useState(null); 
-  const [userData, setUserData] = useState(null); 
+  const [userAuth, setUserAuth] = useState(null);
+  const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const refreshUser = async () => {
@@ -23,8 +24,14 @@ export const AuthProvider = ({ children }) => {
       setUserAuth(user);
 
       const { data } = await getUsuario(user.id);
-      setUserData(data);
+      // VALIDAR PREMIUM
+      const premiumActivo = await validatePremiumStatus(data);
 
+      // ACTUALIZAR userData
+      setUserData({
+        ...data,
+        es_premium: premiumActivo,
+      });
     } catch (error) {
       console.error("Auth error:", error);
       setUserAuth(null);
