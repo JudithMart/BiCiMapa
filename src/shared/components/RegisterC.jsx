@@ -39,7 +39,7 @@ function RegisterC({ onClose,  onAuthSuccess }) {
       nombre, 
       telefono,
     );
-    console.log("Respuesta de Supabase al registrar:", { user, error });
+    // console.log("Respuesta de Supabase al registrar:", { user, error });
     if (error) {
       setMensaje("Error al registrar: " + error.message);
       setTipoMensaje("error");
@@ -85,6 +85,7 @@ function RegisterC({ onClose,  onAuthSuccess }) {
               type="text"
               placeholder="Ingrese nombre completo"
               value={nombre}
+              maxLength={100}
               onChange={(e) => setNombre(e.target.value)}
               className="w-full px-3 py-2 rounded-lg  mt-1 border font-playfair font-thin border-[#E2E8F0] focus:outline-none focus:ring-2 focus:ring-primary"
             />
@@ -93,7 +94,7 @@ function RegisterC({ onClose,  onAuthSuccess }) {
           <div className="mt-5 w-full flex flex-col justify-start pl-6 px-5">
             <p className=" text-texto font-semibold text-base md:text-lg lg:text-xl ">Numero de teléfono</p>
             <input
-              type="text"
+              type="tel"
               placeholder="Ingrese numero de teléfono"
               value={telefono}
               onChange={(e) => setTelefono(e.target.value)}
@@ -104,7 +105,7 @@ function RegisterC({ onClose,  onAuthSuccess }) {
           <div className="mt-5 w-full flex flex-col justify-start pl-6 px-5">
             <p className=" text-texto font-semibold text-base md:text-lg lg:text-xl ">Email</p>
             <input
-              type="text"
+              type="email"
               placeholder="Ingrese su email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -119,6 +120,7 @@ function RegisterC({ onClose,  onAuthSuccess }) {
                 type={showPassword ? "text" : "password"}
                 placeholder="*******"
                 value={password}
+                minLength={8}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-3 py-2 rounded-lg mt-1 border font-thin border-[#E2E8F0] focus:outline-none focus:ring-2 focus:ring-primary pr-10"
               />

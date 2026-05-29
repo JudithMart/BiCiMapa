@@ -1,3 +1,4 @@
+
 /*
 Funciones para:
 - Registro de usuarios
@@ -34,7 +35,7 @@ export const logoutUser = async () => {
 
 export const getCurrentUser = async () => {
   const { data, error } = await supabase.auth.getUser();
-  console.log('Usuario actual:', { data, error });
+  // console.log('Usuario actual:', { data, error });
   return { user: data?.user, error };
 };
 
@@ -48,3 +49,15 @@ export const getUsuario = async (id) => {
   return { data, error };
 };
 
+//Cambiar redirectTo: "https://tudominio.com/update-password"
+export const resetPassword = async (email) => {
+  return await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: "http://localhost:5173/editar-contrasena",
+  });
+};
+
+// Actualizar contraseña del usuario autenticado
+export const updatePassword = async (password) => {
+  const { error } = await supabase.auth.updateUser({ password });
+  return { error };
+};

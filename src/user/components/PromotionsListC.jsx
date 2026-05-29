@@ -34,7 +34,9 @@ function PromotionsListC({ places, es_premium }) {
                 tipoColor={lugar.tipo?.color_hex || ""}
                 slug={lugar.slug || ""}
                 es_premium={es_premium}
+                es_convenio={lugar.es_convenio}
               />
+
               
             ))
             
