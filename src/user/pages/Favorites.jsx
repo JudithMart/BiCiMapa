@@ -18,7 +18,7 @@ function Favorites() {
       }
 
       setLugaresFavoritos(favoritos);
-      console.log(favoritos);
+      // console.log(favoritos);
     };
 
     if (userData?.id) {

@@ -10,9 +10,9 @@ function Validation() {
 
   const { nombreLugar, descripcion, descuento, imagenLugar } =
     location.state || {};
-    console.log("Datos recibidos en Validation:", {
-      promocionId,
-      nombreLugar,});
+    // console.log("Datos recibidos en Validation:", {
+    //   promocionId,
+    //   nombreLugar,});
   return (
     <>
     

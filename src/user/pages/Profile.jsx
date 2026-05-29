@@ -39,7 +39,7 @@ function Profile() {
     const fetchUserProgress = async () => {
       if (userAuth?.id) {
         const { data, error } = await getUserProgress(userAuth?.id);
-        console.log("Progreso del usuario:", data);
+        // console.log("Progreso del usuario:", data);
         if (error) {
           console.error(error);
           return;
@@ -58,7 +58,7 @@ function Profile() {
     const fetchVisitedLugares = async () => {
       if (userAuth?.id) {
         const { data, error } = await getVisitedLugares(userAuth?.id);
-        console.log("Lugares visitados por el usuario:", data);
+
         if (error) {
           console.error(error);
           return;
@@ -75,7 +75,7 @@ function Profile() {
     const fetchRetoLugares = async () => {
       if (retoActivo?.id) {
         const { data, error } = await getRetoLugares(retoActivo?.id);
-        console.log("Lugares del reto activo:", data);
+       
         if (error) {
           console.error(error);
           return;

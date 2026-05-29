@@ -51,7 +51,7 @@ function Card({
 
         if (error && error.code !== "23505") {
           // duplicate
-          console.error(error);
+          // console.error(error);
           return;
         }
 

@@ -23,7 +23,7 @@ export const calculateRouteInfo = async (start, end) => {
       geometry: data.routes[0].geometry,
     };
   } catch (error) {
-    console.error(error);
+    // console.error(error);
 
     return {
       minutes: null,
