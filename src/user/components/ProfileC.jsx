@@ -45,7 +45,7 @@ function ProfileC({
         className="py-8  mt-1 w-full bg-[#ffffff]/75 flex items-center rounded-b-2xl 
       shadow-lg "
       >
-        <div className=" rounded-full w-52 h-[85px]  ">
+        <div className=" rounded-full w-44 h-[85px]  ">
           <img
             className="bg-cover  h-full w-full"
             src="\Avatar\Avatar.png"
