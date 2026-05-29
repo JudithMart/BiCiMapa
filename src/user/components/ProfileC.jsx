@@ -5,6 +5,9 @@ import BoxPlace from "./BoxPlace";
 import { getDaysLeft } from "../../services/user_premium.service";
 import { MdOutlineDirections } from "react-icons/md";
 import ButtonPink from "../../shared/components/ButtonPink";
+import { IoLogOutOutline } from "react-icons/io5";
+import { useAuth } from "../../context/AuthContext";
+import { logoutUser } from "../../services/auth.service";
 
 function ProfileC({
   nombre,
@@ -14,6 +17,14 @@ function ProfileC({
   es_premium,
 }) {
   const navigate = useNavigate();
+  const { setUserAuth, setUserData } = useAuth();
+  // Handler para cerrar sesión
+  const handleLogout = async () => {
+    await logoutUser();
+    setUserAuth(null);
+    setUserData(null);
+    navigate("/");
+  };
   // Unificar lugares del reto y marcar si han sido visitados
   const lugaresCombinados = (lugares_reto || []).map((lugar) => {
     const id = lugar.id_lugar || lugar.lugar?.id || lugar.id;
@@ -35,24 +46,51 @@ function ProfileC({
   const completadas = lugaresCombinados.filter((l) => l.visitado).length;
 
   const porcentaje = Math.min((completadas / total) * 100, 100);
+  // Procesar el nombre para mostrarlo en partes y el último apellido en color
+  const nombreParts = (nombre || "").trim().split(/\s+/);
+  let nombre1 = "", nombre2 = "", apellido1 = "", apellido2 = "";
+  if (nombreParts.length >= 4) {
+    [nombre1, nombre2, apellido1, apellido2] = nombreParts;
+  } else if (nombreParts.length === 3) {
+    [nombre1, apellido1, apellido2] = nombreParts;
+  } else if (nombreParts.length === 2) {
+    [nombre1, apellido1] = nombreParts;
+  } else if (nombreParts.length === 1) {
+    [nombre1] = nombreParts;
+  }
+
   return (
     <div
-      className="relative flex items-center flex-col w-full h-screen
-         bg-cover bg-center "
+      className="relative flex items-center flex-col w-full h-screen bg-cover bg-center "
       style={{ backgroundImage: "url('/Fondos/FondoCafe.png')" }}
     >
-      <div
-        className="py-8  mt-1 w-full bg-[#ffffff]/75 flex items-center rounded-b-2xl 
-      shadow-lg "
+      {/* Botón de cerrar sesión */}
+      <button
+        className="absolute top-12 right-4 z-50    transition-colors"
+        title="Cerrar sesión"
+        onClick={handleLogout}
+        name="Cerrar sesión"
       >
-        <div className=" rounded-full w-52 h-[85px]  ">
+        <IoLogOutOutline className="text-primary" size={24} />
+      </button>
+      <div
+        className="py-8  mt-1 w-full bg-[#ffffff]/75 flex items-center rounded-b-2xl shadow-lg "
+      >
+        <div className="rounded-full ml-5 w-24 aspect-square overflow-hidden flex items-center justify-center  shadow-md">
           <img
-            className="bg-cover  h-full w-full"
-            src="\Avatar\Avatar.png"
-          ></img>
+            className="object-cover w-full h-full"
+            src="/Avatar/Avatar.png"
+            alt="Avatar"
+          />
         </div>
         <div>
-          <p className="text-texto -ml-5 text-2xl font-bold">{nombre}</p>
+          <p className="text-texto ml-3 text-2xl font-bold">
+            {/* Mostrar nombres y apellidos, el último en color primario */}
+            {nombre1} {nombre2} {apellido1}
+            {apellido2 && (
+              <span className="text-primary"> {apellido2}</span>
+            )}
+          </p>
         </div>
       </div>
       <div className=" relative flex flex-col justify-center px-3 py-5 w-full  ">

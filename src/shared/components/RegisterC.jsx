@@ -136,7 +136,7 @@ function RegisterC({ onClose,  onAuthSuccess }) {
             </span>
           </div>
           <div className="-mt-5 w-full flex flex-col justify-start pl-6 px-5">
-            <ButtonPink px="px-4" texto="Iniciar sesión" onClick={handleRegister} />
+            <ButtonPink px="px-4" texto="Registrarse" onClick={handleRegister} />
             {mensaje && (
               <div className={`mt-1 px-3 py-2 rounded text-sm text-center font-semibold 
                 ${tipoMensaje === 'error' ? 'bg-red-100 text-red-700 border border-red-300' : ''}

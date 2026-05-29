@@ -178,7 +178,7 @@ function LoginC({ onClose, onShowRegister, onAuthSuccess }) {
               Email
             </p>
             <input
-              type="text"
+              type="email"
               placeholder="Ingresa tu email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
