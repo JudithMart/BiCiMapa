@@ -177,6 +177,6 @@ export const drawBicitasRoute = async ({
       },
     });
   } catch (error) {
-    console.error(error);
+    // console.error(error);
   }
 };

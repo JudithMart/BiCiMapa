@@ -28,7 +28,7 @@ export const validatePremiumStatus = async (user) => {
       .eq("id", user.id);
 
     if (error) {
-      console.error("Error actualizando premium:", error);
+      // console.error("Error actualizando premium:", error);
     }
 
     return false;

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { loginUser } from "../../services/auth.service";
+import { loginUser,resetPassword } from "../../services/auth.service";
 import { useAuth } from "../../context/AuthContext";
 import ButtonPink from "./ButtonPink";
 
@@ -104,18 +104,37 @@ function LoginC({ onClose, onShowRegister, onAuthSuccess }) {
       setUserAuth(user);
       setMensaje("Inicio de sesión exitoso");
       if (onAuthSuccess) onAuthSuccess();
-      console.log("Usuario logeado:", user);
+      // console.log("Usuario logeado:", user);
     }
+  };
+
+  const handleReset = async () => {
+    if (!email) {
+      setMensaje("Por favor ingresa tu correo electrónico.");
+      setTipoMensaje("error");
+      return;
+    }
+
+    // Validación básica de formato de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setMensaje("Correo no existe y/o está mal escrito");
+      setTipoMensaje("error");
+      return;
+    }
+
+    await resetPassword(email);
+    setMensaje("Si el correo existe, se ha enviado un correo para restablecer tu contraseña.");
+    setTipoMensaje("success");
   };
 
   return (
     <div className="h-dvh flex items-center justify-center bg-transparent overflow-hidden">
-     <div
-  className="relative flex flex-col
+      <div
+        className="relative flex flex-col
   w-80 md:w-[650px]
   max-h-[90dvh] overflow-y-auto
   rounded-2xl shadow-lg bg-cover bg-center"
-
         style={{ backgroundImage: "url('/Fondos/FondoBicis.jpeg')" }}
       >
         {/* Botón de cerrar modal */}
@@ -159,7 +178,7 @@ function LoginC({ onClose, onShowRegister, onAuthSuccess }) {
               Email
             </p>
             <input
-              type="text"
+              type="email"
               placeholder="Ingresa tu email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -187,8 +206,16 @@ function LoginC({ onClose, onShowRegister, onAuthSuccess }) {
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
               </span>
             </div>
+            <button
+              className="flex items-center mt-2"
+              onClick={handleReset}
+            >
+              <p className=" text-xs font-extralight text-texto hover:underline ml-1">
+                Olvidé mi contraseña
+              </p>
+            </button>
           </div>
-          <div className="mt-5  w-full flex flex-col justify-start pl-6 px-5">
+          <div className="mt-2  w-full flex flex-col justify-start pl-6 px-5">
             <ButtonPink
               texto="Iniciar sesión"
               px="px-4"
@@ -196,7 +223,7 @@ function LoginC({ onClose, onShowRegister, onAuthSuccess }) {
               disabled={bloqueado}
             />
           </div>
-          <p className="font-thin text-[11px] py-3">
+          <p className="font-thin text-[11px] py-4">
             {bloqueado ? (
               <span className="text-red-500">
                 Demasiados intentos. Intenta de nuevo en 5 min.

@@ -78,7 +78,7 @@ export const useUserLocation = ({
           }
         },
         (error) => {
-          console.error(error);
+          // console.error(error);
         },
         {
           enableHighAccuracy: true,

@@ -61,9 +61,9 @@ function MapView() {
   useEffect(() => {
     const fetchRutas = async () => {
       const { rutas, error } = await getRutas();
-      console.log("RUTAS:", rutas);
+      // console.log("RUTAS:", rutas);
       if (error) {
-        console.error(error);
+        // console.error(error);
         return;
       }
 
@@ -88,8 +88,8 @@ function MapView() {
   //------------
   // Actualizar isFavorite cuando cambie el usuario o el lugar seleccionado
   useEffect(() => {
-    console.log("USER:", userAuth);
-    console.log("SELECTED:", selectedPlace);
+    // console.log("USER:", userAuth);
+    // console.log("SELECTED:", selectedPlace);
 
     const checkFavorite = async () => {
       if (userAuth?.id && selectedPlace?.id) {
@@ -229,7 +229,7 @@ useEffect(() => {
       const { places, error } = await getPlaces();
 
       if (error) {
-        console.error(error);
+        // console.error(error);
         return;
       }
 

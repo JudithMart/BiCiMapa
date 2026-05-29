@@ -15,6 +15,7 @@ export const getLugaresConPromociones = async () => {
       id,
       nombre,
       imagen_url,
+      es_convenio,
       slug,
       tipo:tipo (
         id,
@@ -48,7 +49,7 @@ export const getPromocionesPorLugar = async (slug) => {
   // 1. Obtener lugar por slug
   const { data: lugar, error: errorLugar } = await supabase
     .from("lugar")
-    .select("id, nombre, slug")
+    .select("id, nombre, slug, es_convenio")
     .eq("slug", slug)
     .maybeSingle();
 
@@ -69,6 +70,7 @@ export const getPromocionesPorLugar = async (slug) => {
         id,
         nombre,
         imagen_url,
+        es_convenio,
         slug,
           tipo:tipo (
       id,
