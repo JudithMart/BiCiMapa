@@ -35,7 +35,7 @@ function BoxPromotion({
          focus:outline-none w-full "
         onClick={handleClick}
         type="button"
-        disabled={!es_premium}
+        disabled={!es_premium || !es_convenio}
         style={!es_premium ? { opacity: 0.7, cursor: "not-allowed" } : {}}
       >
         {/* Overlay solo si no es premium */}

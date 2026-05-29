@@ -17,7 +17,7 @@ function Coupons() {
     }
 
     setPromociones(promociones);
-    console.log(promociones);
+    // console.log(promociones);
   };
 
   if (slug) fetchPlaces();

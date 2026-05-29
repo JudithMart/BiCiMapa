@@ -33,7 +33,7 @@ export const AuthProvider = ({ children }) => {
         es_premium: premiumActivo,
       });
     } catch (error) {
-      console.error("Auth error:", error);
+      // console.error("Auth error:", error);
       setUserAuth(null);
       setUserData(null);
     } finally {

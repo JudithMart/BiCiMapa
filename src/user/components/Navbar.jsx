@@ -12,7 +12,7 @@ export default function Navbar({ onPerfilClick }) {
     { name: "Explorar", icon: Home, route: "/" },
     { name: "Favoritos", icon: Heart, route: "/favoritos" },
     { name: "Promociones", icon: Ticket, route: "/promociones" },
-    { name: "Perfil", icon: User, route: isLoggedIn ? "/profile" : "/login" },
+    { name: "Perfil", icon: User, route: isLoggedIn ? "/perfil" : "/login" },
   ];
   const navigate = useNavigate();
   const location = useLocation();

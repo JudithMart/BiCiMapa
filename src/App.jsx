@@ -1,3 +1,4 @@
+
 import "./App.css";
 
 import Navbar from "./user/components/Navbar";
@@ -13,12 +14,16 @@ import { useState } from "react";
 import { useAuth } from "./context/AuthContext";
 import Validation from "./user/pages/Validation";
 import Favorites from "./user/pages/Favorites";
+import ProtectedRoute from "./user/components/ProtectedRoute";
+import NotFound from "./user/pages/NotFound";
+import ResetPassword from "./user/pages/ResetPassword";
 
 
 function App() {
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
   const { refreshUser } = useAuth();
+   const { loading } = useAuth();
 
   // Función para actualizar el estado de login tras login/registro
   const handleAuthSuccess = () => {
@@ -40,20 +45,27 @@ function App() {
   const handleCloseLogin = () => setShowLogin(false);
   const handleCloseRegister = () => setShowRegister(false);
 
+   if (loading) {
+    return <ProtectedRoute />;
+  }
+
+
   return (
     <>
       <BrowserRouter>
         <Navbar onPerfilClick={handleShowLogin} />
         <Routes>
-          <Route path="/" element={<MapView />} />
-          <Route path="/mapa" element={<MapView />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/favoritos" element={<Favorites />} />
+          <Route path="/" element={<ProtectedRoute><MapView /></ProtectedRoute>} />
+          <Route path="/mapa" element={<ProtectedRoute><MapView /></ProtectedRoute>} />
+          <Route path="/perfil" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+          <Route path="/favoritos" element={<ProtectedRoute><Favorites /></ProtectedRoute>} />
           {/* LISTA GENERAL */}
-          <Route path="/promociones" element={<PromotionsList />} />
+          <Route path="/promociones" element={<ProtectedRoute><PromotionsList /></ProtectedRoute>} />
           {/*  DETALLE POR LUGAR (desde navbar o card) */}
-          <Route path="/promociones/:slug" element={<Coupons />} />
-          <Route path="/validacion/:promocionId" element={<Validation />} />
+          <Route path="/promociones/:slug" element={<ProtectedRoute><Coupons /></ProtectedRoute>} />
+          <Route path="/validacion/:promocionId" element={<ProtectedRoute><Validation /></ProtectedRoute>} />
+          <Route path="*" element={<NotFound />} />
+          <Route path="/editar-contrasena" element={<ProtectedRoute><ResetPassword /></ProtectedRoute>} />
         </Routes>
       </BrowserRouter>
       {showLogin && (
@@ -83,3 +95,4 @@ function App() {
 }
 
 export default App;
+
