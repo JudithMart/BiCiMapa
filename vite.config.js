@@ -8,4 +8,10 @@ export default defineConfig({
     host: '0.0.0.0', // Permite acceso desde cualquier IP local
     port: 5173 // Puedes cambiar el puerto si lo deseas
   },
+
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: './src/tests/setup.js',
+  },
 })
