@@ -29,8 +29,8 @@ export const usePlaceMarkers = ({
             <div
               className={`relative flex items-center justify-center rounded-full ${
                 place.es_convenio
-                  ? " w-8 h-8 shadow-md"
-                  : " 7 w-7 h-7 opacity-80"
+                  ? " w-9 h-9 shadow-md"
+                  : "  w-8 h-8 opacity-80"
               }`}
               style={{
                 backgroundColor: place.es_convenio
