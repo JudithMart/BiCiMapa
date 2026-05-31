@@ -110,12 +110,16 @@ function MapView() {
   }, [userAuth, selectedPlace]);
   //------------
 
+  
+    const routeColorRef = useRef("#B57A86");
   //------------
   const handleDrawRoute = async (place) => {
     if (!userLocationRef.current || !mapRef.current) {
       alert("Ubicación no disponible");
       return;
     }
+
+    routeColorRef.current = place.t;
 
     await drawRoute({
       map: mapRef.current,
@@ -126,6 +130,7 @@ function MapView() {
     });
   };
   //------------
+
   const handleDrawBicitasRoute = async (ruta) => {
     setSelectedRuta(ruta); // Guardar la ruta seleccionada
     if (!userLocationRef.current || !mapRef.current) {
@@ -216,12 +221,14 @@ function MapView() {
     userLocationRef,
     userMarkerRef,
     routeCoordinatesRef,
+    routeColorRef,
     selectedPlaceRef,
     lastRecalcRef,
     handleDrawRoute,
     setLocationReady,
     locationReady,
     mapReady,
+   
   });
   //------------
   usePlaceMarkers({
@@ -270,10 +277,11 @@ function MapView() {
             tipo: { color_hex: "#B57A86" },
           })
         }
-        className="bg-secundary/60 rounded-full text-sm md:text-base text-primary font-semibold px-2 py-1  fixed top-8 right-4 z-50 "
+        className="bg-primary/85 rounded-full text-sm md:text-base text-white font-semibold px-3 py-3  fixed top-8 right-4 z-50 "
       >
-        <MdOutlineDirections className=" ml-2 w-7 h-7 text-center" />
-        <p className="text-sm md:text-sm font-extrabold  ">BiCitas </p>
+        <MdOutlineDirections className=" ml-2 w-5 h-5 text-center" />
+        <p className="text-xs md:text-sm font-normal  ">BiCitas </p>
+        {/* <p className="text-xs  font-extralight ">Historicas</p> */}
 
         {/* <img src="/Logos/logoB2.png" alt="BiCiMapa Logo" className="w-11 h-12 fixed top-8 right-4 z-50 rounded-md" >
         </img> */}

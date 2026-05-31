@@ -3,21 +3,22 @@ import { useEffect } from "react";
 import mapboxgl from "mapbox-gl";
 import { createRoot } from "react-dom/client";
 import { MdDirectionsBike } from "react-icons/md";
+import { findClosestPointIndex } from "../utils/routeProgress";
+import { drawProgressRoute } from "../utils/mapRoutes";
 
 export const useUserLocation = ({
   mapRef,
   userLocationRef,
   userMarkerRef,
   routeCoordinatesRef,
-  selectedPlaceRef,
-  lastRecalcRef,
-  handleDrawRoute,
-   mapReady,
+
+  mapReady,
   setLocationReady,
+  routeColorRef,
 }) => {
   useEffect(() => {
     if (!mapRef.current) return;
-      if (!mapReady) return;
+    if (!mapReady) return;
 
     let watchId;
 
@@ -32,6 +33,23 @@ export const useUserLocation = ({
 
           userLocationRef.current = newCoords;
 
+          if (routeCoordinatesRef.current?.length) {
+            const closestIndex = findClosestPointIndex(
+              newCoords,
+              routeCoordinatesRef.current,
+            );
+
+            const traveled = routeCoordinatesRef.current.slice(0, closestIndex);
+
+            const remaining = routeCoordinatesRef.current.slice(closestIndex);
+
+            drawProgressRoute({
+              map: mapRef.current,
+              traveled,
+              remaining,
+              color: routeColorRef.current,
+            });
+          }
           // mover marcador
           if (userMarkerRef.current) {
             userMarkerRef.current.setLngLat(newCoords);
@@ -56,15 +74,15 @@ export const useUserLocation = ({
           }
 
           // recalcular ruta
-          if (routeCoordinatesRef.current && selectedPlaceRef.current) {
-            const now = Date.now();
+          // if (routeCoordinatesRef.current && selectedPlaceRef.current) {
+          //   const now = Date.now();
 
-            if (now - lastRecalcRef.current > 5000) {
-              handleDrawRoute(selectedPlaceRef.current);
+          //   if (now - lastRecalcRef.current > 5000) {
+          //     handleDrawRoute(selectedPlaceRef.current);
 
-              lastRecalcRef.current = now;
-            }
-          }
+          //     lastRecalcRef.current = now;
+          //   }
+          // }
 
           // mover cámara
           if (
@@ -77,7 +95,7 @@ export const useUserLocation = ({
               duration: 500,
             });
           }
-         setLocationReady(true);
+          setLocationReady(true);
         },
 
         (error) => {

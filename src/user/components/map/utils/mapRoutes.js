@@ -3,11 +3,15 @@ import mapboxgl from "mapbox-gl";
 
 let progress = 0;
 
-export const animateRoute = ({
-  map,
-  coordinates,
-  color = "#B57A86",
-}) => {
+export const clearRoutes = (map) => {
+  ["route", "route-traveled", "route-remaining"].forEach((id) => {
+    if (map.getLayer(id)) map.removeLayer(id);
+
+    if (map.getSource(id)) map.removeSource(id);
+  });
+};
+
+export const animateRoute = ({ map, coordinates, color = "#B57A86" }) => {
   const partialRoute = {
     type: "Feature",
     geometry: {
@@ -17,10 +21,7 @@ export const animateRoute = ({
   };
 
   // Eliminar anterior
-  if (map.getSource("route")) {
-    map.removeLayer("route");
-    map.removeSource("route");
-  }
+  clearRoutes(map);
 
   map.addSource("route", {
     type: "geojson",
@@ -42,9 +43,7 @@ export const animateRoute = ({
 
   function step() {
     if (progress < coordinates.length) {
-      partialRoute.geometry.coordinates.push(
-        coordinates[progress]
-      );
+      partialRoute.geometry.coordinates.push(coordinates[progress]);
 
       map.getSource("route").setData(partialRoute);
 
@@ -72,7 +71,7 @@ export const drawRoute = async ({
 
   const route = data.routes[0].geometry;
 
-  routeCoordinatesRef.current = route.coordinates;
+  routeCoordinatesRef.current = route;
 
   animateRoute({
     map,
@@ -93,10 +92,7 @@ export const drawRoute = async ({
   return data.routes[0];
 };
 
-export const isUserOffRoute = (
-  routeCoordinates,
-  userCoords,
-) => {
+export const isUserOffRoute = (routeCoordinates, userCoords) => {
   if (!routeCoordinates) return false;
 
   const threshold = 0.0003;
@@ -121,20 +117,12 @@ export const drawBicitasRoute = async ({
     // Ordenar lugares
     const lugaresOrdenados = [...ruta.ruta_lugar]
       .sort((a, b) => a.orden - b.orden)
-      .map((item) => [
-        item.lugar.longitud,
-        item.lugar.latitud,
-      ]);
+      .map((item) => [item.lugar.longitud, item.lugar.latitud]);
 
     // Inicio usuario + puntos ruta
-    const coordinates = [
-      start,
-      ...lugaresOrdenados,
-    ];
+    const coordinates = [start, ...lugaresOrdenados];
 
-    const coordsString = coordinates
-      .map((coord) => coord.join(","))
-      .join(";");
+    const coordsString = coordinates.map((coord) => coord.join(",")).join(";");
 
     const url = `https://api.mapbox.com/directions/v5/mapbox/cycling/${coordsString}?geometries=geojson&access_token=${mapboxgl.accessToken}`;
 
@@ -145,13 +133,10 @@ export const drawBicitasRoute = async ({
 
     const route = data.routes[0].geometry.coordinates;
 
-    routeCoordinatesRef.current = route;
+    routeCoordinatesRef.current = route.coordinates;
 
     // borrar anterior
-    if (map.getSource("route")) {
-      map.removeLayer("route");
-      map.removeSource("route");
-    }
+    clearRoutes(map);
 
     map.addSource("route", {
       type: "geojson",
@@ -180,4 +165,54 @@ export const drawBicitasRoute = async ({
   } catch (error) {
     // console.error(error);
   }
+};
+
+export const drawProgressRoute = ({ map, traveled, remaining, color }) => {
+  ["route-traveled", "route-remaining"].forEach((id) => {
+    if (map.getLayer(id)) map.removeLayer(id);
+
+    if (map.getSource(id)) map.removeSource(id);
+  });
+
+  map.addSource("route-traveled", {
+    type: "geojson",
+    data: {
+      type: "Feature",
+      geometry: {
+        type: "LineString",
+        coordinates: traveled,
+      },
+    },
+  });
+
+  map.addLayer({
+    id: "route-traveled",
+    type: "line",
+    source: "route-traveled",
+    paint: {
+      "line-color": "#CFCFCF",
+      "line-width": 6,
+    },
+  });
+
+  map.addSource("route-remaining", {
+    type: "geojson",
+    data: {
+      type: "Feature",
+      geometry: {
+        type: "LineString",
+        coordinates: remaining,
+      },
+    },
+  });
+
+  map.addLayer({
+    id: "route-remaining",
+    type: "line",
+    source: "route-remaining",
+    paint: {
+      "line-color": color,
+      "line-width": 6,
+    },
+  });
 };
