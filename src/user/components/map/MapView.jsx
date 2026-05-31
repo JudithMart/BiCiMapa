@@ -110,8 +110,7 @@ function MapView() {
   }, [userAuth, selectedPlace]);
   //------------
 
-  
-    const routeColorRef = useRef("#B57A86");
+  const routeColorRef = useRef("#B57A86");
   //------------
   const handleDrawRoute = async (place) => {
     if (!userLocationRef.current || !mapRef.current) {
@@ -119,6 +118,7 @@ function MapView() {
       return;
     }
 
+    setSelectedPlace(null);
     routeColorRef.current = place.t;
 
     await drawRoute({
@@ -130,9 +130,21 @@ function MapView() {
     });
   };
   //------------
+  const handleGoToAllende = async () => {
+    setShowBicitasCard(false);
+
+    await handleDrawRoute({
+      nombre: "Allende 527",
+      longitud: allende.lng,
+      latitud: allende.lat,
+      tipo: { color_hex: "#B57A86" },
+    });
+  };
+  //------------
 
   const handleDrawBicitasRoute = async (ruta) => {
     setSelectedRuta(ruta); // Guardar la ruta seleccionada
+    
     if (!userLocationRef.current || !mapRef.current) {
       alert("Ubicación no disponible");
       return;
@@ -144,6 +156,8 @@ function MapView() {
       ruta,
       routeCoordinatesRef,
     });
+
+    setShowBicitasCard(false);
   };
 
   //------------
@@ -228,7 +242,6 @@ function MapView() {
     setLocationReady,
     locationReady,
     mapReady,
-   
   });
   //------------
   usePlaceMarkers({
@@ -357,14 +370,7 @@ function MapView() {
               <CardBicitas
                 rutas={bicitasRutasInfo.length ? bicitasRutasInfo : rutas}
                 onRouteClick={handleDrawBicitasRoute}
-                onRouteClickDirection={() =>
-                  handleDrawRoute({
-                    nombre: "Allende 527",
-                    longitud: allende.lng,
-                    latitud: allende.lat,
-                    tipo: { color_hex: "#B57A86" },
-                  })
-                }
+             onRouteClickDirection={handleGoToAllende}
                 lugares={
                   selectedRuta
                     ? selectedRuta.ruta_lugar?.map((rl) => rl.lugar) || []
