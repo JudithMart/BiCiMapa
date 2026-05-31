@@ -1,3 +1,4 @@
+// mapRoutes.js
 import mapboxgl from "mapbox-gl";
 
 let progress = 0;

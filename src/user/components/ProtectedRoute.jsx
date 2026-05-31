@@ -4,7 +4,7 @@ import { useAuth } from "../../context/AuthContext";
 import LoadingScreen from "./LoadingScreen";
 
 function ProtectedRoute({ children }) {
-  const { userAuth, loading } = useAuth();
+  const {  loading } = useAuth();
 
   if (loading) {
     return (

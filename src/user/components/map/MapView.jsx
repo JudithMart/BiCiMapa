@@ -14,12 +14,14 @@ import CardBicitas from "./../CardBicitas";
 
 import { useBicitasRoutes } from "./hooks/useBicitasRoutes";
 
-import { drawRoute, isUserOffRoute, drawBicitasRoute } from "./utils/mapRoutes";
+import { drawRoute, drawBicitasRoute } from "./utils/mapRoutes";
 import { calculateRouteInfo } from "./utils/calculateRouteInfo";
 import { useMapInitialization } from "./hooks/useMapInitialization";
 import { useUserLocation } from "./hooks/useUserLocation.jsx";
 import { usePlaceMarkers } from "./hooks/usePlaceMarkers.jsx";
 import { useBicitasMarker } from "./hooks/useBicitasMarker.jsx";
+
+import { MdOutlineDirections } from "react-icons/md";
 
 import LoadingScreen from "../LoadingScreen.jsx";
 
@@ -42,7 +44,6 @@ function MapView() {
   const [showBicitasCard, setShowBicitasCard] = useState(false);
   const [selectedRuta, setSelectedRuta] = useState(null);
 
-  const [mapLoading, setMapLoading] = useState(true);
   const [mapReady, setMapReady] = useState(false);
   const [locationReady, setLocationReady] = useState(false);
 
@@ -260,6 +261,23 @@ function MapView() {
       {/* TEXTURA (overlay) */}
       <div className="pointer-events-none absolute inset-0 bg-noise opacity-[100]" />
 
+      <button
+        onClick={() =>
+          handleDrawRoute({
+            nombre: "Allende 527",
+            longitud: allende.lng,
+            latitud: allende.lat,
+            tipo: { color_hex: "#B57A86" },
+          })
+        }
+        className="bg-secundary/60 rounded-full text-sm md:text-base text-primary font-semibold px-2 py-1  fixed top-8 right-4 z-50 "
+      >
+        <MdOutlineDirections className=" ml-2 w-7 h-7 text-center" />
+        <p className="text-sm md:text-sm font-extrabold  ">BiCitas </p>
+
+        {/* <img src="/Logos/logoB2.png" alt="BiCiMapa Logo" className="w-11 h-12 fixed top-8 right-4 z-50 rounded-md" >
+        </img> */}
+      </button>
       {/* CARD OVERLAY */}
       {selectedPlace && (
         <>
@@ -331,6 +349,14 @@ function MapView() {
               <CardBicitas
                 rutas={bicitasRutasInfo.length ? bicitasRutasInfo : rutas}
                 onRouteClick={handleDrawBicitasRoute}
+                onRouteClickDirection={() =>
+                  handleDrawRoute({
+                    nombre: "Allende 527",
+                    longitud: allende.lng,
+                    latitud: allende.lat,
+                    tipo: { color_hex: "#B57A86" },
+                  })
+                }
                 lugares={
                   selectedRuta
                     ? selectedRuta.ruta_lugar?.map((rl) => rl.lugar) || []
