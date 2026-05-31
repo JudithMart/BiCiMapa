@@ -142,8 +142,8 @@ function LoginC({ onClose, onShowRegister, onAuthSuccess }) {
           <button
             onClick={onClose}
             className="absolute top-2 right-3 text-primary
-              text-3xl font-bold z-30 transition-transform 
-              duration-200 hover:scale-125 hover:rotate-90 active:scale-95"
+              text-3xl font-bold z-30 
+              "
             aria-label="Cerrar"
           >
             ×

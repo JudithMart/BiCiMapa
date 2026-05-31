@@ -1,7 +1,13 @@
 import React from "react";
 import BoxRoad from "./BoxRoad";
+import { MdOutlineDirections } from "react-icons/md";
 
-function CardBicitas({ rutas = [], onRouteClick, lugares = [] }) {
+function CardBicitas({
+  rutas = [],
+  onRouteClick,
+  lugares = [],
+  onRouteClickDirection,
+}) {
   // Si hay una sola ruta y lugares, mostrar solo esa ruta con sus lugares
   const mostrarSoloRutaSeleccionada = rutas.length === 1 && lugares.length > 0;
   return (
@@ -35,6 +41,13 @@ shadow-lg bg-cover bg-center "
             sin una BiCita
           </p>
         </div>
+        <button
+          onClick={onRouteClickDirection}
+          className="text-sm md:text-base text-primary font-semibold px-2 py-1   "
+        >
+          <MdOutlineDirections className="w-5 h-5" />
+          <p className="text-xs md:text-sm font-extralight ">Ir</p>
+        </button>
       </div>
       <div className="py-5 pb-8 pr-1 overflow-y-auto touch-pan-y custom-scroll ">
         {mostrarSoloRutaSeleccionada ? (
