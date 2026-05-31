@@ -1,3 +1,4 @@
+//userLocation.jsx
 import { useEffect } from "react";
 import mapboxgl from "mapbox-gl";
 import { createRoot } from "react-dom/client";
@@ -11,9 +12,12 @@ export const useUserLocation = ({
   selectedPlaceRef,
   lastRecalcRef,
   handleDrawRoute,
+   mapReady,
+  setLocationReady,
 }) => {
   useEffect(() => {
     if (!mapRef.current) return;
+      if (!mapReady) return;
 
     let watchId;
 
@@ -43,7 +47,7 @@ export const useUserLocation = ({
                 <div className="text-white text-sm bg-[#B57A86] rounded-full p-2 shadow-lg">
                   <MdDirectionsBike />
                 </div>
-              </>
+              </>,
             );
 
             userMarkerRef.current = new mapboxgl.Marker(el)
@@ -52,10 +56,7 @@ export const useUserLocation = ({
           }
 
           // recalcular ruta
-          if (
-            routeCoordinatesRef.current &&
-            selectedPlaceRef.current
-          ) {
+          if (routeCoordinatesRef.current && selectedPlaceRef.current) {
             const now = Date.now();
 
             if (now - lastRecalcRef.current > 5000) {
@@ -76,7 +77,9 @@ export const useUserLocation = ({
               duration: 500,
             });
           }
+         setLocationReady(true);
         },
+
         (error) => {
           // console.error(error);
         },
@@ -84,7 +87,7 @@ export const useUserLocation = ({
           enableHighAccuracy: true,
           maximumAge: 1000,
           timeout: 10000,
-        }
+        },
       );
     }
 
@@ -93,5 +96,5 @@ export const useUserLocation = ({
         navigator.geolocation.clearWatch(watchId);
       }
     };
-  }, [mapRef.current]);
+  }, [mapRef.current, mapReady]);
 };

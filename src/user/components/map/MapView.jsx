@@ -14,13 +14,14 @@ import CardBicitas from "./../CardBicitas";
 
 import { useBicitasRoutes } from "./hooks/useBicitasRoutes";
 
-import { drawRoute, isUserOffRoute,drawBicitasRoute, } from "./utils/mapRoutes";
+import { drawRoute, isUserOffRoute, drawBicitasRoute } from "./utils/mapRoutes";
 import { calculateRouteInfo } from "./utils/calculateRouteInfo";
 import { useMapInitialization } from "./hooks/useMapInitialization";
 import { useUserLocation } from "./hooks/useUserLocation.jsx";
 import { usePlaceMarkers } from "./hooks/usePlaceMarkers.jsx";
 import { useBicitasMarker } from "./hooks/useBicitasMarker.jsx";
 
+import LoadingScreen from "../LoadingScreen.jsx";
 
 function MapView() {
   const location = useLocation();
@@ -40,6 +41,10 @@ function MapView() {
 
   const [showBicitasCard, setShowBicitasCard] = useState(false);
   const [selectedRuta, setSelectedRuta] = useState(null);
+
+  const [mapLoading, setMapLoading] = useState(true);
+  const [mapReady, setMapReady] = useState(false);
+  const [locationReady, setLocationReady] = useState(false);
 
   const getIcon = (type) => {
     const Icon = placeTypes[type]?.icon;
@@ -172,6 +177,7 @@ function MapView() {
     mapRef,
     mapContainerRef,
     center: [allende.lng, allende.lat],
+    setMapReady,
   });
 
   //------------
@@ -183,25 +189,25 @@ function MapView() {
 
   // Si la URL tiene ?goto=allende, centrar y mostrar la card
   // Detectar query param y activar estado
-// Detectar query param
-useEffect(() => {
-  const params = new URLSearchParams(location.search);
+  // Detectar query param
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
 
-  if (params.get("goto") === "allende") {
-    setShowBicitasCard(true);
+    if (params.get("goto") === "allende") {
+      setShowBicitasCard(true);
 
-    // Esperar un poco para asegurar que el mapa ya montó
-    setTimeout(() => {
-      if (mapRef.current) {
-        mapRef.current.flyTo({
-          center: [allende.lng, allende.lat],
-          zoom: 17,
-          speed: 1.2,
-        });
-      }
-    }, 500);
-  }
-}, [location.search]);
+      // Esperar un poco para asegurar que el mapa ya montó
+      setTimeout(() => {
+        if (mapRef.current) {
+          mapRef.current.flyTo({
+            center: [allende.lng, allende.lat],
+            zoom: 17,
+            speed: 1.2,
+          });
+        }
+      }, 500);
+    }
+  }, [location.search]);
   //------------
 
   useUserLocation({
@@ -212,6 +218,9 @@ useEffect(() => {
     selectedPlaceRef,
     lastRecalcRef,
     handleDrawRoute,
+    setLocationReady,
+    locationReady,
+    mapReady,
   });
   //------------
   usePlaceMarkers({
@@ -244,7 +253,10 @@ useEffect(() => {
   return (
     <>
       {/* MAPA */}
+
       <div ref={mapContainerRef} className="w-full h-[100dvh]" />
+      {(!mapReady || !locationReady) && <LoadingScreen />}
+
       {/* TEXTURA (overlay) */}
       <div className="pointer-events-none absolute inset-0 bg-noise opacity-[100]" />
 
@@ -291,44 +303,44 @@ useEffect(() => {
         </>
       )}
       {/* CARD BiCitas */}
-{showBicitasCard && (
-  <div
-    className="fixed inset-0 z-50"
-    onClick={() => {
-      setShowBicitasCard(false);
-      setSelectedRuta(null);
-    }}
-  >
-    {/* Overlay */}
-    <div className="absolute inset-0 bg-black/10" />
+      {showBicitasCard && (
+        <div
+          className="fixed inset-0 z-50"
+          onClick={() => {
+            setShowBicitasCard(false);
+            setSelectedRuta(null);
+          }}
+        >
+          {/* Overlay */}
+          <div className="absolute inset-0 bg-black/10" />
 
-    {/* CONTENEDOR */}
-    <div
-      className="
+          {/* CONTENEDOR */}
+          <div
+            className="
         absolute inset-x-0 bottom-0
         flex justify-center
         px-3
         pb-28
         pt-4
       "
-    >
-      <div
-        className="w-full max-w-[650px]"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <CardBicitas
-          rutas={bicitasRutasInfo.length ? bicitasRutasInfo : rutas}
-          onRouteClick={handleDrawBicitasRoute}
-          lugares={
-            selectedRuta
-              ? selectedRuta.ruta_lugar?.map((rl) => rl.lugar) || []
-              : []
-          }
-        />
-      </div>
-    </div>
-  </div>
-)}
+          >
+            <div
+              className="w-full max-w-[650px]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <CardBicitas
+                rutas={bicitasRutasInfo.length ? bicitasRutasInfo : rutas}
+                onRouteClick={handleDrawBicitasRoute}
+                lugares={
+                  selectedRuta
+                    ? selectedRuta.ruta_lugar?.map((rl) => rl.lugar) || []
+                    : []
+                }
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
