@@ -25,6 +25,7 @@ function Card({
   slug,
   es_convenio,
 }) {
+  const [showLoginMsg, setShowLoginMsg] = useState(false);
   const navigate = useNavigate();
   // Estado local para saber si es favorito
   const [isFavorite, setIsFavorite] = useState(favorite);
@@ -38,7 +39,12 @@ function Card({
   // Función para agregar/quitar favorito
 
   const handleFavorite = async () => {
-    if (!id_usuario || loadingFav) return;
+    if (!id_usuario) {
+      setShowLoginMsg(true);
+      setTimeout(() => setShowLoginMsg(false), 2000);
+      return;
+    }
+    if (loadingFav) return;
 
     setLoadingFav(true);
 
@@ -86,21 +92,28 @@ function Card({
       <div className="absolute inset-0 bg-secundary bg-opacity-10 rounded-3xl pointer-events-none z-0" />
 
       {/* Icono de favorito */}
-      <button
-        onClick={handleFavorite}
-        disabled={loadingFav}
-        className={`absolute top-3 right-5 text-xl 
-    ${!id_usuario ? "opacity-50 cursor-not-allowed" : ""}
-    ${isFavorite ? "text-primary" : "text-gray-500"}`}
-        aria-label={isFavorite ? "Quitar de favoritos" : "Agregar a favoritos"}
-        title={isFavorite ? "Quitar de favoritos" : "Agregar a favoritos"}
-      >
-        <FaHeart
-          className={
-            isFavorite ? "fill-primary" : "stroke-gray-400 fill-gray-500"
-          }
-        />
-      </button>
+      <div className="absolute top-3 right-5 flex flex-col items-center">
+        <button
+          onClick={handleFavorite}
+          disabled={loadingFav}
+          className={`text-xl 
+            ${!id_usuario ? "opacity-50 cursor-not-allowed" : ""}
+            ${isFavorite ? "text-primary" : "text-gray-500"}`}
+          aria-label={isFavorite ? "Quitar de favoritos" : "Agregar a favoritos"}
+          title={isFavorite ? "Quitar de favoritos" : "Agregar a favoritos"}
+        >
+          <FaHeart
+            className={
+              isFavorite ? "fill-primary" : "stroke-gray-400 fill-gray-500"
+            }
+          />
+        </button>
+        {showLoginMsg && (
+          <span className="text-[11px] text-gray-600 mt-1 bg-white/90 px-2 py-0.5 rounded shadow select-none animate-fade-in">
+            Inicia sesión para guardar favoritos
+          </span>
+        )}
+      </div>
       <div className="flex gap-4 mt-8 w-full  rounded-2xl z-10 relative">
         <img
           src={imagenMostrar}
@@ -155,8 +168,7 @@ function Card({
         </div>
       )}
       <div
-        className={`z-10 py-5 -mt-8 shadow-sm ${!es_premium  && !esBaño && !esCiclopuerto && es_convenio? "opacity-50 pointer-events-none" : ""} 
-        ${esBaño || esCiclopuerto || !es_convenio? "flex justify-center" : "flex justify-between"}`}
+        className={`z-10 py-5 gap-1 -mt-8 shadow-sm flex justify-center`}
       >
         <ButtonGray
           texto={
@@ -169,7 +181,7 @@ function Card({
           mt="mt-10"
           onClick={() => onRouteClick()}
         />
-        {/* Solo mostrar promociones si NO es baño ni ciclopuerto */}
+        {/* Solo mostrar promociones si NO es baño ni ciclopuerto y es convenio */}
         {!(esBaño || esCiclopuerto || !es_convenio) && (
           <ButtonPink
             texto={
@@ -183,8 +195,10 @@ function Card({
               </span>
             }
             px="px-5"
+            disabled={!es_premium || !id_usuario}
+            className={!es_premium || !id_usuario ? "opacity-50 cursor-not-allowed" : ""}
             onClick={() => {
-              navigate(`/promociones/${slug}`);
+              if (es_premium && id_usuario) navigate(`/promociones/${slug}`);
             }}
           />
         )}

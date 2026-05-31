@@ -1,3 +1,4 @@
+// calculateRouteInfo.js
 import mapboxgl from "mapbox-gl";
 
 export const calculateRouteInfo = async (start, end) => {
