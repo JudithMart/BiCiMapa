@@ -11,9 +11,9 @@ export const useUserLocation = ({
   userLocationRef,
   userMarkerRef,
   routeCoordinatesRef,
-
   mapReady,
   setLocationReady,
+  setLocationStatus,
   routeColorRef,
 }) => {
   useEffect(() => {
@@ -21,6 +21,8 @@ export const useUserLocation = ({
     if (!mapReady) return;
 
     let watchId;
+
+    setLocationStatus?.("waiting");
 
     if (navigator.geolocation) {
       watchId = navigator.geolocation.watchPosition(
@@ -95,11 +97,16 @@ export const useUserLocation = ({
               duration: 500,
             });
           }
+          setLocationStatus?.("ready");
           setLocationReady(true);
         },
 
         (error) => {
-          // console.error(error);
+          if (error?.code === error.PERMISSION_DENIED || error?.code === 1) {
+            setLocationStatus?.("permission-denied");
+          } else {
+            setLocationStatus?.("unavailable");
+          }
         },
         {
           enableHighAccuracy: true,
@@ -107,6 +114,8 @@ export const useUserLocation = ({
           timeout: 10000,
         },
       );
+    } else {
+      setLocationStatus?.("unavailable");
     }
 
     return () => {

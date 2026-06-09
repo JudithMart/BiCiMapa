@@ -276,7 +276,10 @@ function MapView() {
       {/* MAPA */}
 
       <div ref={mapContainerRef} className="w-full h-[100dvh]" />
-      {(!mapReady || !locationReady) && <LoadingScreen />}
+      {(!mapReady) && <LoadingScreen />}
+      {/* {(!mapReady || !locationReady) && (
+        <LoadingScreen status={mapReady ? locationStatus : "waiting"} />
+      )} */}
 
       {/* TEXTURA (overlay) */}
       <div className="pointer-events-none absolute inset-0 bg-noise opacity-[100]" />
