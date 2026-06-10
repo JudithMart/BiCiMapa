@@ -1,6 +1,7 @@
 import { useRef, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import "mapbox-gl/dist/mapbox-gl.css";
+import { Search } from "lucide-react";
 
 import { MdDirectionsBike } from "react-icons/md";
 import { GiDutchBike } from "react-icons/gi";
@@ -30,6 +31,45 @@ function MapView() {
   const mapRef = useRef(null);
   const mapContainerRef = useRef(null);
   const [places, setPlaces] = useState([]);
+
+  const [search, setSearch] = useState("");
+  const [selectedType, setSelectedType] = useState(null);
+
+  const tipos = [
+    {
+      id: null,
+      label: "Todos",
+      icon: placeTypes[7].icon,
+      color: "#B57A86",
+    },
+
+    ...Object.entries(placeTypes)
+      .filter(([id]) => Number(id) !== 7)
+      .map(([id, data]) => {
+        const ejemplo = places.find((p) => p.id_tipo === Number(id));
+
+        return {
+          id: Number(id),
+          label: data.label,
+          icon: data.icon,
+
+          color: ejemplo?.tipo?.color_hex || "#B57A86",
+        };
+      }),
+  ];
+
+  const visiblePlaces = places.filter((place) => {
+    if (!place) return false;
+
+    const searchOk = (place.nombre  || place.tipo?.label || "")
+      .toLowerCase()
+      .includes(search.toLowerCase());
+
+    const typeOk = selectedType === null || place.id_tipo === selectedType;
+
+    return searchOk && typeOk;
+  });
+
   const markersRef = useRef([]);
   const userLocationRef = useRef(null);
 
@@ -98,8 +138,8 @@ function MapView() {
     // console.log("SELECTED:", selectedPlace);
 
     const checkFavorite = async () => {
-      if (userAuth?.id && selectedPlace?.id) {
-        const { favorito } = await isFavorito(userAuth.id, selectedPlace.id);
+      if (userData?.id && selectedPlace?.id) {
+        const { favorito } = await isFavorito(userData.id, selectedPlace.id);
         setIsFavorite(favorito);
       } else {
         setIsFavorite(false);
@@ -107,7 +147,7 @@ function MapView() {
     };
 
     checkFavorite();
-  }, [userAuth, selectedPlace]);
+  }, [userData?.id, selectedPlace?.id]);
   //------------
 
   const routeColorRef = useRef("#B57A86");
@@ -144,7 +184,7 @@ function MapView() {
 
   const handleDrawBicitasRoute = async (ruta) => {
     setSelectedRuta(ruta); // Guardar la ruta seleccionada
-    
+
     if (!userLocationRef.current || !mapRef.current) {
       alert("Ubicación no disponible");
       return;
@@ -246,7 +286,7 @@ function MapView() {
   //------------
   usePlaceMarkers({
     mapRef,
-    places,
+    places: visiblePlaces,
     markersRef,
     getIcon,
     onSelectPlace: setSelectedPlace,
@@ -271,12 +311,154 @@ function MapView() {
 
   //------------
 
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+
+    const slug = params.get("place");
+
+    if (!slug || places.length === 0) return;
+
+    const place = places.find((p) => p.slug === slug);
+
+    if (!place) return;
+
+    setSelectedPlace(place);
+
+    if (mapRef.current) {
+      mapRef.current.flyTo({
+        center: [place.longitud, place.latitud],
+        zoom: 17,
+        speed: 1.2,
+      });
+    }
+  }, [places, location.search]);
+
+  //------------
+  //Buscador
+
   return (
     <>
+      {/* BUSCADOR */}
+
+      <div className="fixed top-10 left-4 right-4 z-50 flex justify-center">
+        <div className="w-full max-w-xl">
+          <div className=" flex items-center bg-white/95 backdrop-blur-md rounded-full px-5 py-3 shadow-xl">
+            <Search className="w-5 h-5 text-gray-400 ml-2" />
+
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Explora Morelia..."
+              className=" ml-3 flex-1 outline-none bg-transparent"
+            />
+            <button
+              onClick={() =>
+                handleDrawRoute({
+                  nombre: "Allende 527",
+                  longitud: allende.lng,
+                  latitud: allende.lat,
+                  tipo: { color_hex: "#B57A86" },
+                })
+              }
+              className="ml-3 inline-flex items-center gap-2 rounded-full bg-[#B57A86] px-4 py-2 text-white font-semibold shadow-md shadow-[#B57A86]/25 transition-transform hover:-translate-y-0.5"
+            >
+              <MdOutlineDirections className="h-3 w-3" />
+              <p className="text-xs md:text-sm font-normal">BiCitas</p>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+            {/* RESULTADOS DE BÚSQUEDA */}
+      {search.length > 0 && (
+        <div className=" fixed top-28 left-4 right-4 z-50 flex justify-center">
+          <div className=" w-full max-w-xl bg-white rounded-3xl shadow-xl overflow-hidden border border-white/70">
+            {visiblePlaces
+              .slice(0, 6)
+
+              .map((place) => {
+                const Icon = placeTypes[place.id_tipo]?.icon || Search;
+                const placeColor = place.tipo?.color_hex || "#B57A86";
+
+                return (
+                  <div
+                    key={place.id}
+                    onClick={() => {
+                      setSelectedPlace(place);
+
+                      mapRef.current.flyTo({
+                        center: [place.longitud, place.latitud],
+
+                        zoom: 17,
+                      });
+
+                      setSearch("");
+                    }}
+                    className="flex gap-3 items-center px-4 py-3 cursor-pointer transition-colors"
+                    style={{
+                      backgroundColor: "rgba(255,255,255,0.95)",
+                    }}
+                  >
+                    <div
+                      className="w-10 h-10 rounded-full flex items-center justify-center text-white shrink-0"
+                      style={{ backgroundColor: placeColor }}
+                    >
+                      <Icon className="w-5 h-5" />
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium text-texto truncate">
+                        {place.nombre}
+                      </p>
+
+                      <p
+                        className="text-xs truncate"
+                        style={{ color: placeColor }}
+                      >
+                        {placeTypes[place.id_tipo]?.label}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+          </div>
+        </div>
+      )}
+      {/* TIPOS DE LUGARES */}
+      <div className=" fixed top-28  z-40 overflow-x-auto scrollbar-hide left-4 right-4 md:items-center flex md:justify-center">
+        <div className="flex gap-2 w-max  ">
+          {tipos.map((tipo) => {
+            const Icon = tipo.icon;
+
+            return (
+              <button
+                key={tipo.id}
+                onClick={() => {
+                  setSelectedType(selectedType === tipo.id ? null : tipo.id);
+                }}
+                className="flex items-center gap-2 px-5 py-2 rounded-full "
+                style={{
+                  backgroundColor:
+                    selectedType === tipo.id
+                      ? tipo.color
+                      : "rgba(255,255,255,.95)",
+                  color: selectedType === tipo.id ? "#fff" : "#555",
+                  border: `1px solid ${tipo.color}30`,
+                }}
+              >
+                <Icon />
+
+                <span className="text-xs font-medium">{tipo.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       {/* MAPA */}
 
       <div ref={mapContainerRef} className="w-full h-[100dvh]" />
-      {(!mapReady) && <LoadingScreen />}
+      {!mapReady && <LoadingScreen />}
       {/* {(!mapReady || !locationReady) && (
         <LoadingScreen status={mapReady ? locationStatus : "waiting"} />
       )} */}
@@ -284,24 +466,6 @@ function MapView() {
       {/* TEXTURA (overlay) */}
       <div className="pointer-events-none absolute inset-0 bg-noise opacity-[100]" />
 
-      <button
-        onClick={() =>
-          handleDrawRoute({
-            nombre: "Allende 527",
-            longitud: allende.lng,
-            latitud: allende.lat,
-            tipo: { color_hex: "#B57A86" },
-          })
-        }
-        className="bg-primary/85 rounded-full text-sm md:text-base text-white font-semibold px-3 py-3  fixed top-8 right-4 z-50 "
-      >
-        <MdOutlineDirections className=" ml-2 w-5 h-5 text-center" />
-        <p className="text-xs md:text-sm font-normal  ">BiCitas </p>
-        {/* <p className="text-xs  font-extralight ">Historicas</p> */}
-
-        {/* <img src="/Logos/logoB2.png" alt="BiCiMapa Logo" className="w-11 h-12 fixed top-8 right-4 z-50 rounded-md" >
-        </img> */}
-      </button>
       {/* CARD OVERLAY */}
       {selectedPlace && (
         <>
@@ -335,7 +499,7 @@ function MapView() {
                 minutes={routeInfo.minutes}
                 km={routeInfo.km}
                 es_premium={userData?.es_premium}
-                id_usuario={userAuth?.id}
+                id_usuario={userData?.id}
                 id_lugar={selectedPlace.id}
                 favorite={isFavorite}
                 slug={selectedPlace.slug}
@@ -373,7 +537,7 @@ function MapView() {
               <CardBicitas
                 rutas={bicitasRutasInfo.length ? bicitasRutasInfo : rutas}
                 onRouteClick={handleDrawBicitasRoute}
-             onRouteClickDirection={handleGoToAllende}
+                onRouteClickDirection={handleGoToAllende}
                 lugares={
                   selectedRuta
                     ? selectedRuta.ruta_lugar?.map((rl) => rl.lugar) || []
