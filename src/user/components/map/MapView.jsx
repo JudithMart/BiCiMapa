@@ -9,6 +9,7 @@ import { useAuth } from "../../../context/AuthContext";
 import { placeTypes } from "../../../config/placeTypes";
 import { getPlaces, isFavorito } from "../../../services/lugar.service";
 import { getRutas } from "../../../services/bicitas.service";
+import { getNovedadActiva } from "../../../services/new_features.service";
 
 import Card from "./../Card";
 import CardBicitas from "./../CardBicitas";
@@ -23,8 +24,10 @@ import { usePlaceMarkers } from "./hooks/usePlaceMarkers.jsx";
 import { useBicitasMarker } from "./hooks/useBicitasMarker.jsx";
 
 import { MdOutlineDirections } from "react-icons/md";
-
 import LoadingScreen from "../LoadingScreen.jsx";
+import ModalFeatures from "../ModalFeatures.jsx";
+
+
 
 function MapView() {
   const location = useLocation();
@@ -61,7 +64,7 @@ function MapView() {
   const visiblePlaces = places.filter((place) => {
     if (!place) return false;
 
-    const searchOk = (place.nombre  || place.tipo?.label || "")
+    const searchOk = (place.nombre || place.tipo?.label || "")
       .toLowerCase()
       .includes(search.toLowerCase());
 
@@ -159,6 +162,8 @@ function MapView() {
     }
 
     setSelectedPlace(null);
+    // cerrar modal de novedades si está abierto
+    setShowNovedad(false);
     routeColorRef.current = place.t;
 
     await drawRoute({
@@ -190,6 +195,8 @@ function MapView() {
       return;
     }
 
+    // cerrar modal de novedades si está abierto
+    setShowNovedad(false);
     await drawBicitasRoute({
       map: mapRef.current,
       start: userLocationRef.current,
@@ -310,7 +317,7 @@ function MapView() {
   }, []);
 
   //------------
-
+  //Buscador
   useEffect(() => {
     const params = new URLSearchParams(location.search);
 
@@ -334,7 +341,25 @@ function MapView() {
   }, [places, location.search]);
 
   //------------
-  //Buscador
+  //Novedades BiCitas activas
+  const [novedades, setNovedades] = useState(null);
+  const [showNovedad, setShowNovedad] = useState(false);
+
+  useEffect(() => {
+    const fetchNovedad = async () => {
+      const { data } = await getNovedadActiva();
+
+      if (data) {
+        setNovedades(data);
+
+        setShowNovedad(true);
+      }
+    };
+
+    fetchNovedad();
+  }, []);
+
+
 
   return (
     <>
@@ -368,8 +393,8 @@ function MapView() {
           </div>
         </div>
       </div>
-      
-            {/* RESULTADOS DE BÚSQUEDA */}
+
+      {/* RESULTADOS DE BÚSQUEDA */}
       {search.length > 0 && (
         <div className=" fixed top-28 left-4 right-4 z-50 flex justify-center">
           <div className=" w-full max-w-xl bg-white rounded-3xl shadow-xl overflow-hidden border border-white/70">
@@ -455,6 +480,10 @@ function MapView() {
         </div>
       </div>
 
+
+
+
+
       {/* MAPA */}
 
       <div ref={mapContainerRef} className="w-full h-[100dvh]" />
@@ -462,6 +491,24 @@ function MapView() {
       {/* {(!mapReady || !locationReady) && (
         <LoadingScreen status={mapReady ? locationStatus : "waiting"} />
       )} */}
+
+      
+      {/*Modal Features */}
+      {showNovedad && novedades && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center px-4"
+          onClick={() => setShowNovedad(false)}
+        >
+          <div
+            className="w-full max-w-[650px]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <ModalFeatures novedades={novedades}
+             onRouteClickDirection={handleGoToAllende} />
+          </div>
+        </div>
+      )}
+
 
       {/* TEXTURA (overlay) */}
       <div className="pointer-events-none absolute inset-0 bg-noise opacity-[100]" />
