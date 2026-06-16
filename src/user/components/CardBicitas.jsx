@@ -10,6 +10,8 @@ function CardBicitas({
   lugares = [],
   onRouteClickDirection,
   bicitasProgress,
+  minutes,
+  km,
 }) {
   // Si hay una sola ruta y lugares, mostrar solo esa ruta con sus lugares
   const mostrarSoloRutaSeleccionada = rutas.length === 1 && lugares.length > 0;
@@ -22,12 +24,9 @@ function CardBicitas({
     return "nueva";
   };
 
-
   const total = bicitasProgress?.ruta?.ruta_lugar?.length || 0;
 
   const completadas = bicitasProgress ? bicitasProgress.puntoActual - 1 : 0;
-
-
 
   console.log("Rutas recibidas en CardBicitasSSS:", rutas);
   return (
@@ -102,8 +101,16 @@ shadow-lg bg-cover bg-center "
             key={rutas[0].id}
             nombre={rutas[0].nombre}
             descripcion={rutas[0].descripcion}
-            tiempo={rutas[0].minutos ?? rutas[0].tiempo_estimado}
-            distancia={rutas[0].km ?? rutas[0].distancia_km}
+            tiempo={
+              bicitasProgress?.ruta?.id === rutas[0].id
+                ? minutes
+                : rutas[0].tiempo_estimado
+            }
+            distancia={
+              bicitasProgress?.ruta?.id === rutas[0].id
+                ? km
+                : rutas[0].distancia_km
+            }
             ruta={rutas[0]}
             onClick={() => onRouteClick(rutas[0])}
             lugares={
@@ -122,8 +129,14 @@ shadow-lg bg-cover bg-center "
               key={ruta.id}
               nombre={ruta.nombre}
               descripcion={ruta.descripcion}
-              tiempo={ruta.minutos ?? ruta.tiempo_estimado}
-              distancia={ruta.km ?? ruta.distancia_km}
+              tiempo={
+                bicitasProgress?.ruta?.id === ruta.id
+                  ? minutes
+                  : ruta.tiempo_estimado
+              }
+              distancia={
+                bicitasProgress?.ruta?.id === ruta.id ? km : ruta.distancia_km
+              }
               ruta={ruta}
               onClick={() => onRouteClick(ruta)}
               lugares={

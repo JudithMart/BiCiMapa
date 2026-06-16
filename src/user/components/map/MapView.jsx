@@ -58,6 +58,11 @@ function MapView() {
   const [search, setSearch] = useState("");
   const [selectedType, setSelectedType] = useState(null);
 
+  const [bicitasRouteInfo, setBicitasRouteInfo] = useState({
+    minutes: null,
+    km: null,
+  });
+
   const tipos = [
     {
       id: null,
@@ -188,6 +193,31 @@ function MapView() {
       ? bicitasRutasInfo
       : rutas;
 
+  useEffect(() => {
+    const fetchBicitasInfo = async () => {
+      if (
+        !bicitasProgress ||
+        !userLocationRef.current ||
+        !bicitasProgress.lugarActual
+      ) {
+        setBicitasRouteInfo({
+          minutes: null,
+          km: null,
+        });
+
+        return;
+      }
+
+      const info = await calculateRouteInfo(userLocationRef.current, [
+        bicitasProgress.lugarActual.longitud,
+        bicitasProgress.lugarActual.latitud,
+      ]);
+
+      setBicitasRouteInfo(info);
+    };
+
+    fetchBicitasInfo();
+  }, [bicitasProgress, userLocation]);
   //------------
 
   // Estado para el usuario
@@ -739,6 +769,8 @@ function MapView() {
                     ? selectedRuta.ruta_lugar?.map((rl) => rl.lugar) || []
                     : []
                 }
+                minutes={bicitasRouteInfo.minutes}
+                km={bicitasRouteInfo.km}
               />
             </div>
           </div>
