@@ -1,11 +1,8 @@
+// src/user/components/map/hooks/useBicitasRoutes.jsx
 import { useEffect, useState } from "react";
 import { calculateRouteInfo } from "../utils/calculateRouteInfo";
 
-export const useBicitasRoutes = ({
-  showBicitasCard,
-  rutas,
-  userLocation,
-}) => {
+export const useBicitasRoutes = ({ showBicitasCard, rutas, userLocation }) => {
   const [bicitasRutasInfo, setBicitasRutasInfo] = useState([]);
 
   useEffect(() => {
@@ -16,12 +13,10 @@ export const useBicitasRoutes = ({
       }
 
       const promesas = rutas.map(async (ruta) => {
-
         // ordenar lugares
-        const lugaresOrdenados = [...ruta.ruta_lugar].sort(
-          (a, b) => a.orden - b.orden
+        const lugaresOrdenados = [...(ruta.ruta_lugar || [])].sort(
+          (a, b) => a.orden - b.orden,
         );
-
         // primer punto
         const primerLugar = lugaresOrdenados[0]?.lugar;
 
@@ -33,10 +28,10 @@ export const useBicitasRoutes = ({
           };
         }
 
-        const info = await calculateRouteInfo(
-          userLocation,
-          [primerLugar.longitud, primerLugar.latitud]
-        );
+        const info = await calculateRouteInfo(userLocation, [
+          primerLugar.longitud,
+          primerLugar.latitud,
+        ]);
 
         return {
           ...ruta,

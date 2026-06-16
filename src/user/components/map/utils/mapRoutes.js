@@ -216,3 +216,57 @@ export const drawProgressRoute = ({ map, traveled, remaining, color }) => {
     },
   });
 };
+
+export const drawSingleBicitasRoute = async ({
+    map,
+    start,
+    lugar,
+    routeCoordinatesRef
+})=>{
+
+    const end=[
+        lugar.longitud,
+        lugar.latitud
+    ];
+
+    const url=
+`https://api.mapbox.com/directions/v5/mapbox/cycling/${
+start.join(",")
+};${
+end.join(",")
+}?geometries=geojson&access_token=${
+mapboxgl.accessToken
+}`;
+
+    const res=await fetch(url);
+    const data=await res.json();
+
+    if(!data.routes?.length) return;
+
+    const route=data.routes[0].geometry.coordinates;
+
+    routeCoordinatesRef.current=route;
+
+    clearRoutes(map);
+
+    map.addSource("route",{
+        type:"geojson",
+        data:{
+            type:"Feature",
+            geometry:{
+                type:"LineString",
+                coordinates:route
+            }
+        }
+    });
+
+    map.addLayer({
+        id:"route",
+        type:"line",
+        source:"route",
+        paint:{
+            "line-color":"#B57A86",
+            "line-width":5
+        }
+    });
+}

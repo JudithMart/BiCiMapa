@@ -8,7 +8,15 @@ import { GiDutchBike } from "react-icons/gi";
 import { useAuth } from "../../../context/AuthContext";
 import { placeTypes } from "../../../config/placeTypes";
 import { getPlaces, isFavorito } from "../../../services/lugar.service";
-import { getRutas } from "../../../services/bicitas.service";
+import {
+  getRutas,
+  getActiveRuta,
+  getUserRuta,
+  createRuta,
+  advanceRoute,
+  visitPlace,
+  finishRuta,
+} from "../../../services/bicitas.service";
 import { getNovedadActiva } from "../../../services/new_features.service";
 
 import Card from "./../Card";
@@ -16,7 +24,12 @@ import CardBicitas from "./../CardBicitas";
 
 import { useBicitasRoutes } from "./hooks/useBicitasRoutes";
 
-import { drawRoute, drawBicitasRoute } from "./utils/mapRoutes";
+import {
+  drawRoute,
+  drawSingleBicitasRoute,
+  drawProgressRoute,
+} from "./utils/mapRoutes";
+
 import { calculateRouteInfo } from "./utils/calculateRouteInfo";
 import { useMapInitialization } from "./hooks/useMapInitialization";
 import { useUserLocation } from "./hooks/useUserLocation.jsx";
@@ -27,13 +40,20 @@ import { MdOutlineDirections } from "react-icons/md";
 import LoadingScreen from "../LoadingScreen.jsx";
 import ModalFeatures from "../ModalFeatures.jsx";
 
-
+const allende = {
+  name: "Allende 527",
+  lng: -101.19633730177365,
+  lat: 19.701918925746046,
+};
 
 function MapView() {
   const location = useLocation();
   const mapRef = useRef(null);
   const mapContainerRef = useRef(null);
   const [places, setPlaces] = useState([]);
+  const [userLocation, setUserLocation] = useState(null);
+  const bicitasProgressRef = useRef(null);
+  const [llegaste, setLlegaste] = useState(false);
 
   const [search, setSearch] = useState("");
   const [selectedType, setSelectedType] = useState(null);
@@ -100,11 +120,18 @@ function MapView() {
 
   // Estado para rutas BiCitas
   const [rutas, setRutas] = useState([]);
+  const [bicitasProgress, setBicitasProgress] = useState(null);
+  // const rutasCompletadas = await getRutasCompletadas();
+  // const completadas = rutasCompletadas.filter(r=>r.completada).length;
+
+  useEffect(() => {
+    bicitasProgressRef.current = bicitasProgress;
+  }, [bicitasProgress]);
 
   const bicitasRutasInfo = useBicitasRoutes({
     showBicitasCard,
     rutas,
-    userLocation: userLocationRef.current,
+    userLocation,
   });
 
   useEffect(() => {
@@ -122,11 +149,50 @@ function MapView() {
     fetchRutas();
   }, []);
 
+  const [activeRuta, setActiveRuta] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const active = await getActiveRuta();
+
+      if (active.ruta) {
+        setActiveRuta(active.ruta);
+        const rutaActiva = active.ruta;
+        const ruta = rutaActiva.ruta;
+        const puntoActual = rutaActiva.punto_actual ?? 1;
+        const lugarActual =
+          ruta?.ruta_lugar?.find((item) => item.orden === puntoActual)?.lugar ||
+          null;
+
+        setBicitasProgress({
+          usuarioRutaId: rutaActiva.id,
+          ruta,
+          puntoActual,
+          lugarActual,
+        });
+      } else {
+        setActiveRuta(null);
+        setBicitasProgress(null);
+        setLlegaste(false);
+        const all = await getRutas();
+        setRutas(all.rutas || []);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const rutasMostrar = activeRuta
+    ? [activeRuta.ruta]
+    : bicitasRutasInfo.length
+      ? bicitasRutasInfo
+      : rutas;
+
   //------------
 
   // Estado para el usuario
   //--------
-  const { userAuth, userData } = useAuth();
+  const { userData } = useAuth();
   const [isFavorite, setIsFavorite] = useState(false);
   // Obtener usuario solo una vez al montar
 
@@ -164,7 +230,7 @@ function MapView() {
     setSelectedPlace(null);
     // cerrar modal de novedades si está abierto
     setShowNovedad(false);
-    routeColorRef.current = place.t;
+    routeColorRef.current = place.tipo?.color_hex || "#B57A86";
 
     await drawRoute({
       map: mapRef.current,
@@ -188,23 +254,44 @@ function MapView() {
   //------------
 
   const handleDrawBicitasRoute = async (ruta) => {
-    setSelectedRuta(ruta); // Guardar la ruta seleccionada
+    setShowBicitasCard(false);
+    setLlegaste(false);
 
-    if (!userLocationRef.current || !mapRef.current) {
-      alert("Ubicación no disponible");
-      return;
+    let progreso = await getUserRuta(ruta.id);
+
+    if (!progreso.data) {
+      const creada = await createRuta(ruta.id);
+
+      if (!creada.data) {
+        console.log(creada.error);
+        return;
+      }
+
+      progreso = {
+        data: creada.data,
+      };
     }
 
-    // cerrar modal de novedades si está abierto
-    setShowNovedad(false);
-    await drawBicitasRoute({
-      map: mapRef.current,
-      start: userLocationRef.current,
+    const progresoData = progreso.data;
+    const rutaOrdenada = [...ruta.ruta_lugar].sort((a, b) => a.orden - b.orden);
+    const lugarActual = rutaOrdenada[progresoData.punto_actual - 1];
+
+    setBicitasProgress({
+      usuarioRutaId: progresoData.id,
+
       ruta,
-      routeCoordinatesRef,
+
+      puntoActual: progresoData.punto_actual,
+
+      lugarActual: lugarActual.lugar,
     });
 
-    setShowBicitasCard(false);
+    await drawSingleBicitasRoute({
+      map: mapRef.current,
+      start: userLocationRef.current,
+      lugar: lugarActual.lugar,
+      routeCoordinatesRef,
+    });
   };
 
   //------------
@@ -232,12 +319,6 @@ function MapView() {
     fetchRouteInfo();
   }, [selectedPlace]);
 
-  const allende = {
-    name: "Allende 527",
-    lng: -101.19633730177365,
-    lat: 19.701918925746046,
-  };
-
   //------------
 
   useMapInitialization({
@@ -261,10 +342,9 @@ function MapView() {
     const params = new URLSearchParams(location.search);
 
     if (params.get("goto") === "allende") {
-      setShowBicitasCard(true);
+      const timeoutId = window.setTimeout(() => {
+        setShowBicitasCard(true);
 
-      // Esperar un poco para asegurar que el mapa ya montó
-      setTimeout(() => {
         if (mapRef.current) {
           mapRef.current.flyTo({
             center: [allende.lng, allende.lat],
@@ -273,6 +353,8 @@ function MapView() {
           });
         }
       }, 500);
+
+      return () => window.clearTimeout(timeoutId);
     }
   }, [location.search]);
   //------------
@@ -280,6 +362,9 @@ function MapView() {
   useUserLocation({
     mapRef,
     userLocationRef,
+    setUserLocation,
+    bicitasProgressRef,
+    setLlegaste,
     userMarkerRef,
     routeCoordinatesRef,
     routeColorRef,
@@ -289,6 +374,10 @@ function MapView() {
     setLocationReady,
     locationReady,
     mapReady,
+    setBicitasProgress,
+    advanceRoute,
+    finishRuta,
+    visitPlace,
   });
   //------------
   usePlaceMarkers({
@@ -329,15 +418,19 @@ function MapView() {
 
     if (!place) return;
 
-    setSelectedPlace(place);
+    const timeoutId = window.setTimeout(() => {
+      setSelectedPlace(place);
 
-    if (mapRef.current) {
-      mapRef.current.flyTo({
-        center: [place.longitud, place.latitud],
-        zoom: 17,
-        speed: 1.2,
-      });
-    }
+      if (mapRef.current) {
+        mapRef.current.flyTo({
+          center: [place.longitud, place.latitud],
+          zoom: 17,
+          speed: 1.2,
+        });
+      }
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
   }, [places, location.search]);
 
   //------------
@@ -358,8 +451,6 @@ function MapView() {
 
     fetchNovedad();
   }, []);
-
-
 
   return (
     <>
@@ -480,10 +571,6 @@ function MapView() {
         </div>
       </div>
 
-
-
-
-
       {/* MAPA */}
 
       <div ref={mapContainerRef} className="w-full h-[100dvh]" />
@@ -492,7 +579,66 @@ function MapView() {
         <LoadingScreen status={mapReady ? locationStatus : "waiting"} />
       )} */}
 
-      
+      <button
+        className="fixed bottom-40 right-4 z-50 bg-red-500 text-white p-3 rounded-full"
+        onClick={async () => {
+          const progreso = bicitasProgressRef.current;
+
+          if (!progreso) {
+            console.warn("No hay progreso activo para avanzar la ruta");
+            return;
+          }
+          console.log("progreso:", progreso);
+          const siguiente = progreso.puntoActual + 1;
+          console.log("siguiente:", siguiente);
+
+          const total = progreso.ruta.ruta_lugar.length;
+          console.log("total:", total);
+
+          if (siguiente > total) {
+            await finishRuta(progreso.usuarioRutaId);
+
+            setBicitasProgress(null);
+
+            return;
+          }
+
+          const siguienteLugar = progreso.ruta.ruta_lugar.find(
+            (r) => r.orden === siguiente,
+          )?.lugar;
+
+          const nuevo = {
+            ...progreso,
+            puntoActual: siguiente,
+            lugarActual: siguienteLugar,
+          };
+
+          const respuesta = await advanceRoute(
+            progreso.usuarioRutaId,
+            siguiente,
+          );
+
+          if (respuesta.error) {
+            console.log(respuesta.error);
+            return;
+          }
+          console.log("respuesta:", respuesta);
+
+          bicitasProgressRef.current = nuevo;
+
+          setBicitasProgress(nuevo);
+
+          await drawSingleBicitasRoute({
+            map: mapRef.current,
+            start: userLocationRef.current,
+            lugar: siguienteLugar,
+            routeCoordinatesRef,
+          });
+        }}
+      >
+        DEBUG
+      </button>
+
       {/*Modal Features */}
       {showNovedad && novedades && (
         <div
@@ -503,12 +649,13 @@ function MapView() {
             className="w-full max-w-[650px]"
             onClick={(e) => e.stopPropagation()}
           >
-            <ModalFeatures novedades={novedades}
-             onRouteClickDirection={handleGoToAllende} />
+            <ModalFeatures
+              novedades={novedades}
+              onRouteClickDirection={handleGoToAllende}
+            />
           </div>
         </div>
       )}
-
 
       {/* TEXTURA (overlay) */}
       <div className="pointer-events-none absolute inset-0 bg-noise opacity-[100]" />
@@ -582,9 +729,11 @@ function MapView() {
               onClick={(e) => e.stopPropagation()}
             >
               <CardBicitas
-                rutas={bicitasRutasInfo.length ? bicitasRutasInfo : rutas}
+                rutas={rutasMostrar}
                 onRouteClick={handleDrawBicitasRoute}
                 onRouteClickDirection={handleGoToAllende}
+                bicitasProgress={bicitasProgress}
+                llegaste={llegaste}
                 lugares={
                   selectedRuta
                     ? selectedRuta.ruta_lugar?.map((rl) => rl.lugar) || []

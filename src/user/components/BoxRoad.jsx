@@ -1,5 +1,7 @@
+//BoxRoad.jsx
 import React, { useState } from "react";
 import { MdOutlineDirections } from "react-icons/md";
+
 import { ChevronDown } from "lucide-react";
 import ButtonGray from "../../shared/components/ButtonGray";
 
@@ -10,9 +12,15 @@ function BoxRoad({
   distancia,
   lugares = [],
   onClick,
+  estado,
 }) {
   const [open, setOpen] = useState(false);
-
+  const textoBoton = {
+    nueva: "Iniciar ruta",
+    activa: "Continuar ruta",
+    completada: "Ruta completada",
+  };
+  const textoActual = textoBoton[estado] ?? textoBoton.nueva;
   return (
     <div className="mt-2">
       <button
@@ -49,6 +57,7 @@ function BoxRoad({
       {open && (
         <div className=" px-1 py-3 mx-2  ">
           <p className="text-sm text-texto">{descripcion}</p>
+         
           <div className="mt-3 flex flex-wrap gap-2 ">
             {lugares
               .slice() // para no mutar el array original
@@ -67,7 +76,7 @@ function BoxRoad({
             texto={
               <span className="flex justify-center  gap-2">
                 <MdOutlineDirections className="w-5 h-5" />
-                Ruta
+                {textoActual}
               </span>
             }
             px="px-7"

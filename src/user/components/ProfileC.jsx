@@ -8,6 +8,7 @@ import ButtonPink from "../../shared/components/ButtonPink";
 import { IoLogOutOutline } from "react-icons/io5";
 import { useAuth } from "../../context/AuthContext";
 import { logoutUser } from "../../services/auth.service";
+import Progress from "./Progress";
 
 function ProfileC({
   nombre,
@@ -159,22 +160,31 @@ function ProfileC({
 
         {/* Progreso del usuario */}
         <div className="flex flex-col px-5 py-4 bg-[#FEF7F7]  rounded-md shadow-lg">
-          <div className="flex gap-20 ">
+          <Progress
+            completadas={completadas}
+            total={total}
+            porcentaje={porcentaje}
+            texto="visitados"
+            mostrarTitulo={true}
+            colorTexto="primary"
+            tamanoTexto="base"
+          />
+          {/* <div className="flex gap-20 ">
             <p className="text-texto font-bold ">Recorrido</p>
             <p className="text-primary font-normal ">
               {completadas} de {total} lugares visitados
             </p>
-          </div>
+          </div> */}
           {/* Barra de progreo */}
-          <div className="relative w-full bg-gray-200 rounded-full h-4 mt-4">
+          {/* <div className="relative w-full bg-gray-200 rounded-full h-4 mt-4">
             <div
               className="bg-primary/60 h-4 rounded-full"
               style={{
                 width: `${porcentaje}%`,
               }}
-            ></div>
+            ></div> */}
             {/* Icono de la bici avanzando */}
-            <div
+            {/* <div
               className="absolute bottom-0 -translate-y-1/2"
               style={{
                 left: `calc(${porcentaje}% - 16px)`,
@@ -200,7 +210,7 @@ function ProfileC({
               y obten una promo en
               <span className="text-primary font-semibold "> BiCitas</span>
             </p>
-          )}
+          )} */}
         </div>
         {fecha_expiracion && (
           <p className="text-sm text-center text-gray-500 mt-2">
