@@ -4,7 +4,11 @@ import mapboxgl from "mapbox-gl";
 import { createRoot } from "react-dom/client";
 import { MdDirectionsBike } from "react-icons/md";
 import { findClosestPointIndex } from "../utils/routeProgress";
-import { drawProgressRoute,clearRoutes } from "../utils/mapRoutes";
+import {
+  drawProgressRoute,
+  clearRoutes,
+  clearBicitasMarker,
+} from "../utils/mapRoutes";
 
 export const useUserLocation = ({
   mapRef,
@@ -20,7 +24,6 @@ export const useUserLocation = ({
   routeColorRef,
   setBicitasProgress,
   advanceRoute,
-  visitPlace,
   drawSingleBicitasRoute,
   finishRuta,
 }) => {
@@ -79,7 +82,7 @@ export const useUserLocation = ({
 
               const total = progreso.ruta.ruta_lugar.length;
 
-              await visitPlace(progreso.usuarioRutaId, progreso.lugarActual.id);
+              // await visitPlace(progreso.usuarioRutaId, progreso.lugarActual.id);
 
               if (siguiente > total) {
                 await finishRuta(progreso.usuarioRutaId);
@@ -88,6 +91,7 @@ export const useUserLocation = ({
 
                 setLlegaste(false);
                 clearRoutes(mapRef.current);
+                clearBicitasMarker();
 
                 routeCoordinatesRef.current = null;
 
@@ -229,5 +233,10 @@ export const useUserLocation = ({
     routeColorRef,
     setLocationReady,
     setLocationStatus,
+    advanceRoute,
+    drawSingleBicitasRoute,
+    finishRuta,
+    setBicitasProgress,
+   
   ]);
 };

@@ -10,6 +10,7 @@ export const usePlaceMarkers = ({
   markersRef,
   getIcon,
   onSelectPlace,
+  
 }) => {
   useEffect(() => {
     if (!mapRef.current) return;

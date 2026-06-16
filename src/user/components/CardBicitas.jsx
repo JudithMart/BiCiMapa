@@ -103,12 +103,12 @@ shadow-lg bg-cover bg-center "
             descripcion={rutas[0].descripcion}
             tiempo={
               bicitasProgress?.ruta?.id === rutas[0].id
-                ? minutes
+                ? (minutes ?? rutas[0].tiempo_estimado)
                 : rutas[0].tiempo_estimado
             }
             distancia={
               bicitasProgress?.ruta?.id === rutas[0].id
-                ? km
+                ? (km ?? rutas[0].distancia_km)
                 : rutas[0].distancia_km
             }
             ruta={rutas[0]}
@@ -131,11 +131,13 @@ shadow-lg bg-cover bg-center "
               descripcion={ruta.descripcion}
               tiempo={
                 bicitasProgress?.ruta?.id === ruta.id
-                  ? minutes
+                  ? (minutes ?? ruta.tiempo_estimado)
                   : ruta.tiempo_estimado
               }
               distancia={
-                bicitasProgress?.ruta?.id === ruta.id ? km : ruta.distancia_km
+                bicitasProgress?.ruta?.id === ruta.id
+                  ? (km ?? ruta.distancia_km)
+                  : ruta.distancia_km
               }
               ruta={ruta}
               onClick={() => onRouteClick(ruta)}

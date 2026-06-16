@@ -14,7 +14,7 @@ import {
   getUserRuta,
   createRuta,
   advanceRoute,
-  visitPlace,
+
   finishRuta,
 } from "../../../services/bicitas.service";
 import { getNovedadActiva } from "../../../services/new_features.service";
@@ -24,11 +24,7 @@ import CardBicitas from "./../CardBicitas";
 
 import { useBicitasRoutes } from "./hooks/useBicitasRoutes";
 
-import {
-  drawRoute,
-  drawSingleBicitasRoute,
-  drawProgressRoute,
-} from "./utils/mapRoutes";
+import { drawRoute, drawSingleBicitasRoute, clearRoutes, clearBicitasMarker} from "./utils/mapRoutes";
 
 import { calculateRouteInfo } from "./utils/calculateRouteInfo";
 import { useMapInitialization } from "./hooks/useMapInitialization";
@@ -72,7 +68,7 @@ function MapView() {
     },
 
     ...Object.entries(placeTypes)
-      .filter(([id]) => Number(id) !== 7)
+      .filter(([id]) => Number(id) !== 8)
       .map(([id, data]) => {
         const ejemplo = places.find((p) => p.id_tipo === Number(id));
 
@@ -407,7 +403,7 @@ function MapView() {
     setBicitasProgress,
     advanceRoute,
     finishRuta,
-    visitPlace,
+   
   });
   //------------
   usePlaceMarkers({
@@ -581,6 +577,8 @@ function MapView() {
                 key={tipo.id}
                 onClick={() => {
                   setSelectedType(selectedType === tipo.id ? null : tipo.id);
+                  clearRoutes(mapRef.current);
+                  routeCoordinatesRef.current = null;
                 }}
                 className="flex items-center gap-2 px-5 py-2 rounded-full "
                 style={{
@@ -629,6 +627,10 @@ function MapView() {
             await finishRuta(progreso.usuarioRutaId);
 
             setBicitasProgress(null);
+            clearRoutes(mapRef.current);
+            clearBicitasMarker();
+
+            routeCoordinatesRef.current = null;
 
             return;
           }

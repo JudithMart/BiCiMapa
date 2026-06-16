@@ -1,7 +1,12 @@
 // mapRoutes.js
 import mapboxgl from "mapbox-gl";
+import { createElement } from "react";
+import { createRoot } from "react-dom/client";
+import { MdOutlineElectricBike } from "react-icons/md";
 
 let progress = 0;
+
+let bicitasMarker = null;
 
 export const clearRoutes = (map) => {
   ["route", "route-traveled", "route-remaining"].forEach((id) => {
@@ -9,6 +14,13 @@ export const clearRoutes = (map) => {
 
     if (map.getSource(id)) map.removeSource(id);
   });
+};
+
+export const clearBicitasMarker = () => {
+  if (bicitasMarker) {
+    bicitasMarker.remove();
+    bicitasMarker = null;
+  }
 };
 
 export const animateRoute = ({ map, coordinates, color = "#B57A86" }) => {
@@ -133,7 +145,7 @@ export const drawBicitasRoute = async ({
 
     const route = data.routes[0].geometry.coordinates;
 
-    routeCoordinatesRef.current = route.coordinates;
+    routeCoordinatesRef.current = route;
 
     // borrar anterior
     clearRoutes(map);
@@ -218,55 +230,74 @@ export const drawProgressRoute = ({ map, traveled, remaining, color }) => {
 };
 
 export const drawSingleBicitasRoute = async ({
-    map,
-    start,
-    lugar,
-    routeCoordinatesRef
-})=>{
+  map,
+  start,
+  lugar,
+  routeCoordinatesRef,
+}) => {
+  const end = [lugar.longitud, lugar.latitud];
 
-    const end=[
-        lugar.longitud,
-        lugar.latitud
-    ];
+  const url = `https://api.mapbox.com/directions/v5/mapbox/cycling/${start.join(
+    ",",
+  )};${end.join(",")}?geometries=geojson&access_token=${mapboxgl.accessToken}`;
 
-    const url=
-`https://api.mapbox.com/directions/v5/mapbox/cycling/${
-start.join(",")
-};${
-end.join(",")
-}?geometries=geojson&access_token=${
-mapboxgl.accessToken
-}`;
+  const res = await fetch(url);
+  const data = await res.json();
 
-    const res=await fetch(url);
-    const data=await res.json();
+  if (!data.routes?.length) return;
 
-    if(!data.routes?.length) return;
+  const route = data.routes[0].geometry.coordinates;
 
-    const route=data.routes[0].geometry.coordinates;
+  routeCoordinatesRef.current = route;
 
-    routeCoordinatesRef.current=route;
+  clearRoutes(map);
+  clearBicitasMarker();
 
-    clearRoutes(map);
+  const el = document.createElement("div");
 
-    map.addSource("route",{
-        type:"geojson",
-        data:{
-            type:"Feature",
-            geometry:{
-                type:"LineString",
-                coordinates:route
-            }
-        }
-    });
+  const root = createRoot(el);
 
-    map.addLayer({
-        id:"route",
-        type:"line",
-        source:"route",
-        paint:{
-            "line-color":"#B57A86",
-            "line-width":5
-        }
-    });
-}
+  root.render(
+    createElement(
+      "div",
+      {
+        style: {
+          width: "30px",
+          height: "30px",
+          borderRadius: "50%",
+          background: "#B57A86",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          color: "white",
+          fontSize: "18px",
+          boxShadow: "0 4px 12px rgba(0,0,0,.25)",
+        },
+      },
+      createElement(MdOutlineElectricBike),
+    ),
+  );
+
+  bicitasMarker = new mapboxgl.Marker(el).setLngLat(end).addTo(map);
+
+  map.addSource("route", {
+    type: "geojson",
+    data: {
+      type: "Feature",
+      geometry: {
+        type: "LineString",
+        coordinates: route,
+      },
+    },
+  });
+
+  map.addLayer({
+    id: "route",
+    type: "line",
+    source: "route",
+    paint: {
+      "line-color": "#B57A86",
+      "line-width": 5,
+    },
+  });
+};

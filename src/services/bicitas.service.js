@@ -86,7 +86,6 @@ export const startRuta = async (id_ruta) => {
     .eq("id_ruta", id_ruta)
     .eq("punto_actual", 1)
     .eq("id_usuario", supabase.auth.user().id)
-    .eq("activa", true)
     .eq("completada", false)
     .maybeSingle();
   return {
@@ -169,16 +168,16 @@ export const advanceRoute = async (idUsuarioRuta, siguientePunto) => {
 };
 
 // Lugar visitado
-export const visitPlace = async (idUsuarioRuta, idLugar) => {
-  return await supabase
-    .from("usuario_ruta_bicitas_lugar")
-    .update({
-      visitado: true,
-      fecha_visita: new Date(),
-    })
-    .eq("id_usuario_ruta_bicitas", idUsuarioRuta)
-    .eq("id_lugar", idLugar);
-};
+// export const visitPlace = async (idUsuarioRuta, idLugar) => {
+//   return await supabase
+//     .from("usuario_ruta_bicitas_lugar")
+//     .update({
+//       visitado: true,
+//       fecha_visita: new Date(),
+//     })
+//     .eq("id_usuario_ruta_bicitas", idUsuarioRuta)
+//     .eq("id_lugar", idLugar);
+// };
 
 export const finishRuta = async (idUsuarioRuta) => {
   const { data, error } = await supabase
