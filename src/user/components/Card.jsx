@@ -177,9 +177,9 @@ function Card({
           {/* Overlay solo sobre la promoción */}
           {!es_premium && (
             <div className="absolute inset-0 flex items-center justify-center z-20">
-              <span className="flex gap-2 text-gray-200 text-xs bg-opacity-70 py-2 rounded-xl bg-black px-10 font-bold mb-1">
-                <TbLock className="text-[13px]" />
-                Visita Bicitas para ver la promo
+              <span className="flex gap-2 text-gray-100 text-xs bg-opacity-70 py-1.5 rounded-xl bg-black px-6 font-bold mb-1">
+                <TbLock className="text-2xl" />
+               ¡ Pedalea hasta BiCitas y descubre esta sorpresa!
               </span>
             </div>
           )}
