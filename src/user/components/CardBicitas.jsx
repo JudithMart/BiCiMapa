@@ -12,6 +12,7 @@ function CardBicitas({
   bicitasProgress,
   minutes,
   km,
+  userData,
 }) {
   // Si hay una sola ruta y lugares, mostrar solo esa ruta con sus lugares
   const mostrarSoloRutaSeleccionada = rutas.length === 1 && lugares.length > 0;
@@ -28,7 +29,6 @@ function CardBicitas({
 
   const completadas = bicitasProgress ? bicitasProgress.puntoActual - 1 : 0;
 
-  console.log("Rutas recibidas en CardBicitasSSS:", rutas);
   return (
     <div
       className="relative flex flex-col rounded-3xl px-5
@@ -73,14 +73,7 @@ shadow-lg bg-cover bg-center "
         </button>
       </div>
 
-      {/* {bicitasProgress && (
-        <div className="mt-3 flex gap-3">
-          <p className="font-thin">Ruta activa</p>
 
-          <p>{bicitasProgress.ruta.nombre}</p>
-
-        </div>
-      )} */}
 
       <div className=" mt-4">
         <Progress
@@ -122,6 +115,7 @@ shadow-lg bg-cover bg-center "
                 : []
             }
             estado={getEstadoRuta(rutas[0])}
+            userData={userData}
           />
         ) : (
           rutas.map((ruta) => (
@@ -150,6 +144,7 @@ shadow-lg bg-cover bg-center "
                   : []
               }
               estado={getEstadoRuta(ruta)}
+              userData={userData}
             />
           ))
         )}

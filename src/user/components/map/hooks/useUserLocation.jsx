@@ -71,7 +71,10 @@ export const useUserLocation = ({
           }
 
           userLocationRef.current = newCoords;
-          setUserLocation?.(newCoords);
+
+          if (!prev || distanceInMeters(prev, newCoords) > 5) {
+            setUserLocation?.(newCoords);
+          }
 
           const lugarActual = bicitasProgressRef?.current?.lugarActual;
 
@@ -146,6 +149,10 @@ export const useUserLocation = ({
               routeCoordinatesRef.current,
             );
 
+            if (Math.abs(closestIndex - lastClosestIndexRef.current) < 2) {
+              return;
+            }
+            lastClosestIndexRef.current = closestIndex;
             if (closestIndex < lastClosestIndexRef.current) return;
 
             lastClosestIndexRef.current = closestIndex;

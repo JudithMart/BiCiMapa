@@ -13,14 +13,33 @@ function BoxRoad({
   lugares = [],
   onClick,
   estado,
+  userData,
 }) {
   const [open, setOpen] = useState(false);
+  const [showLoginMsg, setShowLoginMsg] = useState(false);
+  const isLoggedIn = !!userData?.id;
+
   const textoBoton = {
     nueva: "Iniciar ruta",
     activa: "Continuar ruta",
     completada: "Ruta completada",
   };
   const textoActual = textoBoton[estado] ?? textoBoton.nueva;
+
+  const handleStartRoute = () => {
+    if (!isLoggedIn) {
+      setShowLoginMsg(true);
+
+      window.setTimeout(() => {
+        setShowLoginMsg(false);
+      }, 2000);
+
+      return;
+    }
+
+    onClick?.();
+  };
+
   return (
     <div className="mt-2">
       <button
@@ -71,17 +90,25 @@ function BoxRoad({
                 </span>
               ))}
           </div>{" "}
-          <ButtonGray
-            onClick={onClick}
-            texto={
-              <span className="flex justify-center  gap-2">
-                <MdOutlineDirections className="w-5 h-5" />
-                {textoActual}
-              </span>
-            }
-            px="px-7"
-            mt="mt-4"
-          ></ButtonGray>
+          {/* Botón iniciar ruta */}
+          <div className={!isLoggedIn ? "opacity-50" : ""}>
+            <ButtonGray
+              onClick={handleStartRoute}
+              texto={
+                <span className="flex justify-center gap-2">
+                  <MdOutlineDirections className="w-5 h-5" />
+                  {textoActual}
+                </span>
+              }
+              px="px-7"
+              mt="mt-4"
+            ></ButtonGray>
+          </div>
+          {!isLoggedIn && showLoginMsg && (
+            <p className="mt-2 text-center text-xs text-red-500">
+              Tienes que iniciar sesión
+            </p>
+          )}
         </div>
       )}
     </div>

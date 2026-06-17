@@ -13,6 +13,8 @@ export const usePlaceMarkers = ({
   
 }) => {
   useEffect(() => {
+   
+
     if (!mapRef.current) return;
 
     markersRef.current.forEach((marker) => marker.remove());
@@ -23,6 +25,7 @@ export const usePlaceMarkers = ({
       const el = document.createElement("div");
 
       const root = createRoot(el);
+
 
       root.render(
         <button onClick={() => onSelectPlace(place)}>

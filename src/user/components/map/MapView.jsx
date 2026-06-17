@@ -39,6 +39,8 @@ import { MdOutlineDirections } from "react-icons/md";
 import LoadingScreen from "../LoadingScreen.jsx";
 import ModalFeatures from "../ModalFeatures.jsx";
 
+import { useMemo } from "react";
+
 const allende = {
   name: "Allende 527",
   lng: -101.19633730177365,
@@ -89,17 +91,25 @@ function MapView() {
       }),
   ];
 
-  const visiblePlaces = places.filter((place) => {
+  const visiblePlaces = useMemo(() => {
+  return places.filter(place => {
     if (!place) return false;
 
-    const searchOk = (place.nombre || place.tipo?.label || "")
+    const searchOk = (
+      place.nombre ||
+      place.tipo?.label ||
+      ""
+    )
       .toLowerCase()
       .includes(search.toLowerCase());
 
-    const typeOk = selectedType === null || place.id_tipo === selectedType;
+    const typeOk =
+      selectedType === null ||
+      place.id_tipo === selectedType;
 
     return searchOk && typeOk;
   });
+}, [places, search, selectedType]);
 
   const markersRef = useRef([]);
   const userLocationRef = useRef(null);
@@ -145,7 +155,7 @@ function MapView() {
   useEffect(() => {
     const fetchRutas = async () => {
       const { rutas, error } = await getRutas();
-      // console.log("RUTAS:", rutas);
+    
       if (error) {
         // console.error(error);
         return;
@@ -236,8 +246,7 @@ function MapView() {
   //------------
   // Actualizar isFavorite cuando cambie el usuario o el lugar seleccionado
   useEffect(() => {
-    // console.log("USER:", userAuth);
-    // console.log("SELECTED:", selectedPlace);
+   
 
     const checkFavorite = async () => {
       if (userData?.id && selectedPlace?.id) {
@@ -318,6 +327,8 @@ function MapView() {
 
       lugarActual: lugarActual.lugar,
     });
+
+    lastClosestIndexRef.current=0;
 
     await drawSingleBicitasRoute({
       map: mapRef.current,
@@ -423,6 +434,7 @@ function MapView() {
   });
 
   //------------
+
 
   useEffect(() => {
     const fetchPlaces = async () => {
@@ -720,6 +732,7 @@ function MapView() {
                 }
                 minutes={bicitasRouteInfo.minutes}
                 km={bicitasRouteInfo.km}
+                userData={userData}
               />
             </div>
           </div>

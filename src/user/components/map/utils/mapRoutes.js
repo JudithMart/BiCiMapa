@@ -7,6 +7,8 @@ import { MdOutlineElectricBike } from "react-icons/md";
 let progress = 0;
 
 let bicitasMarker = null;
+const traveledId = "route-traveled";
+const remainingId = "route-remaining";
 
 export const clearRoutes = (map) => {
   ["route", "route-traveled", "route-remaining"].forEach((id) => {
@@ -178,55 +180,63 @@ export const drawBicitasRoute = async ({
     console.error(error);
   }
 };
-
 export const drawProgressRoute = ({ map, traveled, remaining, color }) => {
-   if (!map.isStyleLoaded()) return;
-    clearRoutes(map);
+  if (!map.isStyleLoaded()) return;
 
+  const traveledData = {
+    type: "Feature",
+    geometry: {
+      type: "LineString",
+      coordinates: traveled,
+    },
+  };
 
-  map.addSource("route-traveled", {
-    type: "geojson",
-    data: {
-      type: "Feature",
-      geometry: {
-        type: "LineString",
-        coordinates: traveled,
+  const remainingData = {
+    type: "Feature",
+    geometry: {
+      type: "LineString",
+      coordinates: remaining,
+    },
+  };
+
+  if (!map.getSource(traveledId)) {
+    map.addSource(traveledId, {
+      type: "geojson",
+      data: traveledData,
+    });
+
+    map.addLayer({
+      id: traveledId,
+      type: "line",
+      source: traveledId,
+      paint: {
+        "line-color": "#CFCFCF",
+        "line-width": 6,
       },
-    },
-  });
+    });
+  } else {
+    map.getSource(traveledId).setData(traveledData);
+  }
 
-  map.addLayer({
-    id: "route-traveled",
-    type: "line",
-    source: "route-traveled",
-    paint: {
-      "line-color": "#CFCFCF",
-      "line-width": 6,
-    },
-  });
+  if (!map.getSource(remainingId)) {
+    map.addSource(remainingId, {
+      type: "geojson",
+      data: remainingData,
+    });
 
-  map.addSource("route-remaining", {
-    type: "geojson",
-    data: {
-      type: "Feature",
-      geometry: {
-        type: "LineString",
-        coordinates: remaining,
+    map.addLayer({
+      id: remainingId,
+      type: "line",
+      source: remainingId,
+      paint: {
+        "line-color": color,
+        "line-width": 6,
       },
-    },
-  });
-
-  map.addLayer({
-    id: "route-remaining",
-    type: "line",
-    source: "route-remaining",
-    paint: {
-      "line-color": color,
-      "line-width": 6,
-    },
-  });
-}
-
+    });
+  } else {
+    map.getSource(remainingId).setData(remainingData);
+  }
+};
 export const drawSingleBicitasRoute = async ({
   map,
   start,
