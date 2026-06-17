@@ -32,7 +32,7 @@ export const placeTypes = {
   },
   7:{
     icon: CiStar,
-    label: "Importante_Morelia",
+    label: "Turístico",
   },
 
 

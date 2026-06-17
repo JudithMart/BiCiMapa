@@ -1,15 +1,34 @@
+//cardBicitas.jsx
 import React from "react";
 import BoxRoad from "./BoxRoad";
 import { MdOutlineDirections } from "react-icons/md";
+import Progress from "./Progress";
 
 function CardBicitas({
   rutas = [],
   onRouteClick,
   lugares = [],
   onRouteClickDirection,
+  bicitasProgress,
+  minutes,
+  km,
 }) {
   // Si hay una sola ruta y lugares, mostrar solo esa ruta con sus lugares
   const mostrarSoloRutaSeleccionada = rutas.length === 1 && lugares.length > 0;
+
+  const getEstadoRuta = (ruta) => {
+    if (ruta.completada) return "completada";
+
+    if (bicitasProgress?.ruta?.id === ruta.id) return "activa";
+
+    return "nueva";
+  };
+
+  const total = bicitasProgress?.ruta?.ruta_lugar?.length || 0;
+
+  const completadas = bicitasProgress ? bicitasProgress.puntoActual - 1 : 0;
+
+  console.log("Rutas recibidas en CardBicitasSSS:", rutas);
   return (
     <div
       className="relative flex flex-col rounded-3xl px-5
@@ -22,12 +41,15 @@ shadow-lg bg-cover bg-center "
       }}
     >
       {/* Overlay gris semitransparente */}
-      <div className="absolute inset-0 bg-secundary bg-opacity-10 rounded-3xl pointer-events-none z-0 " />
+      <div
+        className="absolute inset-0 bg-secundary bg-opacity-10 rounded-3xl
+       pointer-events-none z-0 "
+      />
       <div className="flex gap-3 mt-6 w-full z-10 relative flex-shrink-0 items-start ">
         <img
-          src="/Logos/logoB2.png"
+          src="/Logos/image.png"
           alt="BiCitas Historicas"
-          className="w-20 h-20 md:w-32 md:h-32 object-cover rounded-xlflex-shrink-0 rounded-xl"
+          className="w-20 h-20 md:w-32 md:h-32 object-cover  rounded-lg "
         />
 
         <div className="min-w-0 flex-1 ">
@@ -41,6 +63,7 @@ shadow-lg bg-cover bg-center "
             sin una BiCita
           </p>
         </div>
+
         <button
           onClick={onRouteClickDirection}
           className="text-sm md:text-base text-primary font-semibold px-2 py-1   "
@@ -49,14 +72,45 @@ shadow-lg bg-cover bg-center "
           <p className="text-xs md:text-sm font-extralight ">Ir</p>
         </button>
       </div>
+
+      {/* {bicitasProgress && (
+        <div className="mt-3 flex gap-3">
+          <p className="font-thin">Ruta activa</p>
+
+          <p>{bicitasProgress.ruta.nombre}</p>
+
+        </div>
+      )} */}
+
+      <div className=" mt-4">
+        <Progress
+          completadas={completadas}
+          total={total}
+          porcentaje={total ? Math.round((completadas * 100) / total) : 0}
+          mostrarTexto={false}
+          mostrarTitulo={false}
+          texto={"recorridos"}
+          recorrido={false}
+          colorTexto="[#4A565B]"
+          tamanoTexto="sm"
+        />
+      </div>
       <div className="py-5 pb-8 pr-1 overflow-y-auto touch-pan-y custom-scroll ">
         {mostrarSoloRutaSeleccionada ? (
           <BoxRoad
             key={rutas[0].id}
             nombre={rutas[0].nombre}
             descripcion={rutas[0].descripcion}
-            tiempo={rutas[0].minutos ?? rutas[0].tiempo_estimado}
-            distancia={rutas[0].km ?? rutas[0].distancia_km}
+            tiempo={
+              bicitasProgress?.ruta?.id === rutas[0].id
+                ? (minutes ?? rutas[0].tiempo_estimado)
+                : rutas[0].tiempo_estimado
+            }
+            distancia={
+              bicitasProgress?.ruta?.id === rutas[0].id
+                ? (km ?? rutas[0].distancia_km)
+                : rutas[0].distancia_km
+            }
             ruta={rutas[0]}
             onClick={() => onRouteClick(rutas[0])}
             lugares={
@@ -67,6 +121,7 @@ shadow-lg bg-cover bg-center "
                   }))
                 : []
             }
+            estado={getEstadoRuta(rutas[0])}
           />
         ) : (
           rutas.map((ruta) => (
@@ -74,8 +129,16 @@ shadow-lg bg-cover bg-center "
               key={ruta.id}
               nombre={ruta.nombre}
               descripcion={ruta.descripcion}
-              tiempo={ruta.minutos ?? ruta.tiempo_estimado}
-              distancia={ruta.km ?? ruta.distancia_km}
+              tiempo={
+                bicitasProgress?.ruta?.id === ruta.id
+                  ? (minutes ?? ruta.tiempo_estimado)
+                  : ruta.tiempo_estimado
+              }
+              distancia={
+                bicitasProgress?.ruta?.id === ruta.id
+                  ? (km ?? ruta.distancia_km)
+                  : ruta.distancia_km
+              }
               ruta={ruta}
               onClick={() => onRouteClick(ruta)}
               lugares={
@@ -86,6 +149,7 @@ shadow-lg bg-cover bg-center "
                     }))
                   : []
               }
+              estado={getEstadoRuta(ruta)}
             />
           ))
         )}

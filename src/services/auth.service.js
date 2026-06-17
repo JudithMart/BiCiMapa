@@ -44,7 +44,7 @@ export const getUsuario = async (id) => {
     .from("usuario")
     .select("*")
     .eq("id", id)
-    .single();
+    .maybeSingle();
 
   return { data, error };
 };
