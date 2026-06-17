@@ -26,6 +26,8 @@ export const useUserLocation = ({
   advanceRoute,
   drawSingleBicitasRoute,
   finishRuta,
+  lastClosestIndexRef,
+  bikeIconRef,
 }) => {
   const distanceInMeters = (origin, destination) => {
     const toRadians = (value) => (value * Math.PI) / 180;
@@ -48,6 +50,7 @@ export const useUserLocation = ({
     if (!mapReady) return;
 
     let watchId;
+    let angle = 0;
 
     setLocationStatus?.("waiting");
 
@@ -59,6 +62,13 @@ export const useUserLocation = ({
           const newCoords = [longitude, latitude];
 
           const prev = userLocationRef.current;
+
+          if (prev) {
+            const dx = longitude - prev[0];
+            const dy = latitude - prev[1];
+
+            angle = (Math.atan2(dy, dx) * 180) / Math.PI;
+          }
 
           userLocationRef.current = newCoords;
           setUserLocation?.(newCoords);
@@ -82,8 +92,6 @@ export const useUserLocation = ({
 
               const total = progreso.ruta.ruta_lugar.length;
 
-              // await visitPlace(progreso.usuarioRutaId, progreso.lugarActual.id);
-
               if (siguiente > total) {
                 await finishRuta(progreso.usuarioRutaId);
 
@@ -97,7 +105,6 @@ export const useUserLocation = ({
 
                 return;
               }
-              
 
               await advanceRoute(progreso.usuarioRutaId, siguiente);
 
@@ -139,7 +146,14 @@ export const useUserLocation = ({
               routeCoordinatesRef.current,
             );
 
-            const traveled = routeCoordinatesRef.current.slice(0, closestIndex);
+            if (closestIndex < lastClosestIndexRef.current) return;
+
+            lastClosestIndexRef.current = closestIndex;
+
+            const traveled = routeCoordinatesRef.current.slice(
+              0,
+              closestIndex + 1,
+            );
 
             const remaining = routeCoordinatesRef.current.slice(closestIndex);
 
@@ -154,37 +168,34 @@ export const useUserLocation = ({
           if (userMarkerRef.current) {
             userMarkerRef.current.setLngLat(newCoords);
           } else {
-            const el = document.createElement("div");
+            if (userMarkerRef.current) {
+              userMarkerRef.current.setLngLat(newCoords);
 
-            const root = createRoot(el);
+              if (bikeIconRef.current) {
+                bikeIconRef.current.style.transform = `rotate(${angle + 90}deg)`;
 
-            root.render(
-              <>
-                <div className="absolute w-7 h-7 bg-[#B57A86] rounded-full animate-pulse"></div>
+                bikeIconRef.current.style.transition = "transform .3s";
+              }
+            } else {
+              const bikeDiv = document.createElement("div");
 
-                <div className="text-white text-sm bg-[#B57A86] rounded-full p-2 shadow-lg">
-                  <MdDirectionsBike />
-                </div>
-              </>,
-            );
+              bikeDiv.className =
+                "text-white text-sm bg-[#B57A86] rounded-full p-2 shadow-lg";
 
-            userMarkerRef.current = new mapboxgl.Marker(el)
-              .setLngLat(newCoords)
-              .addTo(mapRef.current);
+              const root = createRoot(bikeDiv);
+
+              root.render(<MdDirectionsBike />);
+
+              bikeIconRef.current = bikeDiv;
+
+              const wrapper = document.createElement("div");
+              wrapper.appendChild(bikeDiv);
+
+              userMarkerRef.current = new mapboxgl.Marker(wrapper)
+                .setLngLat(newCoords)
+                .addTo(mapRef.current);
+            }
           }
-
-          // recalcular ruta
-          // if (routeCoordinatesRef.current && selectedPlaceRef.current) {
-          //   const now = Date.now();
-
-          //   if (now - lastRecalcRef.current > 5000) {
-          //     handleDrawRoute(selectedPlaceRef.current);
-
-          //     lastRecalcRef.current = now;
-          //   }
-          // }
-
-          // mover cámara
           if (
             !prev ||
             Math.abs(prev[0] - longitude) > 0.0001 ||
@@ -237,6 +248,5 @@ export const useUserLocation = ({
     drawSingleBicitasRoute,
     finishRuta,
     setBicitasProgress,
-   
   ]);
 };

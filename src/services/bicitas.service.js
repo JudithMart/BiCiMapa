@@ -137,21 +137,6 @@ export const getActiveRuta = async () => {
   return { ruta: data, error };
 };
 
-// terminar ruta activa
-// export const finishRuta = async (id_usuario_ruta) => {
-
-//   const { data, error } = await supabase
-//     .from("usuario_ruta_bicitas_lugar")
-//     .update({ fecha_fin: new Date().toISOString(), completada: true, activo:false })
-//     .eq("id", id_usuario_ruta)
-//     .eq("id_usuario", supabase.auth.user().id)
-//     .eq("completada", false)
-//     .single();
-//   return {
-//     ruta: data,
-//     error,
-//   };
-// };
 
 //avanzar ruta
 export const advanceRoute = async (idUsuarioRuta, siguientePunto) => {
@@ -167,17 +152,6 @@ export const advanceRoute = async (idUsuarioRuta, siguientePunto) => {
   return { data, error };
 };
 
-// Lugar visitado
-// export const visitPlace = async (idUsuarioRuta, idLugar) => {
-//   return await supabase
-//     .from("usuario_ruta_bicitas_lugar")
-//     .update({
-//       visitado: true,
-//       fecha_visita: new Date(),
-//     })
-//     .eq("id_usuario_ruta_bicitas", idUsuarioRuta)
-//     .eq("id_lugar", idLugar);
-// };
 
 export const finishRuta = async (idUsuarioRuta) => {
   const { data, error } = await supabase

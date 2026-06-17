@@ -14,7 +14,6 @@ import {
   getUserRuta,
   createRuta,
   advanceRoute,
-
   finishRuta,
 } from "../../../services/bicitas.service";
 import { getNovedadActiva } from "../../../services/new_features.service";
@@ -24,7 +23,11 @@ import CardBicitas from "./../CardBicitas";
 
 import { useBicitasRoutes } from "./hooks/useBicitasRoutes";
 
-import { drawRoute, drawSingleBicitasRoute, clearRoutes, clearBicitasMarker} from "./utils/mapRoutes";
+import {
+  drawRoute,
+  drawSingleBicitasRoute,
+  clearRoutes,
+} from "./utils/mapRoutes";
 
 import { calculateRouteInfo } from "./utils/calculateRouteInfo";
 import { useMapInitialization } from "./hooks/useMapInitialization";
@@ -53,6 +56,10 @@ function MapView() {
 
   const [search, setSearch] = useState("");
   const [selectedType, setSelectedType] = useState(null);
+
+  const lastClosestIndexRef = useRef(0);
+
+  const bikeIconRef = useRef(null);
 
   const [bicitasRouteInfo, setBicitasRouteInfo] = useState({
     minutes: null,
@@ -403,7 +410,8 @@ function MapView() {
     setBicitasProgress,
     advanceRoute,
     finishRuta,
-   
+    lastClosestIndexRef,
+    bikeIconRef,
   });
   //------------
   usePlaceMarkers({
@@ -477,6 +485,7 @@ function MapView() {
 
     fetchNovedad();
   }, []);
+
 
   return (
     <>
@@ -607,69 +616,7 @@ function MapView() {
         <LoadingScreen status={mapReady ? locationStatus : "waiting"} />
       )} */}
 
-      <button
-        className="fixed bottom-40 right-4 z-50 bg-red-500 text-white p-3 rounded-full"
-        onClick={async () => {
-          const progreso = bicitasProgressRef.current;
-
-          if (!progreso) {
-            console.warn("No hay progreso activo para avanzar la ruta");
-            return;
-          }
-          console.log("progreso:", progreso);
-          const siguiente = progreso.puntoActual + 1;
-          console.log("siguiente:", siguiente);
-
-          const total = progreso.ruta.ruta_lugar.length;
-          console.log("total:", total);
-
-          if (siguiente > total) {
-            await finishRuta(progreso.usuarioRutaId);
-
-            setBicitasProgress(null);
-            clearRoutes(mapRef.current);
-            clearBicitasMarker();
-
-            routeCoordinatesRef.current = null;
-
-            return;
-          }
-
-          const siguienteLugar = progreso.ruta.ruta_lugar.find(
-            (r) => r.orden === siguiente,
-          )?.lugar;
-
-          const nuevo = {
-            ...progreso,
-            puntoActual: siguiente,
-            lugarActual: siguienteLugar,
-          };
-
-          const respuesta = await advanceRoute(
-            progreso.usuarioRutaId,
-            siguiente,
-          );
-
-          if (respuesta.error) {
-            console.log(respuesta.error);
-            return;
-          }
-          console.log("respuesta:", respuesta);
-
-          bicitasProgressRef.current = nuevo;
-
-          setBicitasProgress(nuevo);
-
-          await drawSingleBicitasRoute({
-            map: mapRef.current,
-            start: userLocationRef.current,
-            lugar: siguienteLugar,
-            routeCoordinatesRef,
-          });
-        }}
-      >
-        DEBUG
-      </button>
+   
 
       {/*Modal Features */}
       {showNovedad && novedades && (

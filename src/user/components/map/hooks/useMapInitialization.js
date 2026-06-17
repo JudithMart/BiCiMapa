@@ -5,7 +5,7 @@ import mapboxgl from "mapbox-gl";
 export const useMapInitialization = ({ mapRef, mapContainerRef, center, setMapReady }) => {
   useEffect(() => {
     if (mapRef.current) return;
-    if (!mapContainerRef.current) return; // Wait until the container is available
+    if (!mapContainerRef.current) return; 
 
     mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 

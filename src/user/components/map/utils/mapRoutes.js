@@ -175,16 +175,14 @@ export const drawBicitasRoute = async ({
       },
     });
   } catch (error) {
-    // console.error(error);
+    console.error(error);
   }
 };
 
 export const drawProgressRoute = ({ map, traveled, remaining, color }) => {
-  ["route-traveled", "route-remaining"].forEach((id) => {
-    if (map.getLayer(id)) map.removeLayer(id);
+   if (!map.isStyleLoaded()) return;
+    clearRoutes(map);
 
-    if (map.getSource(id)) map.removeSource(id);
-  });
 
   map.addSource("route-traveled", {
     type: "geojson",
@@ -227,7 +225,7 @@ export const drawProgressRoute = ({ map, traveled, remaining, color }) => {
       "line-width": 6,
     },
   });
-};
+}
 
 export const drawSingleBicitasRoute = async ({
   map,
