@@ -44,7 +44,7 @@ export const getPlaces = async () => {
     .from("lugar")
     .select("*, tipo(*), promocion(*)")
     .eq("visible_mapa", true);  
-  // console.log("lugares:", { data, error });
+  
   return { places: data, error };
 };
 
@@ -117,7 +117,7 @@ export const isFavorito = async (id_usuario, id_lugar) => {
     .maybeSingle();
 
   if (error) {
-    // console.error(error);
+  
     return { favorito: false, error };
   }
 
@@ -149,7 +149,7 @@ export const getLugaresFavoritosPorUsuario = async (id_usuario) => {
     )
     .eq("id_usuario", id_usuario);
   if (error) {
-    // console.error(error);
+ 
     return { favoritos: [], error };
   }
   // Total de promociones a cada lugar

@@ -26,7 +26,6 @@ export const getRutas = async () => {
     )
     .eq("activa", true);
 
-  // console.log(data);
 
   return {
     rutas: data,

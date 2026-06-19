@@ -57,7 +57,7 @@ function Card({
         const { error } = await addFavorito(id_usuario, id_lugar);
 
         if (error && error.code !== "23505") {
-          // duplicate
+        
           console.error(error);
           return;
         }

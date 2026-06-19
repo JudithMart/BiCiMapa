@@ -157,7 +157,7 @@ function MapView() {
       const { rutas, error } = await getRutas();
     
       if (error) {
-        // console.error(error);
+        console.error(error);
         return;
       }
 
@@ -441,7 +441,7 @@ function MapView() {
       const { places, error } = await getPlaces();
 
       if (error) {
-        // console.error(error);
+        console.error(error);
         return;
       }
 

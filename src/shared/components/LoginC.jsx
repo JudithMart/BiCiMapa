@@ -104,7 +104,7 @@ function LoginC({ onClose, onShowRegister, onAuthSuccess }) {
       setUserAuth(user);
       setMensaje("Inicio de sesión exitoso");
       if (onAuthSuccess) onAuthSuccess();
-      // console.log("Usuario logeado:", user);
+     
     }
   };
 
