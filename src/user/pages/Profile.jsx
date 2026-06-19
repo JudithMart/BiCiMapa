@@ -39,7 +39,6 @@ function Profile() {
     const fetchUserProgress = async () => {
       if (userAuth?.id) {
         const { data, error } = await getUserProgress(userAuth?.id);
-        // console.log("Progreso del usuario:", data);
         if (error) {
           console.error(error);
           return;

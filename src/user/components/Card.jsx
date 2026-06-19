@@ -8,6 +8,7 @@ import ButtonGray from "../../shared/components/ButtonGray";
 import { useNavigate } from "react-router-dom";
 import { FaHeart } from "react-icons/fa6";
 import { addFavorito, removeFavorito } from "../../services/lugar.service";
+import { CiShare2 } from "react-icons/ci";
 
 function Card({
   image,
@@ -56,8 +57,8 @@ function Card({
         const { error } = await addFavorito(id_usuario, id_lugar);
 
         if (error && error.code !== "23505") {
-          // duplicate
-          // console.error(error);
+        
+          console.error(error);
           return;
         }
 
@@ -67,6 +68,23 @@ function Card({
       setLoadingFav(false);
     }
   };
+
+  // Función para compartir
+  const handleShare = async () => {
+  const url =
+`${window.location.origin}/?place=${slug}`;
+
+  if (navigator.share) {
+    await navigator.share({
+      title: title,
+       text: `Mira este lugar en BiCiMapa`,
+      url,
+    });
+  } else {
+    navigator.clipboard.writeText(url);
+    alert("Enlace copiado");
+  }
+};
 
   // Lógica para tipos usando tipo como objeto
   const tipoNombre = tipo?.nombre?.toLowerCase?.() || "";
@@ -90,6 +108,18 @@ function Card({
     >
       {/* Overlay gris semitransparente */}
       <div className="absolute inset-0 bg-secundary bg-opacity-10 rounded-3xl pointer-events-none z-0" />
+      
+      {/* Icono de compartir */}
+      <div className="absolute top-3 flex flex-col items-center">
+        <button
+          onClick={handleShare}
+          className="text-xl text-primary hover:text-primary/50"
+          aria-label="Compartir lugar"
+          title="Compartir lugar"
+        >
+          <CiShare2 />
+        </button>
+      </div>
 
       {/* Icono de favorito */}
       <div className="absolute top-3 right-5 flex flex-col items-center">
@@ -97,7 +127,7 @@ function Card({
           onClick={handleFavorite}
           disabled={loadingFav}
           className={`text-xl 
-            ${!id_usuario ? "opacity-50 cursor-not-allowed" : ""}
+            ${!id_usuario ? "opacity-50 " : ""}
             ${isFavorite ? "text-primary" : "text-gray-500"}`}
           aria-label={isFavorite ? "Quitar de favoritos" : "Agregar a favoritos"}
           title={isFavorite ? "Quitar de favoritos" : "Agregar a favoritos"}
@@ -109,12 +139,12 @@ function Card({
           />
         </button>
         {showLoginMsg && (
-          <span className="text-[11px] text-gray-600 mt-1 bg-white/90 px-2 py-0.5 rounded shadow select-none animate-fade-in">
-            Inicia sesión para guardar favoritos
+          <span className="absolute text-[10px] text-center flex flex-col text-red-500  py-0.5   ">
+           Inicia <span>sesión </span>
           </span>
         )}
       </div>
-      <div className="flex gap-4 mt-8 w-full  rounded-2xl z-10 relative">
+      <div className="flex gap-4 mt-10 w-full  rounded-2xl z-10 relative">
         <img
           src={imagenMostrar}
           alt={title}
@@ -147,9 +177,9 @@ function Card({
           {/* Overlay solo sobre la promoción */}
           {!es_premium && (
             <div className="absolute inset-0 flex items-center justify-center z-20">
-              <span className="flex gap-2 text-gray-200 text-xs bg-opacity-70 py-2 rounded-xl bg-black px-10 font-bold mb-1">
-                <TbLock className="text-[13px]" />
-                Visita Bicitas para ver la promo
+              <span className="flex gap-2 text-gray-100 text-xs bg-opacity-70 py-1.5 rounded-xl bg-black px-6 font-bold mb-1">
+                <TbLock className="text-2xl" />
+               ¡ Pedalea hasta BiCitas y descubre esta sorpresa!
               </span>
             </div>
           )}

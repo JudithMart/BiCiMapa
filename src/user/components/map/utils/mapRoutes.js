@@ -1,7 +1,14 @@
 // mapRoutes.js
 import mapboxgl from "mapbox-gl";
+import { createElement } from "react";
+import { createRoot } from "react-dom/client";
+import { MdOutlineElectricBike } from "react-icons/md";
 
 let progress = 0;
+
+let bicitasMarker = null;
+const traveledId = "route-traveled";
+const remainingId = "route-remaining";
 
 export const clearRoutes = (map) => {
   ["route", "route-traveled", "route-remaining"].forEach((id) => {
@@ -9,6 +16,13 @@ export const clearRoutes = (map) => {
 
     if (map.getSource(id)) map.removeSource(id);
   });
+};
+
+export const clearBicitasMarker = () => {
+  if (bicitasMarker) {
+    bicitasMarker.remove();
+    bicitasMarker = null;
+  }
 };
 
 export const animateRoute = ({ map, coordinates, color = "#B57A86" }) => {
@@ -133,7 +147,7 @@ export const drawBicitasRoute = async ({
 
     const route = data.routes[0].geometry.coordinates;
 
-    routeCoordinatesRef.current = route.coordinates;
+    routeCoordinatesRef.current = route;
 
     // borrar anterior
     clearRoutes(map);
@@ -163,56 +177,135 @@ export const drawBicitasRoute = async ({
       },
     });
   } catch (error) {
-    // console.error(error);
+    console.error(error);
   }
 };
-
 export const drawProgressRoute = ({ map, traveled, remaining, color }) => {
-  ["route-traveled", "route-remaining"].forEach((id) => {
-    if (map.getLayer(id)) map.removeLayer(id);
+  if (!map.isStyleLoaded()) return;
 
-    if (map.getSource(id)) map.removeSource(id);
-  });
+  const traveledData = {
+    type: "Feature",
+    geometry: {
+      type: "LineString",
+      coordinates: traveled,
+    },
+  };
 
-  map.addSource("route-traveled", {
+  const remainingData = {
+    type: "Feature",
+    geometry: {
+      type: "LineString",
+      coordinates: remaining,
+    },
+  };
+
+  if (!map.getSource(traveledId)) {
+    map.addSource(traveledId, {
+      type: "geojson",
+      data: traveledData,
+    });
+
+    map.addLayer({
+      id: traveledId,
+      type: "line",
+      source: traveledId,
+      paint: {
+        "line-color": "#CFCFCF",
+        "line-width": 6,
+      },
+    });
+  } else {
+    map.getSource(traveledId).setData(traveledData);
+  }
+
+  if (!map.getSource(remainingId)) {
+    map.addSource(remainingId, {
+      type: "geojson",
+      data: remainingData,
+    });
+
+    map.addLayer({
+      id: remainingId,
+      type: "line",
+      source: remainingId,
+      paint: {
+        "line-color": color,
+        "line-width": 6,
+      },
+    });
+  } else {
+    map.getSource(remainingId).setData(remainingData);
+  }
+};
+export const drawSingleBicitasRoute = async ({
+  map,
+  start,
+  lugar,
+  routeCoordinatesRef,
+}) => {
+  const end = [lugar.longitud, lugar.latitud];
+
+  const url = `https://api.mapbox.com/directions/v5/mapbox/cycling/${start.join(
+    ",",
+  )};${end.join(",")}?geometries=geojson&access_token=${mapboxgl.accessToken}`;
+
+  const res = await fetch(url);
+  const data = await res.json();
+
+  if (!data.routes?.length) return;
+
+  const route = data.routes[0].geometry.coordinates;
+
+  routeCoordinatesRef.current = route;
+
+  clearRoutes(map);
+  clearBicitasMarker();
+
+  const el = document.createElement("div");
+
+  const root = createRoot(el);
+
+  root.render(
+    createElement(
+      "div",
+      {
+        style: {
+          width: "30px",
+          height: "30px",
+          borderRadius: "50%",
+          background: "#B57A86",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          color: "white",
+          fontSize: "18px",
+          boxShadow: "0 4px 12px rgba(0,0,0,.25)",
+        },
+      },
+      createElement(MdOutlineElectricBike),
+    ),
+  );
+
+  bicitasMarker = new mapboxgl.Marker(el).setLngLat(end).addTo(map);
+
+  map.addSource("route", {
     type: "geojson",
     data: {
       type: "Feature",
       geometry: {
         type: "LineString",
-        coordinates: traveled,
+        coordinates: route,
       },
     },
   });
 
   map.addLayer({
-    id: "route-traveled",
+    id: "route",
     type: "line",
-    source: "route-traveled",
+    source: "route",
     paint: {
-      "line-color": "#CFCFCF",
-      "line-width": 6,
-    },
-  });
-
-  map.addSource("route-remaining", {
-    type: "geojson",
-    data: {
-      type: "Feature",
-      geometry: {
-        type: "LineString",
-        coordinates: remaining,
-      },
-    },
-  });
-
-  map.addLayer({
-    id: "route-remaining",
-    type: "line",
-    source: "route-remaining",
-    paint: {
-      "line-color": color,
-      "line-width": 6,
+      "line-color": "#B57A86",
+      "line-width": 5,
     },
   });
 };

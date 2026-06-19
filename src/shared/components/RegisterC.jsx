@@ -33,13 +33,13 @@ function RegisterC({ onClose,  onAuthSuccess }) {
       setTipoMensaje("error");
       return;
     }
-    const { user, error } = await registerUser(
+    const { error } = await registerUser(
       email,
       password,
       nombre, 
       telefono,
     );
-    // console.log("Respuesta de Supabase al registrar:", { user, error });
+   
     if (error) {
       setMensaje("Error al registrar: " + error.message);
       setTipoMensaje("error");

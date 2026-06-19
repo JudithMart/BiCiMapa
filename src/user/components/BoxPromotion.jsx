@@ -41,9 +41,9 @@ function BoxPromotion({
         {/* Overlay solo si no es premium */}
         {!es_premium && (
           <div className="absolute inset-0 flex items-center justify-center z-20 rounded-xl">
-            <span className="flex gap-2 text-gray-200 text-xs bg-opacity-70 py-2 rounded-xl bg-black px-10 font-bold mb-1">
-              <TbLock className="text-[13px]" />
-              Visita Bicitas para ver la promo
+            <span className="flex gap-2 text-gray-100 text-xs bg-opacity-75 py-1.5 rounded-xl bg-black px-6 font-bold mb-1">
+              <TbLock className="text-2xl" />¡ Pedalea hasta BiCitas y descubre
+              esta sorpresa!
             </span>
           </div>
         )}
@@ -56,7 +56,9 @@ function BoxPromotion({
         )}
         <div className="flex justify-between w-full items-center">
           <div className="mt-2 flex flex-col items-start ">
-            <p className="text-texto font-semibold text-base text-left line-clamp-2">{nombre}</p>
+            <p className="text-texto font-semibold text-base text-left line-clamp-2">
+              {nombre}
+            </p>
             <p
               className="text-sm  font-light  uppercase"
               style={tipoColor ? { color: tipoColor } : {}}

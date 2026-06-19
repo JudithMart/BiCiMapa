@@ -1,3 +1,4 @@
+// src/user/components/map/hooks/usePlaceMarkers.jsx
 import { useEffect } from "react";
 import mapboxgl from "mapbox-gl";
 import { createRoot } from "react-dom/client";
@@ -9,8 +10,11 @@ export const usePlaceMarkers = ({
   markersRef,
   getIcon,
   onSelectPlace,
+  
 }) => {
   useEffect(() => {
+   
+
     if (!mapRef.current) return;
 
     markersRef.current.forEach((marker) => marker.remove());
@@ -21,6 +25,7 @@ export const usePlaceMarkers = ({
       const el = document.createElement("div");
 
       const root = createRoot(el);
+
 
       root.render(
         <button onClick={() => onSelectPlace(place)}>
