@@ -1,10 +1,17 @@
+//LoginC.jsx
 import React, { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { loginUser,resetPassword } from "../../services/auth.service";
+import {
+  loginUser,
+  resetPassword,
+  getUsuario,
+} from "../../services/auth.service";
 import { useAuth } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 import ButtonPink from "./ButtonPink";
 
 function LoginC({ onClose, onShowRegister, onAuthSuccess }) {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -22,16 +29,22 @@ function LoginC({ onClose, onShowRegister, onAuthSuccess }) {
   });
   const [mensaje, setMensaje] = useState("");
   const [tipoMensaje, setTipoMensaje] = useState(""); // 'error', 'success', 'block'
-  const { setUserAuth } = useAuth();
+  const { setUserAuth, refreshUser } = useAuth();
+
+  const activarBloqueo = React.useCallback((segundos = 300) => {
+    const blockUntil = Date.now() + segundos * 1000;
+    setBloqueado(true);
+    setTimer(segundos);
+    localStorage.setItem("login_block_until", String(blockUntil));
+    localStorage.setItem("login_bloqueado", "true");
+  }, []);
 
   // Guardar en localStorage cuando cambian los valores
 
   React.useEffect(() => {
     localStorage.setItem("login_intentos", intentos);
     localStorage.setItem("login_bloqueado", bloqueado);
-    if (bloqueado) {
-      localStorage.setItem("login_block_until", Date.now() + timer * 1000);
-    }
+    localStorage.setItem("login_timer", timer);
   }, [intentos, bloqueado, timer]);
 
   React.useEffect(() => {
@@ -39,18 +52,22 @@ function LoginC({ onClose, onShowRegister, onAuthSuccess }) {
 
     if (blockUntil && Date.now() < blockUntil) {
       setBloqueado(true);
-      setTimer(Math.floor((blockUntil - Date.now()) / 1000));
+      setTimer(Math.ceil((blockUntil - Date.now()) / 1000));
+    } else if (blockUntil) {
+      // Limpia estados antiguos de bloqueo cuando ya expiraron
+      localStorage.removeItem("login_block_until");
+      localStorage.removeItem("login_bloqueado");
+      localStorage.removeItem("login_timer");
+      localStorage.removeItem("login_intentos");
+      setBloqueado(false);
+      setTimer(0);
+      setIntentos(0);
     }
+  }, []);
 
+  React.useEffect(() => {
     let timeout;
-    if (intentos >= 5 && !bloqueado) {
-      setBloqueado(true);
-      setTimer(300); // 5 minutos = 300 segundos
-      setMensaje(
-        "Has superado el número máximo de intentos. Intenta más tarde.",
-      );
-      setTipoMensaje("block");
-    }
+
     if (bloqueado && timer > 0) {
       timeout = setInterval(() => {
         setTimer((prev) => {
@@ -64,6 +81,7 @@ function LoginC({ onClose, onShowRegister, onAuthSuccess }) {
             localStorage.removeItem("login_intentos");
             localStorage.removeItem("login_bloqueado");
             localStorage.removeItem("login_timer");
+            localStorage.removeItem("login_block_until");
             return 0;
           }
           return prev - 1;
@@ -71,7 +89,7 @@ function LoginC({ onClose, onShowRegister, onAuthSuccess }) {
       }, 1000);
     }
     return () => clearInterval(timeout);
-  }, [intentos, bloqueado, timer]);
+  }, [bloqueado, timer]);
 
   const handleLogin = async () => {
     if (bloqueado) {
@@ -87,9 +105,7 @@ function LoginC({ onClose, onShowRegister, onAuthSuccess }) {
         const newIntentos = prev + 1;
 
         if (newIntentos >= 5) {
-          setBloqueado(true);
-          setTimer(300);
-          localStorage.setItem("login_block_until", Date.now() + 300000);
+          activarBloqueo(300); // 5 minutos
 
           setMensaje("Has superado el número máximo de intentos.");
           setTipoMensaje("block");
@@ -102,9 +118,29 @@ function LoginC({ onClose, onShowRegister, onAuthSuccess }) {
       });
     } else {
       setUserAuth(user);
+
+      const { data, error } = await getUsuario(user.id);
+
+      await refreshUser();
       setMensaje("Inicio de sesión exitoso");
-      if (onAuthSuccess) onAuthSuccess();
-     
+
+      onAuthSuccess?.();
+      console.log("USER AUTH", user);
+      console.log("DATA", data);
+      console.log("ERROR", error);
+      console.log(data.rol);
+
+      if (!data) {
+        setMensaje("No se encontró información del usuario.");
+        setTipoMensaje("error");
+        return;
+      }
+
+      if (data.rol === "admin") {
+        navigate("/bicitas_historicas_manager");
+      } else {
+        navigate("/mapa");
+      }
     }
   };
 
@@ -124,7 +160,9 @@ function LoginC({ onClose, onShowRegister, onAuthSuccess }) {
     }
 
     await resetPassword(email);
-    setMensaje("Si el correo existe, se ha enviado un correo para restablecer tu contraseña.");
+    setMensaje(
+      "Si el correo existe, se ha enviado un correo para restablecer tu contraseña.",
+    );
     setTipoMensaje("success");
   };
 
@@ -206,10 +244,7 @@ function LoginC({ onClose, onShowRegister, onAuthSuccess }) {
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
               </span>
             </div>
-            <button
-              className="flex items-center mt-2"
-              onClick={handleReset}
-            >
+            <button className="flex items-center mt-2" onClick={handleReset}>
               <p className=" text-xs font-extralight text-texto hover:underline ml-1">
                 Olvidé mi contraseña
               </p>

@@ -1,3 +1,4 @@
+// src/context/AuthContext.jsx
 import { createContext, useContext, useEffect, useState } from "react";
 import { getCurrentUser, getUsuario } from "../services/auth.service";
 import { validatePremiumStatus } from "../services/user_premium.service";
@@ -8,6 +9,8 @@ export const AuthProvider = ({ children }) => {
   const [userAuth, setUserAuth] = useState(null);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const isAdmin = userData?.rol === "admin";
 
   const refreshUser = async () => {
     try {
@@ -33,7 +36,7 @@ export const AuthProvider = ({ children }) => {
         es_premium: premiumActivo,
       });
     } catch (error) {
-      
+      console.error(error);
       setUserAuth(null);
       setUserData(null);
     } finally {
@@ -53,6 +56,7 @@ export const AuthProvider = ({ children }) => {
         setUserAuth,
         setUserData,
         refreshUser,
+        isAdmin,
         loading,
       }}
     >

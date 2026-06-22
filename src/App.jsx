@@ -1,4 +1,4 @@
-
+// App.jsx
 import "./App.css";
 
 import Navbar from "./user/components/Navbar";
@@ -15,21 +15,25 @@ import { useAuth } from "./context/AuthContext";
 import Validation from "./user/pages/Validation";
 import Favorites from "./user/pages/Favorites";
 import ProtectedRoute from "./user/components/ProtectedRoute";
-import NotFound from "./user/pages/NotFound";
+import NotFound from "./shared/components/NotFound";
 import ResetPassword from "./user/pages/ResetPassword";
-
+import AdminRoute from "./admin/routes/AdminRoute";
+import AdminDashboard from "./admin/components/AdminDashboard";
+import AdminLayout from "./admin/components/AdminLayout";
 
 function App() {
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
   const { refreshUser } = useAuth();
-   const { loading } = useAuth();
+  const { loading } = useAuth();
 
   // Función para actualizar el estado de login tras login/registro
-  const handleAuthSuccess = () => {
-    refreshUser();
+  const handleAuthSuccess = async () => {
+    await refreshUser();
+
     setShowLogin(false);
     setShowRegister(false);
+    return true;
   };
 
   // Función para mostrar el modal de login
@@ -45,29 +49,102 @@ function App() {
   const handleCloseLogin = () => setShowLogin(false);
   const handleCloseRegister = () => setShowRegister(false);
 
-   if (loading) {
-    return <ProtectedRoute />;
-  }
-
-
   return (
-    <>
-      <BrowserRouter>
-        <Navbar onPerfilClick={handleShowLogin} />
-        <Routes>
-          <Route path="/" element={<ProtectedRoute><MapView /></ProtectedRoute>} />
-          <Route path="/mapa" element={<ProtectedRoute><MapView /></ProtectedRoute>} />
-          <Route path="/perfil" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-          <Route path="/favoritos" element={<ProtectedRoute><Favorites /></ProtectedRoute>} />
-          {/* LISTA GENERAL */}
-          <Route path="/promociones" element={<ProtectedRoute><PromotionsList /></ProtectedRoute>} />
-          {/*  DETALLE POR LUGAR (desde navbar o card) */}
-          <Route path="/promociones/:slug" element={<ProtectedRoute><Coupons /></ProtectedRoute>} />
-          <Route path="/validacion/:promocionId" element={<ProtectedRoute><Validation /></ProtectedRoute>} />
-          <Route path="*" element={<NotFound />} />
-          <Route path="/editar-contrasena" element={<ProtectedRoute><ResetPassword /></ProtectedRoute>} />
-        </Routes>
-      </BrowserRouter>
+    <BrowserRouter>
+      {loading ? (
+        <ProtectedRoute />
+      ) : (
+        <>
+          <Navbar onPerfilClick={handleShowLogin} />
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute>
+                  <MapView />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/mapa"
+              element={
+                <ProtectedRoute>
+                  <MapView />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/perfil"
+              element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/favoritos"
+              element={
+                <ProtectedRoute>
+                  <Favorites />
+                </ProtectedRoute>
+              }
+            />
+            {/* LISTA GENERAL */}
+            <Route
+              path="/promociones"
+              element={
+                <ProtectedRoute>
+                  <PromotionsList />
+                </ProtectedRoute>
+              }
+            />
+            {/*  DETALLE POR LUGAR (desde navbar o card) */}
+            <Route
+              path="/promociones/:slug"
+              element={
+                <ProtectedRoute>
+                  <Coupons />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/validacion/:promocionId"
+              element={
+                <ProtectedRoute>
+                  <Validation />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="*" element={<NotFound />} />
+            <Route
+              path="/editar-contrasena"
+              element={
+                <ProtectedRoute>
+                  <ResetPassword />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              element={
+                <AdminRoute>
+                  <AdminLayout />
+                </AdminRoute>
+              }
+            >
+              <Route
+                path="/bicitas_historicas_manager"
+                element={<AdminDashboard />}
+              />
+{/* 
+              <Route path="/admin/usuarios" element={<UsuariosPage />} />
+
+              <Route path="/admin/lugares" element={<LugaresPage />} />
+
+              <Route path="/admin/promociones" element={<PromocionesPage />} /> */}
+            </Route>
+          </Routes>
+        </>
+      )}
       {showLogin && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-end justify-center">
           <div className="w-full max-w-md bg-transparent rounded-t-3xl  animate-slide-up">
@@ -90,9 +167,8 @@ function App() {
           </div>
         </div>
       )}
-    </>
+    </BrowserRouter>
   );
 }
 
 export default App;
-

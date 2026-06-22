@@ -6,7 +6,9 @@ import { useAuth } from "../../context/AuthContext";
 
 
 export default function Navbar({ onPerfilClick }) {
-  const { userAuth } = useAuth();
+  const { userAuth, isAdmin } = useAuth();
+  // Ocultar Navbar para administradores
+  if (isAdmin) return null;
   const isLoggedIn = !!userAuth;
   const tabs = [
     { name: "Explorar", icon: Home, route: "/" },
