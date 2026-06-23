@@ -119,16 +119,23 @@ function LoginC({ onClose, onShowRegister, onAuthSuccess }) {
     } else {
       setUserAuth(user);
 
-      const { data, error } = await getUsuario(user.id);
+      const { data} = await getUsuario(user.id);
+
+      if (!data.activo) {
+       
+
+        setMensaje("Tu cuenta ha sido desactivada.");
+
+        setTipoMensaje("error");
+
+        return;
+      }
 
       await refreshUser();
       setMensaje("Inicio de sesión exitoso");
 
       onAuthSuccess?.();
-      console.log("USER AUTH", user);
-      console.log("DATA", data);
-      console.log("ERROR", error);
-      console.log(data.rol);
+    
 
       if (!data) {
         setMensaje("No se encontró información del usuario.");

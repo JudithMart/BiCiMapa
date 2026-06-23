@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
+
 import AdminCard from "./AdminCard";
-import { getDashboardStats } from "../../services/admin.service";
-import LoadingScreen from "../../user/components/LoadingScreen";7
+
 import { FaUserGroup } from "react-icons/fa6";
 import { GrUserNew } from "react-icons/gr";
 import { LiaPlaceOfWorshipSolid } from "react-icons/lia";
@@ -9,20 +8,8 @@ import { RiDiscountPercentFill } from "react-icons/ri";
 import { MdOutlineAutoGraph } from "react-icons/md";
 
 
-function AdminDashboard() {
-  const [stats, setStats] = useState(null);
-
-  useEffect(() => {
-    loadStats();
-  }, []);
-
-    const loadStats = async () => {
-    const data = await getDashboardStats();
-    setStats(data);
-    console.log("Dashboard stats:", data); // Agrega este console.log para depuración
-  };
-
-  if (!stats) return <div><LoadingScreen /></div>;
+function AdminDashboard({ stats }) {
+ 
 
 
 

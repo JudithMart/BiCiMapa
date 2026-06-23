@@ -6,7 +6,8 @@ function AdminTable({
   columns = [],
   data = [],
   onEdit,
-  onDelete,
+ 
+  onDeactivate,
 }) {
   return (
     <div className="rounded-3xl bg-white/75 border-2 border-primary shadow-md overflow-hidden">
@@ -40,7 +41,7 @@ function AdminTable({
                 {columns.map((column) => (
                   <td
                     key={column.accessor}
-                    className="px-6 py-5 text-sm text-gray-700"
+                    className="px-6 py-5 text-sm text-gray-700 font-sans"
                   >
                     {column.render
                       ? column.render(row)
@@ -58,7 +59,7 @@ function AdminTable({
                     </button>
 
                     <button
-                      onClick={() => onDelete?.(row)}
+                      onClick={() => onDeactivate?.(row)}
                       className="text-red-500 hover:scale-110 transition"
                     >
                       <LuTrash2 size={18} />
@@ -115,7 +116,7 @@ function AdminTable({
               </button>
 
               <button
-                onClick={() => onDelete?.(row)}
+                onClick={() =>  onDeactivate?.(row)}
                 className="text-red-500"
               >
                 <LuTrash2 size={18} />
