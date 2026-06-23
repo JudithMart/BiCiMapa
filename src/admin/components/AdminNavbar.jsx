@@ -74,7 +74,7 @@ export default function AdminNavbar() {
       {/* SIDEBAR */}
       <nav
         className={`
-          bg-[#AFB2B7]
+          bg-colorAdmin_gray
           text-white
           shadow-lg
           flex
@@ -116,7 +116,7 @@ export default function AdminNavbar() {
                   px-5 py-4
                   rounded-full
                   transition-all duration-200
-                  ${active ? "bg-primary shadow-lg w-72" : "hover:bg-white/10"}
+                  ${active ? "bg-primary shadow-lg md:w-72" : "hover:bg-white/10"}
                 `}
               >
                 {item.icon}

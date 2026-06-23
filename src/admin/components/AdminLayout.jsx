@@ -6,7 +6,7 @@ import AdminNavbar from "./AdminNavbar";
 export default function AdminLayout() {
   return (
     <div
-      className="min-h-screen bg-cover bg-center"
+      className="min-h-screen bg-cover bg-center "
       style={{
         backgroundImage:
           "url('/Fondos/FondoBicis.jpeg')",

@@ -17,9 +17,12 @@ import Favorites from "./user/pages/Favorites";
 import ProtectedRoute from "./user/components/ProtectedRoute";
 import NotFound from "./shared/components/NotFound";
 import ResetPassword from "./user/pages/ResetPassword";
+
 import AdminRoute from "./admin/routes/AdminRoute";
-import AdminDashboard from "./admin/components/AdminDashboard";
 import AdminLayout from "./admin/components/AdminLayout";
+import AdminDashboardPage from "./admin/pages/AdminDashboardPage";
+import AdminUserPage from "./admin/pages/AdminUserPage";
+
 
 function App() {
   const [showLogin, setShowLogin] = useState(false);
@@ -133,11 +136,11 @@ function App() {
             >
               <Route
                 path="/bicitas_historicas_manager"
-                element={<AdminDashboard />}
+                element={<AdminDashboardPage />}
               />
-{/* 
-              <Route path="/admin/usuarios" element={<UsuariosPage />} />
 
+              <Route path="/bicitas_historicas_manager/usuarios" element={<AdminUserPage />} />
+{/* 
               <Route path="/admin/lugares" element={<LugaresPage />} />
 
               <Route path="/admin/promociones" element={<PromocionesPage />} /> */}

@@ -14,6 +14,7 @@ export default {
         primary: '#B0637A',
         secundary: '#FCEAEA',
         texto: '#4A565B',
+        colorAdmin_gray: '#AFB2B7',
       },
       keyframes: {
       bike: {
