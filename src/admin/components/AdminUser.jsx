@@ -1,31 +1,48 @@
 // src/admin/components/AdminUser.jsx
 import React, { useState } from "react";
 import AdminTable from "./AdminTable";
-import AdminUserModal from "./AdminUserModal";
 import {
   togglePremium,
   deactivateUser,
   updateUser,
 } from "../../services/admin.service";
+import AdminFormModal from "./AdminFormModal";
+import UserForm from "./Form/UserForm";
+import Search from "./Search";
 
 function AdminUser({ usuarios }) {
   const [selectedUser, setSelectedUser] = useState(null);
   const [openModal, setOpenModal] = useState(false);
+  const [search, setSearch] = useState("");
+
+  const [form, setForm] = useState({
+    nombre: "",
+    telefono: "",
+    email: "",
+    rol: "user",
+    activo: true,
+  });
 
   const handleEdit = (user) => {
     setSelectedUser(user);
+    setForm({
+      nombre: user.nombre || "",
+      telefono: user.telefono || "",
+      email: user.email || "",
+      rol: user.rol || "user",
+      activo: user.activo,
+    });
     setOpenModal(true);
   };
 
-  const handleSaveUser = async (userData) => {
-    const { error } = await updateUser(selectedUser.id, userData);
+  const handleSaveUser = async (form) => {
+    const { error } = await updateUser(selectedUser.id, form);
 
     if (error) {
-      alert("Error al actualizar usuario");
+      alert("Error");
+
       return;
     }
-
-    alert("Usuario actualizado");
 
     setOpenModal(false);
 
@@ -126,16 +143,46 @@ function AdminUser({ usuarios }) {
     },
   ];
 
+const filteredUsers = usuarios.filter((user) => {
+
+    const text = search.toLowerCase();
+
+    return Object.values(user)
+        .join(" ")
+        .toLowerCase()
+        .includes(text);
+
+});
+
   return (
-    <div className="pt-24">
-      <AdminTable
-        columns={columns}
-        data={usuarios}
-        onEdit={handleEdit}
-        onDeactivate={(user) => handleDeactivate(user)}
-        onPremiumToggle={(user) => handlePremium(user)}
-      />
-    </div>
+    <>
+      <div className="flex justify-between items-center mb-6">
+        <Search
+          value={search}
+          onChange={setSearch}
+          placeholder="Buscar usuario..."
+        />
+      </div>
+
+      <div className="pt-10">
+        <AdminTable
+          columns={columns}
+          data={filteredUsers}
+          onEdit={handleEdit}
+          onDeactivate={(user) => handleDeactivate(user)}
+          onPremiumToggle={(user) => handlePremium(user)}
+        />
+      </div>{" "}
+      <AdminFormModal
+        open={openModal}
+        user={selectedUser}
+        onClose={() => setOpenModal(false)}
+        onSave={handleSaveUser}
+      >
+        {" "}
+        <UserForm form={form} setForm={setForm} onSave={handleSaveUser} />
+      </AdminFormModal>
+    </>
   );
 }
 
