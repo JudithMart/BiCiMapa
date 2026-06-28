@@ -1,85 +1,58 @@
-
+//promotionForm.jsx
+import React from 'react'
 import ButtonPink from "../../../shared/components/ButtonPink";
 
-function UserForm({ form, setForm, onSave }) {
-  return (
+
+
+function PromotionForm({ form, setForm, onSave }) {
+ return (
     <div className="w-full flex flex-col justify-start pl-6 px-5">
       {" "}
-      {/* Input nombre */}
-      <div className="mt-4 w-full flex flex-col justify-start pl-6 px-5">
+      {/* Nombre lugar */}
+      <div className="mt-4 w-full flex justify-center pl-6 px-5">
+        <p className=" text-primary font-bold text-xl md:text-lg lg:text-xl ">
+          {form.nombreLugar ? form.nombreLugar : "Nombre del lugar"}
+        </p>
+      
+      </div>
+      
+      {/* Input descripción */}
+      <div className="mt-5 w-full flex flex-col justify-start pl-6 px-5">
         <p className=" text-texto font-semibold text-base md:text-lg lg:text-xl ">
-          Nombre
+          Descripción
         </p>
         <input
           type="text"
-          placeholder="Ingrese nombre completo"
-          value={form.nombre}
-          maxLength={100}
+          placeholder="Ingresa una breve descripción del lugar"
+          value={form.descripcion}
           onChange={(e) => {
             setForm({
               ...form,
+              descripcion: e.target.value,
+            });
+          }}
+          className="font-sans w-full px-3 py-2 rounded-lg  mt-1 border   bg-gray-300 border-colorAdmin_gray  focus:outline-none focus:ring-2 focus:ring-primary"
+        />
+      </div>
+           {/* Input descripción */}
+      <div className="mt-5 w-full flex flex-col justify-start pl-6 px-5">
+        <p className=" text-texto font-semibold text-base md:text-lg lg:text-xl ">
+          Descuento
+        </p>
+        <input
+          type="text"
+          placeholder="Ingresa el descuento de la promoción"
+          value={form.descuento}
+          onChange={(e) => {
+            setForm({
+              ...form,
+              descuento: e.target.value,
+            });
+          }}
+          className="font-sans w-full px-3 py-2 rounded-lg  mt-1 border   bg-gray-300 border-colorAdmin_gray  focus:outline-none focus:ring-2 focus:ring-primary"
+        />
+      </div>
 
-              nombre: e.target.value,
-            });
-          }}
-          className="font-sans w-full px-3 py-2 rounded-lg  mt-1 border  bg-gray-300 border-colorAdmin_gray focus:outline-none focus:ring-2 focus:ring-primary"
-        />
-      </div>
-      {/* Input numero */}
-      <div className="mt-5 w-full flex flex-col justify-start pl-6 px-5">
-        <p className=" text-texto font-semibold text-base md:text-lg lg:text-xl ">
-          Numero de teléfono
-        </p>
-        <input
-          type="tel"
-          placeholder="Ingrese numero de teléfono"
-          value={form.telefono}
-          onChange={(e) => {
-            setForm({
-              ...form,
-              telefono: e.target.value,
-            });
-          }}
-          className="font-sans w-full px-3 py-2 rounded-lg  mt-1 border   bg-gray-300 border-colorAdmin_gray  focus:outline-none focus:ring-2 focus:ring-primary"
-        />
-      </div>
-      {/* Input email */}
-      <div className="mt-5 w-full flex flex-col justify-start pl-6 px-5">
-        <p className=" text-texto font-semibold text-base md:text-lg lg:text-xl ">
-          Email
-        </p>
-        <input
-          type="email"
-          placeholder="Ingrese su email"
-          value={form.email}
-          onChange={(e) => {
-            setForm({
-              ...form,
-              email: e.target.value,
-            });
-          }}
-          className="font-sans w-full px-3 py-2 rounded-lg  mt-1 border   bg-gray-300 border-colorAdmin_gray  focus:outline-none focus:ring-2 focus:ring-primary"
-        />
-      </div>
-      {/* SELECCION DE ROL*/}
-      <div className="mt-5 w-full flex flex-col justify-start pl-6 px-5">
-        <p className=" text-texto font-semibold text-base md:text-lg lg:text-xl ">
-          Rol
-        </p>
-        <select
-          value={form.rol}
-          onChange={(e) => {
-            setForm({
-              ...form,
-              rol: e.target.value,
-            });
-          }}
-          className="font-sans w-full px-3 py-2 rounded-lg  mt-1 border   bg-gray-300 border-colorAdmin_gray  focus:outline-none focus:ring-2 focus:ring-primary"
-        >
-          <option value="user">Usuario</option>
-          <option value="admin">Administrador</option>
-        </select>
-      </div>
       {/* SELECCION DE ESTADO ACTIVO O INACTIVO */}
       <div className="mt-5 w-full flex flex-col justify-start pl-6 px-5">
         <p className=" text-texto font-semibold text-base md:text-lg lg:text-xl ">
@@ -99,6 +72,8 @@ function UserForm({ form, setForm, onSave }) {
           <option value="false">Inactivo</option>
         </select>
       </div>
+   
+      
       <div className=" mb-8 flex justify-center">
         <ButtonPink
           texto="Guardar cambios"
@@ -110,4 +85,5 @@ function UserForm({ form, setForm, onSave }) {
   );
 }
 
-export default UserForm;
+
+export default PromotionForm

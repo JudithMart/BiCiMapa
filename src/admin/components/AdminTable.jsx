@@ -10,10 +10,10 @@ function AdminTable({
   onDeactivate,
 }) {
   return (
-    <div className="rounded-3xl bg-white/75 border-2 border-primary shadow-md overflow-hidden">
+    <div className="rounded-3xl bg-white/75 border-2 border-primary shadow-md ">
 
       {/* Desktop */}
-      <div className="hidden md:block overflow-x-auto">
+      <div className="hidden md:block overflow-x-auto max-h-[70vh] overflow-auto">
         <table className="w-full">
           <thead>
             <tr className="border-b border-gray-200">

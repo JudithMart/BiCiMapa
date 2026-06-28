@@ -1,7 +1,7 @@
 // src/admin/pages/AdminUserPage.jsx
 import React, { useEffect, useState } from 'react'
 import AdminUser from '../components/AdminUser'
-import {getAllUsers } from '../../services/admin.service'
+import {getAllUsers } from '../../services/admin_user.service'
 
 function AdminUserPage() {
   const [usuarios, setUsuarios] = useState([]);

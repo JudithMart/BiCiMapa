@@ -5,7 +5,7 @@ import {
   togglePremium,
   deactivateUser,
   updateUser,
-} from "../../services/admin.service";
+} from "../../services/admin_user.service";
 import AdminFormModal from "./AdminFormModal";
 import UserForm from "./Form/UserForm";
 import Search from "./Search";

@@ -22,7 +22,8 @@ import AdminRoute from "./admin/routes/AdminRoute";
 import AdminLayout from "./admin/components/AdminLayout";
 import AdminDashboardPage from "./admin/pages/AdminDashboardPage";
 import AdminUserPage from "./admin/pages/AdminUserPage";
-
+import AdminPlacePage from "./admin/pages/AdminPlacePage";
+import AdminPromotionPage from "./admin/pages/AdminPromotionPage";
 
 function App() {
   const [showLogin, setShowLogin] = useState(false);
@@ -139,11 +140,20 @@ function App() {
                 element={<AdminDashboardPage />}
               />
 
-              <Route path="/bicitas_historicas_manager/usuarios" element={<AdminUserPage />} />
-{/* 
-              <Route path="/admin/lugares" element={<LugaresPage />} />
+              <Route
+                path="/bicitas_historicas_manager/usuarios"
+                element={<AdminUserPage />}
+              />
 
-              <Route path="/admin/promociones" element={<PromocionesPage />} /> */}
+              <Route
+                path="/bicitas_historicas_manager/lugares"
+                element={<AdminPlacePage />}
+              />
+
+              <Route
+                path="/bicitas_historicas_manager/promociones"
+                element={<AdminPromotionPage />}
+              />
             </Route>
           </Routes>
         </>

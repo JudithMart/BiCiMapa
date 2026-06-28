@@ -1,7 +1,10 @@
+// src/admin/components/Form/AdminForm.jsx
 
 import ButtonPink from "../../../shared/components/ButtonPink";
+import { placeTypes } from "../../../config/placeTypes";
+import { uploadPlaceImage } from "../../../services/admin_places.service";
 
-function UserForm({ form, setForm, onSave }) {
+function AdminForm({ form, setForm, onSave }) {
   return (
     <div className="w-full flex flex-col justify-start pl-6 px-5">
       {" "}
@@ -24,61 +27,104 @@ function UserForm({ form, setForm, onSave }) {
           }}
           className="font-sans w-full px-3 py-2 rounded-lg  mt-1 border  bg-gray-300 border-colorAdmin_gray focus:outline-none focus:ring-2 focus:ring-primary"
         />
+        {form.imagen_url && (
+          <img src={form.imagen_url} className="w-48 rounded-xl mt-4" />
+        )}
       </div>
-      {/* Input numero */}
+      {/* Input Imagen */}
       <div className="mt-5 w-full flex flex-col justify-start pl-6 px-5">
         <p className=" text-texto font-semibold text-base md:text-lg lg:text-xl ">
-          Numero de teléfono
+          Imagen
         </p>
         <input
-          type="tel"
-          placeholder="Ingrese numero de teléfono"
-          value={form.telefono}
+          type="file"
+          accept="image/*"
+          onChange={async (e) => {
+            const file = e.target.files[0];
+
+            if (!file) return;
+
+            const imageUrl = await uploadPlaceImage(file);
+
+            setForm({
+              ...form,
+              imagen: file,
+              imagen_url: imageUrl,
+            });
+          }}
+        />
+      </div>
+      {/* Input descripción */}
+      <div className="mt-5 w-full flex flex-col justify-start pl-6 px-5">
+        <p className=" text-texto font-semibold text-base md:text-lg lg:text-xl ">
+          Descripción
+        </p>
+        <input
+          type="text"
+          placeholder="Ingresa una breve descripción del lugar"
+          value={form.descripcion}
           onChange={(e) => {
             setForm({
               ...form,
-              telefono: e.target.value,
+              descripcion: e.target.value,
             });
           }}
           className="font-sans w-full px-3 py-2 rounded-lg  mt-1 border   bg-gray-300 border-colorAdmin_gray  focus:outline-none focus:ring-2 focus:ring-primary"
         />
       </div>
-      {/* Input email */}
+      {/* Input slogan */}
       <div className="mt-5 w-full flex flex-col justify-start pl-6 px-5">
         <p className=" text-texto font-semibold text-base md:text-lg lg:text-xl ">
-          Email
+          Slogan
         </p>
         <input
-          type="email"
-          placeholder="Ingrese su email"
-          value={form.email}
+          type="text"
+          placeholder="Ingrese el slogan del lugar"
+          value={form.slogan}
           onChange={(e) => {
             setForm({
               ...form,
-              email: e.target.value,
+              slogan: e.target.value,
             });
           }}
           className="font-sans w-full px-3 py-2 rounded-lg  mt-1 border   bg-gray-300 border-colorAdmin_gray  focus:outline-none focus:ring-2 focus:ring-primary"
         />
       </div>
-      {/* SELECCION DE ROL*/}
+      {/* Input latitud */}
       <div className="mt-5 w-full flex flex-col justify-start pl-6 px-5">
         <p className=" text-texto font-semibold text-base md:text-lg lg:text-xl ">
-          Rol
+          Latitud
         </p>
-        <select
-          value={form.rol}
+        <input
+          type="text"
+          placeholder="Ingrese la latitud del lugar"
+          value={form.latitud}
           onChange={(e) => {
             setForm({
               ...form,
-              rol: e.target.value,
+              latitud: e.target.value,
             });
           }}
           className="font-sans w-full px-3 py-2 rounded-lg  mt-1 border   bg-gray-300 border-colorAdmin_gray  focus:outline-none focus:ring-2 focus:ring-primary"
-        >
-          <option value="user">Usuario</option>
-          <option value="admin">Administrador</option>
-        </select>
+        />
+      </div>
+      {/* Input longitud */}
+      <div className="mt-5 w-full flex flex-col justify-start pl-6 px-5">
+        <p className=" text-texto font-semibold text-base md:text-lg lg:text-xl ">
+          Longitud
+        </p>
+        <input
+          type="text"
+          placeholder="Ingrese la longitud del lugar"
+          value={form.longitud}
+          onChange={(e) => {
+            setForm({
+              ...form,
+              longitud: e.target.value,
+            });
+          }}
+          className="font-sans w-full px-3 py-2 rounded-lg  mt-1 border   bg-gray-300 border-colorAdmin_gray  focus:outline-none focus:ring-2 focus:ring-primary"
+        />
       </div>
       {/* SELECCION DE ESTADO ACTIVO O INACTIVO */}
       <div className="mt-5 w-full flex flex-col justify-start pl-6 px-5">
@@ -99,6 +145,29 @@ function UserForm({ form, setForm, onSave }) {
           <option value="false">Inactivo</option>
         </select>
       </div>
+      {/* SELECCION DE TIPO */}
+      <div className="mt-5 w-full flex flex-col justify-start pl-6 px-5">
+        <p className=" text-texto font-semibold text-base md:text-lg lg:text-xl ">
+          Tipo
+        </p>
+        <select
+          value={form.id_tipo}
+          onChange={(e) =>
+            setForm({
+              ...form,
+              id_tipo: Number(e.target.value),
+            })
+          }
+          className="font-sans w-full px-3 py-2 rounded-lg mt-1 border bg-gray-300 border-colorAdmin_gray"
+        >
+          {Object.entries(placeTypes).map(([id, type]) => (
+            <option key={id} value={id}>
+              {type.label}
+            </option>
+          ))}
+        </select>
+      </div>
+      {/* MOSTRAR ICONO EN EL MAPA  */}
       <div className=" mb-8 flex justify-center">
         <ButtonPink
           texto="Guardar cambios"
@@ -110,4 +179,4 @@ function UserForm({ form, setForm, onSave }) {
   );
 }
 
-export default UserForm;
+export default AdminForm;
