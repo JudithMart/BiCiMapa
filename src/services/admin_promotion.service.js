@@ -113,6 +113,7 @@ export const getLastToken = async (idPromocion) => {
     .order("creado_en", { ascending: false })
     .limit(1)
     .maybeSingle();
+    console.log("DATA", data);
 
   return { data, error };
 };

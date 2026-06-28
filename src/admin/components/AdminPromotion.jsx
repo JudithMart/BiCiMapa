@@ -13,6 +13,7 @@ import {
   createPromotion,
   createToken,
   getLastToken,
+  generateNewToken,
 } from "../../services/admin_promotion.service";
 import PromotionForm from "./Form/PromotionForm";
 import AdminModalQR from "./AdminModalQR";
@@ -23,6 +24,8 @@ function AdminPromotion({ promociones }) {
   const [search, setSearch] = useState("");
   const [openQR, setOpenQR] = useState(false);
   const [selectedToken, setSelectedToken] = useState(null);
+
+  const [selectedPromotion, setSelectedPromotion] = useState(null);
 
   const [form, setForm] = useState({
     id_lugar: "",
@@ -51,24 +54,33 @@ function AdminPromotion({ promociones }) {
 
   const handleGenerateQR = async (promotion) => {
     //¿Existe uno?
-    const { data: tokenActual } = await getLastToken(promotion.id_lugar);
+    const { data: tokenActual } = await getLastToken(promotion.id);
 
     let token = tokenActual;
 
-    console.log(promotion);
     //Si no existe, crear uno
     if (!tokenActual) {
       const { data } = await createToken(promotion);
       token = data;
       console.log("DATA:", data);
-
     }
 
-    
-    //Abrir modal con QR
+    setSelectedPromotion(promotion);
     setSelectedToken(token);
 
     setOpenQR(true);
+  };
+
+  const handleGenerateNewToken = async () => {
+    const { data } = await generateNewToken(selectedPromotion);
+
+    setSelectedToken(data);
+
+    setSelectedPromotion((prev) => ({
+      ...prev,
+      token_lugar: [data],
+    }));
+    window.location.reload();
   };
 
   const handleSavePromotion = async (form) => {
@@ -168,10 +180,10 @@ function AdminPromotion({ promociones }) {
       ),
     },
     {
-      header: "GENERAR QR",
+      header: "Ver QR",
       accessor: "qr",
       render: (promotion) => (
-        <div className="flex justify-start px-5 ">
+        <div className="flex justify-start px-2 ">
           <button
             onClick={() => handleGenerateQR(promotion)}
             className="text-3xl  text-primary hover:text-primary-dark transition"
@@ -186,9 +198,9 @@ function AdminPromotion({ promociones }) {
       accessor: "token",
 
       render: (promotion) => {
-        const ultimo = promotion.token_lugar?.[0].ultimo;
+        const tokenActivo = promotion.token_lugar?.find((t) => t.activo);
 
-        return ultimo ? ultimo.token : "Sin generar";
+        return tokenActivo?.token ?? "Sin generar";
       },
     },
   ];
@@ -213,6 +225,13 @@ function AdminPromotion({ promociones }) {
           onEdit={handleEdit}
           onDeactivate={(place) => handleDelete(place)}
         />
+        <AdminModalQR
+          open={openQR}
+          token={selectedToken}
+          onClose={() => setOpenQR(false)}
+          promotion={selectedPromotion}
+          onGenerateNew={handleGenerateNewToken}
+        />
       </div>{" "}
       <AdminFormModal
         open={openModal}
@@ -224,11 +243,6 @@ function AdminPromotion({ promociones }) {
           form={form}
           setForm={setForm}
           onSave={handleSavePromotion}
-        />
-        <AdminModalQR
-          open={openQR}
-          token={selectedToken}
-          onClose={() => setOpenQR(false)}
         />
       </AdminFormModal>
     </>

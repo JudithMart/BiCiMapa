@@ -6,8 +6,8 @@ function AdminTable({
   columns = [],
   data = [],
   onEdit,
- 
   onDeactivate,
+  
 }) {
   return (
     <div className="rounded-3xl bg-white/75 border-2 border-primary shadow-md ">
