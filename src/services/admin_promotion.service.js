@@ -131,3 +131,19 @@ export const generateNewToken = async(promotion)=>{
     return createToken(promotion);
 
 }
+
+// END CRUD PROMOCIONES
+
+export const getAllPlaces = async () => {
+  return await supabase
+    .from("lugar")
+    .select(`
+      id,
+      nombre,
+      slogan,
+      imagen_url
+    `)
+    .eq("activo", true)
+    .eq("es_convenio", true)
+    .order("nombre");
+};

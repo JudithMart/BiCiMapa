@@ -1,21 +1,30 @@
 //promotionForm.jsx
-import React from 'react'
+import React from "react";
 import ButtonPink from "../../../shared/components/ButtonPink";
+import AdminLugarSelector from "../AdminLugarSelector";
 
 
-
-function PromotionForm({ form, setForm, onSave }) {
- return (
+function PromotionForm({ form, setForm, onSave, lugares }) {
+  return (
     <div className="w-full flex flex-col justify-start pl-6 px-5">
       {" "}
       {/* Nombre lugar */}
       <div className="mt-4 w-full flex justify-center pl-6 px-5">
-        <p className=" text-primary font-bold text-xl md:text-lg lg:text-xl ">
+        <AdminLugarSelector
+          lugares={lugares}
+          value={form.id_lugar}
+          onChange={(lugar) =>
+            setForm({
+              ...form,
+              id_lugar: lugar.id,
+              nombreLugar: lugar.nombre,
+            })
+          }
+        />
+        {/* <p className=" text-primary font-bold text-xl md:text-lg lg:text-xl ">
           {form.nombreLugar ? form.nombreLugar : "Nombre del lugar"}
-        </p>
-      
+        </p> */}
       </div>
-      
       {/* Input descripción */}
       <div className="mt-5 w-full flex flex-col justify-start pl-6 px-5">
         <p className=" text-texto font-semibold text-base md:text-lg lg:text-xl ">
@@ -34,7 +43,7 @@ function PromotionForm({ form, setForm, onSave }) {
           className="font-sans w-full px-3 py-2 rounded-lg  mt-1 border   bg-gray-300 border-colorAdmin_gray  focus:outline-none focus:ring-2 focus:ring-primary"
         />
       </div>
-           {/* Input descripción */}
+      {/* Input descripción */}
       <div className="mt-5 w-full flex flex-col justify-start pl-6 px-5">
         <p className=" text-texto font-semibold text-base md:text-lg lg:text-xl ">
           Descuento
@@ -52,7 +61,6 @@ function PromotionForm({ form, setForm, onSave }) {
           className="font-sans w-full px-3 py-2 rounded-lg  mt-1 border   bg-gray-300 border-colorAdmin_gray  focus:outline-none focus:ring-2 focus:ring-primary"
         />
       </div>
-
       {/* SELECCION DE ESTADO ACTIVO O INACTIVO */}
       <div className="mt-5 w-full flex flex-col justify-start pl-6 px-5">
         <p className=" text-texto font-semibold text-base md:text-lg lg:text-xl ">
@@ -72,8 +80,6 @@ function PromotionForm({ form, setForm, onSave }) {
           <option value="false">Inactivo</option>
         </select>
       </div>
-   
-      
       <div className=" mb-8 flex justify-center">
         <ButtonPink
           texto="Guardar cambios"
@@ -85,5 +91,4 @@ function PromotionForm({ form, setForm, onSave }) {
   );
 }
 
-
-export default PromotionForm
+export default PromotionForm;

@@ -1,5 +1,5 @@
 //admin_promotion.service.js
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ButtonPink from "../../shared/components/ButtonPink";
 import AdminFormModal from "./AdminFormModal";
 import AdminForm from "./Form/AdminForm";
@@ -14,6 +14,7 @@ import {
   createToken,
   getLastToken,
   generateNewToken,
+  getAllPlaces,
 } from "../../services/admin_promotion.service";
 import PromotionForm from "./Form/PromotionForm";
 import AdminModalQR from "./AdminModalQR";
@@ -26,6 +27,17 @@ function AdminPromotion({ promociones }) {
   const [selectedToken, setSelectedToken] = useState(null);
 
   const [selectedPromotion, setSelectedPromotion] = useState(null);
+  const [lugares, setLugares] = useState([]);
+
+  useEffect(() => {
+    loadPlaces();
+  }, []);
+
+  const loadPlaces = async () => {
+    const { data } = await getAllPlaces();
+
+    setLugares(data || []);
+  };
 
   const [form, setForm] = useState({
     id_lugar: "",
@@ -85,6 +97,8 @@ function AdminPromotion({ promociones }) {
 
   const handleSavePromotion = async (form) => {
     let values = { ...form };
+
+    delete values.nombreLugar;
     let error;
     if (selectedPlace) {
       ({ error } = await updatePromotion(selectedPlace.id, values));
@@ -211,12 +225,30 @@ function AdminPromotion({ promociones }) {
   });
   return (
     <>
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center ">
         <Search
           value={search}
           onChange={setSearch}
           placeholder="Buscar promociones o lugares..."
         />
+        <div className="-mt-8">
+          <ButtonPink
+            texto="Agregar promoción"
+            px="px-4"
+            onClick={() => {
+              setSelectedPlace(null);
+
+              setForm({
+                id_lugar: "",
+                descripcion: "",
+                descuento: "",
+                activa: true,
+              });
+
+              setOpenModal(true);
+            }}
+          />
+        </div>
       </div>
       <div className="pt-10">
         <AdminTable
@@ -243,6 +275,7 @@ function AdminPromotion({ promociones }) {
           form={form}
           setForm={setForm}
           onSave={handleSavePromotion}
+          lugares={lugares}
         />
       </AdminFormModal>
     </>
