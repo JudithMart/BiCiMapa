@@ -32,8 +32,8 @@ function AdminForm({ form, setForm, onSave }) {
         )}
       </div>
       {/* Input Imagen */}
-      <div className="mt-5 w-full flex flex-col justify-start pl-6 px-5">
-        <p className=" text-texto font-semibold text-base md:text-lg lg:text-xl ">
+      <div className="mt-5 w-full flex flex-col justify-start pl-6 px-5 ">
+        <p className="text-texto font-semibold text-base md:text-lg lg:text-xl ">
           Imagen
         </p>
         <input

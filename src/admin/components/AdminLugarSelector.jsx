@@ -4,9 +4,7 @@ import { CiSearch } from "react-icons/ci";
 
 function AdminLugarSelector({
   lugares,
-
   value,
-
   onChange,
 }) {
   const [open, setOpen] = useState(false);
@@ -71,7 +69,6 @@ function AdminLugarSelector({
                 src={lugar.imagen_url}
                 className="w-10 h-10 rounded-full object-cover"
               />
-
               <div>
                 <p className="font-normal font-sans">{lugar.nombre}</p>
               </div>

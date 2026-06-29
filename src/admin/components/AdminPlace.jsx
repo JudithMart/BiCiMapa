@@ -5,6 +5,8 @@ import AdminFormModal from "./AdminFormModal";
 import AdminForm from "./Form/AdminForm";
 import Search from "./Search";
 import AdminTable from "./AdminTable";
+
+import { createSlug } from "../utils/slug";
 import {
   toggleConvenio,
   updatePlace,
@@ -55,6 +57,8 @@ function AdminPlace({ lugares }) {
     }
 
     delete values.imagen;
+
+    values.slug = createSlug(values.nombre);
 
     let error;
 
