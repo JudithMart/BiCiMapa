@@ -5,7 +5,7 @@ import AdminFormModal from "./AdminFormModal";
 import AdminForm from "./Form/AdminForm";
 import Search from "./Search";
 import AdminTable from "./AdminTable";
-
+import { IoMdAddCircleOutline } from "react-icons/io";
 import { createSlug } from "../utils/slug";
 import {
   toggleConvenio,
@@ -212,8 +212,13 @@ console.log(error);
           placeholder="Buscar lugar..."
         />
         <div className="-mt-8">
-          <ButtonPink
-            texto="Agregar Lugar"
+           <ButtonPink
+            texto={
+              <p className=" flex items-center gap-2">
+                <IoMdAddCircleOutline className="w-5 h-5" />
+                <span className="md:block hidden">Lugar</span>
+              </p>
+            }
             px="px-4"
             onClick={() => {
               setSelectedPlace(null);

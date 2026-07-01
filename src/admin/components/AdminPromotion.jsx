@@ -6,6 +6,7 @@ import AdminForm from "./Form/AdminForm";
 import Search from "./Search";
 import AdminTable from "./AdminTable";
 import { IoQrCodeOutline } from "react-icons/io5";
+import { IoMdAddCircleOutline } from "react-icons/io";
 import {
   updatePromotion,
   deletePromotion,
@@ -225,15 +226,20 @@ function AdminPromotion({ promociones }) {
   });
   return (
     <>
-      <div className="flex justify-between items-center ">
+      <div className="flex justify-between items-center  gap-2 ">
         <Search
           value={search}
           onChange={setSearch}
           placeholder="Buscar promociones o lugares..."
         />
-        <div className="-mt-8">
+        <div className="-mt-8 ">
           <ButtonPink
-            texto="Agregar promoción"
+            texto={
+              <p className=" flex items-center gap-2">
+                <IoMdAddCircleOutline className="w-5 h-5" />
+                <span className="md:block hidden">Promoción</span>
+              </p>
+            }
             px="px-4"
             onClick={() => {
               setSelectedPlace(null);
