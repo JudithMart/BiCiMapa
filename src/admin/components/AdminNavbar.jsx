@@ -8,6 +8,9 @@ import {
   LuBike,
   LuMenu,
   LuX,
+  LuRoute,
+  LuFlag,
+  LuChartNoAxesColumn,
 } from "react-icons/lu";
 
 export default function AdminNavbar() {
@@ -35,35 +38,46 @@ export default function AdminNavbar() {
       path: "/bicitas_historicas_manager/promociones",
       icon: <LuTicket size={20} />,
     },
+  ];
+
+  const bicitasItems = [
     {
-      label: "Bicitas",
-      path: "/bicitas_historicas_manager/bicitas",
-      icon: <LuBike size={20} />,
+      label: "Rutas",
+      path: "/bicitas_historicas_manager/bicitas/rutas",
+      icon: <LuRoute size={18} />,
+    },
+    {
+      label: "Retos",
+      path: "/bicitas_historicas_manager/bicitas/retos",
+      icon: <LuFlag size={18} />,
+    },
+    {
+      label: "Progreso",
+      path: "/bicitas_historicas_manager/bicitas/progreso",
+      icon: <LuChartNoAxesColumn size={18} />,
     },
   ];
 
   return (
     <>
-      {/* BOTÓN HAMBURGUESA SOLO EN CELULAR */}
       <button
         onClick={() => setOpen(!open)}
         className="
-          md:hidden
-          fixed
-          top-4
-          left-4
-          z-50
-          bg-primary
-          text-white
-          p-3
-          rounded-full
-          shadow-lg
-        "
+        md:hidden
+        fixed
+        top-4
+        left-4
+        z-50
+        bg-primary
+        text-white
+        p-3
+        rounded-full
+        shadow-lg
+      "
       >
         {open ? <LuX size={24} /> : <LuMenu size={24} />}
       </button>
 
-      {/* OVERLAY */}
       {open && (
         <div
           className="fixed inset-0 bg-black/40 z-40 md:hidden"
@@ -71,39 +85,41 @@ export default function AdminNavbar() {
         />
       )}
 
-      {/* SIDEBAR */}
       <nav
         className={`
-          bg-colorAdmin_gray
-          text-white
-          shadow-lg
-          flex
-          flex-col
-          items-center
-          py-10
+        bg-colorAdmin_gray
+        text-white
+        shadow-lg
+        flex
+        flex-col
+        py-10
 
-          fixed md:relative
-          top-0 left-0
-          z-50
+        fixed md:relative
+        top-0 left-0
+        z-50
 
-          h-screen
-          w-72
+        h-screen
+        w-72
 
-          rounded-r-[50px]
+        rounded-r-[50px]
 
-          transform transition-transform duration-300
+        transform transition-transform duration-300
 
-          ${open ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
-        `}
+        ${open ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
+      `}
       >
-        <img
-          src="/Logos/logoB4.png"
-          alt="Logo Bicitas"
-          className="w-28 mb-12"
-        />
+        <div className="flex justify-center">
+          <img
+            src="/Logos/logoB4.png"
+            alt="Logo"
+            className="w-28 mb-10"
+          />
+        </div>
 
-        <div className="flex flex-col gap-4 w-full px-5">
+        <div className="flex flex-col gap-3 px-5">
+
           {menuItems.map((item) => {
+
             const active = location.pathname === item.path;
 
             return (
@@ -112,19 +128,64 @@ export default function AdminNavbar() {
                 to={item.path}
                 onClick={() => setOpen(false)}
                 className={`
-                  flex items-center gap-4
-                  px-5 py-4
-                  rounded-full
-                  transition-all duration-200
-                  ${active ? "bg-primary shadow-lg md:w-72" : "hover:bg-white/10"}
-                `}
+                flex items-center gap-4
+                px-5 py-4 rounded-full
+                transition
+
+                ${
+                  active
+                    ? "bg-primary shadow-lg md:w-72"
+                    : "hover:bg-white/10"
+                }
+              `}
               >
                 {item.icon}
-
-                <span className="text-lg font-light">{item.label}</span>
+                <span>{item.label}</span>
               </Link>
             );
           })}
+
+          <div className="mt-6">
+
+            <div className="flex items-center gap-3 px-5 text-texto font-extrabold uppercase text-base">
+              <LuBike  className="text-primary" />
+              BiCitas
+            </div>
+
+            <div className="mt-3 ml-5 flex flex-col gap-2">
+
+              {bicitasItems.map((item) => {
+
+                const active =
+                  location.pathname === item.path;
+
+                return (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    onClick={() => setOpen(false)}
+                    className={`
+                    flex items-center gap-3
+                    px-4 py-3
+                    rounded-full
+                    transition
+
+                    ${
+                      active
+                        ? "bg-primary"
+                        : "hover:bg-white/10"
+                    }
+                  `}
+                  >
+                    {item.icon}
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </div>
+
+          </div>
+
         </div>
       </nav>
     </>

@@ -2,7 +2,6 @@ import { useRef, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { Search } from "lucide-react";
-
 import { MdDirectionsBike } from "react-icons/md";
 import { GiDutchBike } from "react-icons/gi";
 import { useAuth } from "../../../context/AuthContext";
@@ -40,6 +39,7 @@ import LoadingScreen from "../LoadingScreen.jsx";
 import ModalFeatures from "../ModalFeatures.jsx";
 
 import { useMemo } from "react";
+import centroMorelia from "../../../assets/geojson/centroMorelia";
 
 const allende = {
   name: "Allende 527",
@@ -371,7 +371,50 @@ function MapView() {
     center: [allende.lng, allende.lat],
     setMapReady,
   });
+  //------------
+  //CENTRO DE MORELIA
+  useEffect(() => {
+  if (!mapRef.current) return;
 
+  const map = mapRef.current;
+
+  const addCentro = () => {
+    if (map.getSource("centro-morelia")) return;
+
+    map.addSource("centro-morelia", {
+      type: "geojson",
+      data: centroMorelia,
+    });
+
+    // relleno
+    map.addLayer({
+      id: "centro-morelia-fill",
+      type: "fill",
+      source: "centro-morelia",
+      paint: {
+        "fill-color": "#FCEAEA",
+        "fill-opacity": 0.40,
+      },
+    });
+
+    // borde
+    map.addLayer({
+      id: "centro-morelia-outline",
+      type: "line",
+      source: "centro-morelia",
+      paint: {
+        "line-color": "#FCEAEA",
+        "line-width": 1,
+      },
+    });
+  };
+
+  if (map.isStyleLoaded()) {
+    addCentro();
+  } else {
+    map.once("load", addCentro);
+  }
+}, [mapReady]);
   //------------
   useBicitasMarker({
     mapRef,
