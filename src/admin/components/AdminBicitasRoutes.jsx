@@ -33,19 +33,9 @@ function AdminBicitasRoutes({ rutas }) {
     loadPlaces();
   }, []);
 
-  // useEffect(() => {
-  //   loadLugares();
-  // }, []);
-
-  // const loadLugares = async () => {
-  //   const { data } = await getAllPlaces();
-  //   setLugares(data || []);
-  // };
-
   const [form, setForm] = useState({
     nombre: "",
     descripcion: "",
-    orden: "",
     tiempo_estimado: "",
     distancia_km: "",
     activa: true,
@@ -57,7 +47,6 @@ function AdminBicitasRoutes({ rutas }) {
     setForm({
       nombre: route.nombre || "",
       descripcion: route.descripcion || "",
-      orden: route.orden ?? "",
       tiempo_estimado: route.tiempo_estimado || "",
       distancia_km: route.distancia_km ?? "",
       activa: route.activa ?? true,
@@ -78,11 +67,12 @@ function AdminBicitasRoutes({ rutas }) {
   };
 
   const handleSaveRoute = async (form) => {
-    let values = {
-      ...form,
-      orden: form.orden === "" ? null : Number(form.orden),
-      distancia_km:
-        form.distancia_km === "" ? null : Number(form.distancia_km),
+    const values = {
+      nombre: form.nombre,
+      descripcion: form.descripcion,
+      tiempo_estimado: form.tiempo_estimado,
+      distancia_km: form.distancia_km === "" ? null : Number(form.distancia_km),
+      activa: form.activa,
     };
 
     delete values.lugaresSeleccionados;
@@ -94,6 +84,8 @@ function AdminBicitasRoutes({ rutas }) {
       ({ error } = await updateRoute(selectedPlace.id, values));
     } else {
       const { data } = await createRoute(values);
+
+  
       savedRoute = data;
     }
 
@@ -108,8 +100,8 @@ function AdminBicitasRoutes({ rutas }) {
 
       if (form.lugaresSeleccionados?.length) {
         const inserts = form.lugaresSeleccionados.map((lugar) => ({
-          ruta_id: savedRoute.id,
-          lugar_id: lugar.id,
+          id_ruta: savedRoute.id,
+          id_lugar: lugar.id,
           orden: lugar.orden,
         }));
 
@@ -126,9 +118,9 @@ function AdminBicitasRoutes({ rutas }) {
 
     if (!confirmacion) return;
 
-    const { error } = await deleteRoute(route.id);
+    await deleteRoute(route.id);
 
-    console.log(error);
+    window.location.reload();
   };
 
   const columns = [
@@ -169,18 +161,6 @@ function AdminBicitasRoutes({ rutas }) {
         return lugares || "Sin lugares";
       },
     },
-    // {
-    //   header: "Orden",
-    //   accessor: "orden",
-    //   render: (route) => (
-    //     <p
-    //       className=" max-w-[100px] text-xs truncate line-clamp-2"
-    //       title={route.orden}
-    //     >
-    //       {route.orden}
-    //     </p>
-    //   ),
-    // },
     {
       header: "Tiempo estimado",
       accessor: "tiempo_estimado",
@@ -254,10 +234,10 @@ function AdminBicitasRoutes({ rutas }) {
               setForm({
                 nombre: "",
                 descripcion: "",
-                orden: "",
                 tiempo_estimado: "",
                 distancia_km: "",
                 activa: true,
+                lugaresSeleccionados: [],
               });
 
               setOpenModal(true);

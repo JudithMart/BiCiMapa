@@ -10,7 +10,7 @@ export const getAllRoutes = async () => {
     *,
     ruta_lugar(
         orden,
-        lugar(*)
+        lugar:lugar(*)
     )
 `,
     )
@@ -79,7 +79,7 @@ export const clearPlacesFromRoute = async (routeId) => {
   return await supabase
     .from("ruta_lugar")
     .delete()
-    .eq("ruta_id", routeId);
+    .eq("id_ruta", routeId);
 };
 
 //----
@@ -95,7 +95,6 @@ export const getAllPlaces = async () => {
     `,
     )
     .eq("activo", true)
-    .eq("es_convenio", true)
     .order("nombre");
 };
 //----
