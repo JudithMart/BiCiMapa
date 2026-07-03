@@ -26,6 +26,7 @@ import AdminPlacePage from "./admin/pages/AdminPlacePage";
 import AdminPromotionPage from "./admin/pages/AdminPromotionPage";
 
 import AdminBicitasRoutesPage from "./admin/pages/AdminBicitasRoutesPage";
+import AdminChallengePage from "./admin/pages/AdminChallengePage";
 
 function App() {
   const [showLogin, setShowLogin] = useState(false);
@@ -156,10 +157,13 @@ function App() {
                 path="/bicitas_historicas_manager/promociones"
                 element={<AdminPromotionPage />}
               />
-
               <Route
                 path="/bicitas_historicas_manager/bicitas/rutas"
                 element={<AdminBicitasRoutesPage />}
+              />
+              <Route
+                path="/bicitas_historicas_manager/bicitas/retos"
+                element={<AdminChallengePage />}
               />
             </Route>
           </Routes>
