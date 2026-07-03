@@ -7,7 +7,7 @@ export const getAllPlaces = async () => {
     .from("lugar")
     .select("*, tipo(*), promocion(*)")
     .order("created_at", { ascending: false });
-    
+
   return { data, error };
 };
 
@@ -35,10 +35,7 @@ export const deletePlace = async (id) => {
   return { data, error };
 };
 
-export const toggleConvenio = async (
-  placeId,
-  currentConvenio
-) => {
+export const toggleConvenio = async (placeId, currentConvenio) => {
   const values = currentConvenio
     ? {
         es_convenio: false,
@@ -54,8 +51,6 @@ export const toggleConvenio = async (
     .select()
     .single();
 
-  
-
   return { data, error };
 };
 
@@ -69,24 +64,29 @@ export const createPlace = async (values) => {
   return { data, error };
 };
 
-export const uploadPlaceImage = async(file)=>{
+export const uploadPlaceImage = async (file) => {
+  function normalizeFileName(name) {
+    return name
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "") // quita acentos
+      .replace(/[^a-zA-Z0-9._-]/g, "-"); // reemplaza espacios y caracteres raros
+  }
 
-    const fileName=`${Date.now()}-${file.name}`;
+  const fileName = `${Date.now()}-${normalizeFileName(file.name)}`;
 
-    const {error}=await supabase.storage
+  const { error } = await supabase.storage
 
-        .from("Lugares")
+    .from("Lugares")
 
-        .upload(fileName,file);
+    .upload(fileName, file);
 
-    if(error) throw error;
+  if (error) throw error;
 
-    const {data}=supabase.storage
+  const { data } = supabase.storage
 
-        .from("Lugares")
+    .from("Lugares")
 
-        .getPublicUrl(fileName);
+    .getPublicUrl(fileName);
 
-    return data.publicUrl;
-
-}
+  return data.publicUrl;
+};

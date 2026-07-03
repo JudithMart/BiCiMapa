@@ -1,19 +1,19 @@
 //AdminPlace.jsx
 import React, { useState } from "react";
-import ButtonPink from "../../shared/components/ButtonPink";
-import AdminFormModal from "./AdminFormModal";
-import AdminForm from "./Form/AdminForm";
-import Search from "./Search";
-import AdminTable from "./AdminTable";
+import ButtonPink from "../../../shared/components/ButtonPink";
+import AdminFormModal from "../AdminFormModal";
+import PlaceForm from "../Form/PlaceForm";
+import Search from "../Search";
+import AdminTable from "../AdminTable";
 import { IoMdAddCircleOutline } from "react-icons/io";
-import { createSlug } from "../utils/slug";
+import { createSlug } from "../../utils/slug";
 import {
   toggleConvenio,
   updatePlace,
   uploadPlaceImage,
   deletePlace,
   createPlace,
-} from "../../services/admin_places.service";
+} from "../../../services/admin_places.service";
 
 function AdminPlace({ lugares }) {
   const [selectedPlace, setSelectedPlace] = useState(null);
@@ -29,6 +29,7 @@ function AdminPlace({ lugares }) {
     longitud: "",
     es_convenio: false,
     activo: true,
+    visible_mapa: true,
   });
 
   const handleEdit = (place) => {
@@ -43,6 +44,7 @@ function AdminPlace({ lugares }) {
       es_convenio: place.es_convenio || false,
       activo: place.activo,
       id_tipo: place.id_tipo,
+       visible_mapa: place.visible_mapa ?? true,
     });
     setOpenModal(true);
   };
@@ -143,24 +145,24 @@ console.log(error);
       ),
     },
 
-    {
-      header: "Latitud",
-      accessor: "latitud",
-      render: (place) => (
-        <p className=" max-w-[50px] text-xs truncate" title={place.latitud}>
-          {place.latitud}
-        </p>
-      ),
-    },
-    {
-      header: "Longitud",
-      accessor: "longitud",
-      render: (place) => (
-        <p className=" max-w-[50px] text-xs truncate" title={place.longitud}>
-          {place.longitud}
-        </p>
-      ),
-    },
+    // {
+    //   header: "Latitud",
+    //   accessor: "latitud",
+    //   render: (place) => (
+    //     <p className=" max-w-[50px] text-xs truncate" title={place.latitud}>
+    //       {place.latitud}
+    //     </p>
+    //   ),
+    // },
+    // {
+    //   header: "Longitud",
+    //   accessor: "longitud",
+    //   render: (place) => (
+    //     <p className=" max-w-[50px] text-xs truncate" title={place.longitud}>
+    //       {place.longitud}
+    //     </p>
+    //   ),
+    // },
     {
       header: "Convenio",
       accessor: "es_convenio",
@@ -257,7 +259,7 @@ console.log(error);
         onSave={handleSavePlace}
       >
         {" "}
-        <AdminForm form={form} setForm={setForm} onSave={handleSavePlace} />
+        <PlaceForm form={form} setForm={setForm} onSave={handleSavePlace} />
       </AdminFormModal>
     </>
   );

@@ -1,7 +1,8 @@
 //AdminPlacePage.jsx
 import React, { useEffect, useState } from "react";
-import AdminPlace from "../components/AdminPlace";
+
 import { getAllPlaces } from "../../services/admin_places.service";
+import AdminPlace from "../components/Place/AdminPlace";
 
 function AdminPlacePage() {
 

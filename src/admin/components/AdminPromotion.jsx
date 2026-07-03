@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import ButtonPink from "../../shared/components/ButtonPink";
 import AdminFormModal from "./AdminFormModal";
-import AdminForm from "./Form/AdminForm";
+import PlaceForm from "./Form/PlaceForm";
 import Search from "./Search";
 import AdminTable from "./AdminTable";
 import { IoQrCodeOutline } from "react-icons/io5";

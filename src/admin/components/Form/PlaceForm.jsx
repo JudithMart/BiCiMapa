@@ -3,8 +3,9 @@
 import ButtonPink from "../../../shared/components/ButtonPink";
 import { placeTypes } from "../../../config/placeTypes";
 import { uploadPlaceImage } from "../../../services/admin_places.service";
+import LocationSearch from "../Place/LocationSearch";
 
-function AdminForm({ form, setForm, onSave }) {
+function PlaceForm({ form, setForm, onSave }) {
   return (
     <div className="w-full flex flex-col justify-start pl-6 px-5">
       {" "}
@@ -91,7 +92,7 @@ function AdminForm({ form, setForm, onSave }) {
         />
       </div>
       {/* Input latitud */}
-      <div className="mt-5 w-full flex flex-col justify-start pl-6 px-5">
+      {/* <div className="mt-5 w-full flex flex-col justify-start pl-6 px-5">
         <p className=" text-texto font-semibold text-base md:text-lg lg:text-xl ">
           Latitud
         </p>
@@ -107,9 +108,9 @@ function AdminForm({ form, setForm, onSave }) {
           }}
           className="font-sans w-full px-3 py-2 rounded-lg  mt-1 border   bg-gray-300 border-colorAdmin_gray  focus:outline-none focus:ring-2 focus:ring-primary"
         />
-      </div>
+      </div> */}
       {/* Input longitud */}
-      <div className="mt-5 w-full flex flex-col justify-start pl-6 px-5">
+      {/* <div className="mt-5 w-full flex flex-col justify-start pl-6 px-5">
         <p className=" text-texto font-semibold text-base md:text-lg lg:text-xl ">
           Longitud
         </p>
@@ -125,7 +126,9 @@ function AdminForm({ form, setForm, onSave }) {
           }}
           className="font-sans w-full px-3 py-2 rounded-lg  mt-1 border   bg-gray-300 border-colorAdmin_gray  focus:outline-none focus:ring-2 focus:ring-primary"
         />
-      </div>
+      </div> */}
+      {/* LOCACIÓN */}
+      <LocationSearch form={form} setForm={setForm} />
       {/* SELECCION DE ESTADO ACTIVO O INACTIVO */}
       <div className="mt-5 w-full flex flex-col justify-start pl-6 px-5">
         <p className=" text-texto font-semibold text-base md:text-lg lg:text-xl ">
@@ -200,7 +203,6 @@ function AdminForm({ form, setForm, onSave }) {
           </button>
         </div>
       </div>
-   
       <div className=" mb-8 flex justify-center">
         <ButtonPink
           texto="Guardar cambios"
@@ -212,4 +214,4 @@ function AdminForm({ form, setForm, onSave }) {
   );
 }
 
-export default AdminForm;
+export default PlaceForm;

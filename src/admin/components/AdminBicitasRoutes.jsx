@@ -14,7 +14,7 @@ import ButtonPink from "../../shared/components/ButtonPink";
 import AdminFormModal from "./AdminFormModal";
 import Search from "./Search";
 import AdminTable from "./AdminTable";
-import AdminForm from "./Form/AdminForm";
+import AdminForm from "./Form/PlaceForm";
 import { createSlug } from "../utils/slug";
 import {
   createPlace,
