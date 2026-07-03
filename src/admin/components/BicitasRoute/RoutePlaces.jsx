@@ -5,6 +5,7 @@ function RoutePlaces({
   form,
   setForm,
   lugares,
+  onCreateLugar,
 }) {
 
   const selectedLugares =
@@ -18,6 +19,7 @@ function RoutePlaces({
         id: lugar.id,
         nombre: lugar.nombre,
         orden: selectedLugares.length + 1,
+        visible_mapa: lugar.visible_mapa,
       },
     ];
 
@@ -97,6 +99,7 @@ function RoutePlaces({
         lugares={lugares}
         selectedLugares={selectedLugares}
         onAddLugar={addLugar}
+        onCreateLugar={onCreateLugar}
       />
 
       <div className="mt-5 space-y-3">

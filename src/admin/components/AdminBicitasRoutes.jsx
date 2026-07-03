@@ -1,5 +1,5 @@
 //    AdminBicitasRoutes.jsx
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IoMdAddCircleOutline } from "react-icons/io";
 import {
   deleteRoute,
@@ -14,12 +14,18 @@ import ButtonPink from "../../shared/components/ButtonPink";
 import AdminFormModal from "./AdminFormModal";
 import Search from "./Search";
 import AdminTable from "./AdminTable";
-import { useEffect } from "react";
-import { getAllPlaces } from "../../services/admin_bicitas.service";
+import AdminForm from "./Form/AdminForm";
+import { createSlug } from "../utils/slug";
+import {
+  createPlace,
+  getAllPlaces,
+  uploadPlaceImage,
+} from "../../services/admin_places.service";
 
 function AdminBicitasRoutes({ rutas }) {
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [openModal, setOpenModal] = useState(false);
+  const [openLugarModal, setOpenLugarModal] = useState(false);
   const [search, setSearch] = useState("");
   const [lugares, setLugares] = useState([]);
 
@@ -42,6 +48,19 @@ function AdminBicitasRoutes({ rutas }) {
     lugaresSeleccionados: [],
   });
 
+  const [lugarForm, setLugarForm] = useState({
+    nombre: "",
+    descripcion: "",
+    slogan: "",
+    imagen: null,
+    imagen_url: "",
+    latitud: "",
+    longitud: "",
+    activo: true,
+    es_convenio: false,
+    id_tipo: 1,
+  });
+
   const handleEdit = (route) => {
     setSelectedPlace(route);
     setForm({
@@ -55,6 +74,7 @@ function AdminBicitasRoutes({ rutas }) {
           id: item.lugar.id,
           nombre: item.lugar.nombre,
           orden: item.orden,
+          visible_mapa: item.lugar.visible_mapa,
         })) || [],
     });
     setOpenModal(true);
@@ -73,6 +93,8 @@ function AdminBicitasRoutes({ rutas }) {
       tiempo_estimado: form.tiempo_estimado,
       distancia_km: form.distancia_km === "" ? null : Number(form.distancia_km),
       activa: form.activa,
+      visible_mapa: form.visible_mapa,
+      
     };
 
     delete values.lugaresSeleccionados;
@@ -103,6 +125,7 @@ function AdminBicitasRoutes({ rutas }) {
           id_ruta: savedRoute.id,
           id_lugar: lugar.id,
           orden: lugar.orden,
+          
         }));
 
         await addPlaceToRoute(inserts);
@@ -111,6 +134,46 @@ function AdminBicitasRoutes({ rutas }) {
 
     setOpenModal(false);
     window.location.reload();
+  };
+
+  const handleOpenLugarModal = () => {
+    setLugarForm({
+      nombre: "",
+      descripcion: "",
+      slogan: "",
+      imagen: null,
+      imagen_url: "",
+      latitud: "",
+      longitud: "",
+      activo: true,
+      es_convenio: false,
+      id_tipo: 1,
+    });
+
+    setOpenLugarModal(true);
+  };
+
+  const handleSaveLugar = async (form) => {
+    let values = { ...form };
+
+    if (form.imagen) {
+      const imageUrl = await uploadPlaceImage(form.imagen);
+      values.imagen_url = imageUrl;
+    }
+
+    delete values.imagen;
+    values.slug = createSlug(values.nombre);
+
+    const { data, error } = await createPlace(values);
+
+    if (error) {
+      console.error(error);
+      alert("Error al guardar");
+      return;
+    }
+
+    setLugares((current) => [data, ...current]);
+    setOpenLugarModal(false);
   };
 
   const handleDelete = async (route) => {
@@ -264,6 +327,18 @@ function AdminBicitasRoutes({ rutas }) {
           setForm={setForm}
           onSave={handleSaveRoute}
           lugares={lugares}
+          onCreateLugar={handleOpenLugarModal}
+        />
+      </AdminFormModal>
+
+      <AdminFormModal
+        open={openLugarModal}
+        onClose={() => setOpenLugarModal(false)}
+      >
+        <AdminForm
+          form={lugarForm}
+          setForm={setLugarForm}
+          onSave={handleSaveLugar}
         />
       </AdminFormModal>
     </>

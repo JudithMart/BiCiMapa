@@ -5,6 +5,7 @@ function PlaceSelector({
   lugares = [],
   selectedLugares = [],
   onAddLugar,
+  onCreateLugar,
 }) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -32,7 +33,7 @@ function PlaceSelector({
         className="w-full flex justify-between items-center rounded-xl bg-gray-200 px-4 py-3 border border-colorAdmin_gray hover:bg-gray-300 transition"
       >
         <span className="font-medium">
-          Agregar lugar
+          Agregar lugar a la ruta
         </span>
 
         <LuChevronDown
@@ -67,6 +68,16 @@ function PlaceSelector({
 
             </div>
 
+            {onCreateLugar && (
+              <button
+                type="button"
+                onClick={onCreateLugar}
+                className="mt-3 w-full rounded-lg border border-primary bg-primary/10 px-4 py-2 text-sm font-semibold text-primary transition hover:bg-primary/20"
+              >
+                Agregar lugar
+              </button>
+            )}
+
           </div>
 
           {/* Lista */}
@@ -91,9 +102,16 @@ function PlaceSelector({
                     {lugar.nombre}
                   </p>
 
-                  <p className="text-xs text-gray-500 truncate">
-                    {lugar.slogan}
-                  </p>
+                
+  {lugar.visible_mapa ? (
+    <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700">
+      🗺️ Visible
+    </span>
+  ) : (
+    <span className="rounded-full bg-yellow-100 px-3 py-1 text-xs font-medium text-yellow-700">
+      🚲 Solo ruta
+    </span>
+  )}
                 </button>
               ))
             )}

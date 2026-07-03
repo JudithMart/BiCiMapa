@@ -91,7 +91,8 @@ export const getAllPlaces = async () => {
       id,
       nombre,
       slogan,
-      imagen_url
+      imagen_url,
+      visible_mapa
     `,
     )
     .eq("activo", true)

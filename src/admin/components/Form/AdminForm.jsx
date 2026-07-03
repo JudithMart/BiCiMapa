@@ -168,6 +168,39 @@ function AdminForm({ form, setForm, onSave }) {
         </select>
       </div>
       {/* MOSTRAR ICONO EN EL MAPA  */}
+      <div className="mt-5 w-full flex flex-col pl-6 px-5">
+        <p className="text-texto font-semibold text-base md:text-lg lg:text-xl">
+          Visibilidad
+        </p>
+
+        <div className="flex justify-between items-center mt-2 rounded-xl bg-gray-300 px-4 py-3">
+          <div>
+            <p className="font-medium">Mostrar en el mapa</p>
+
+            <p className="text-xs text-gray-600">
+              Si se desactiva, solo aparecerá al iniciar una ruta.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={() =>
+              setForm({
+                ...form,
+                visible_mapa: !form.visible_mapa,
+              })
+            }
+            className={`relative w-12 h-6 rounded-full transition
+      ${form.visible_mapa ? "bg-green-500" : "bg-gray-400"}`}
+          >
+            <span
+              className={`absolute top-1 w-4 h-4 bg-white rounded-full transition
+        ${form.visible_mapa ? "right-1" : "left-1"}`}
+            />
+          </button>
+        </div>
+      </div>
+   
       <div className=" mb-8 flex justify-center">
         <ButtonPink
           texto="Guardar cambios"
