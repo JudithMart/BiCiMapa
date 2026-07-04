@@ -1,25 +1,68 @@
 import React from "react";
 
-function AdminCard({ icono, descripcion, datos }) {
+function AdminCard({ icono, descripcion, datos, tiempo }) {
   return (
-    <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-5">
-
-      <div className="flex items-center justify-between">
-
-        <div className="w-11 h-11 rounded-xl bg-primary/10 text-primary flex items-center justify-center text-xl">
+    <div
+      className="
+            w-[250px]
+            h-[165px]
+            rounded-[30px]
+            bg-white/75
+            border
+            border-primary
+            shadow-md
+            px-8
+            py-7
+            flex
+            flex-col
+            justify-between
+        "
+    >
+      <div className="flex justify-between">
+        <div
+          className="
+                    w-12
+                    h-12
+                    rounded-2xl
+                    bg-colorAdmin_gray
+                    flex
+                    items-center
+                    justify-center
+                    text-primary
+                    text-xl
+                "
+        >
           {icono}
         </div>
 
-        <p className="text-3xl font-bold text-primary">
-          {datos}
-        </p>
-
+        {tiempo && <p className="text-gray-400 text-sm">{tiempo}</p>}
       </div>
 
-      <p className="mt-5 text-gray-500 uppercase text-sm tracking-wide">
-        {descripcion}
-      </p>
+      <div>
+        <p
+          className="
+                    uppercase
+                    text-gray-500
+                    text-sm
+                    tracking-widest
+                    font-semibold
+                "
+        >
+          {descripcion}
+        </p>
 
+        <p
+          className="
+                    mt-1
+                    text-primary
+                    text-4xl
+                    font-bold
+                    font-sans
+                "
+        >
+          {datos}
+        </p>
+      </div>
     </div>
   );
 }

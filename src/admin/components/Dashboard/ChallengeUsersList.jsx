@@ -1,6 +1,6 @@
 function ChallengeUsersList({ challengeUsers }) {
   return (
-    <div className="bg-white rounded-3xl shadow-md p-6">
+    <div className="bg-white rounded-3xl shadow-md p-6 h-full">
       <h2 className="font-bold text-xl mb-5">Usuarios del reto</h2>
 
       <div className="space-y-4 max-h-[520px] overflow-y-auto">
@@ -11,16 +11,13 @@ function ChallengeUsersList({ challengeUsers }) {
           );
 
           return (
-            <div
-              key={user.usuario.id}
-              className="border rounded-2xl p-4 hover:bg-gray-50 transition"
-            >
+            <div key={user.usuario.id} className="border rounded-2xl p-4">
               <div className="flex justify-between">
                 <div>
                   <p className="font-semibold">{user.usuario.nombre}</p>
 
                   <p className="text-xs text-gray-500">
-                    @{user.usuario.nombreusuario}
+                    {user.usuario.telefono}
                   </p>
                 </div>
 
@@ -39,7 +36,7 @@ function ChallengeUsersList({ challengeUsers }) {
                 <div className="flex justify-between text-sm">
                   <span>
                     {user.visitas_completadas}/
-                    {user.reto_mensual.visitas_requeridas} visitas
+                    {user.reto_mensual.visitas_requeridas}
                   </span>
 
                   <span>{porcentaje}%</span>

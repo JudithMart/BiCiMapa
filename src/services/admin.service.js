@@ -44,7 +44,9 @@ export const getChallengeProgress = async () => {
 
   const { data: usuarios } = await supabase
     .from("usuario")
-    .select("id,nombre,telefono");
+    .select("id,nombre,telefono")
+    .eq("es_premium", true)
+    .eq("rol", "user");
 
   const { data: visitas } = await supabase
     .from("visita")
@@ -74,6 +76,29 @@ export const getChallengeProgress = async () => {
       completado: lugaresVisitados.length >= reto.visitas_requeridas,
     };
   });
+
+  return { data: resultado };
+};
+
+export const getVisitsByPlace = async () => {
+  const { data: lugares } = await supabase
+    .from("lugar")
+    .select("id,nombre")
+    .eq("activo", true)
+    .eq("es_convenio", true);
+
+  const { data: visitas } = await supabase
+    .from("visita")
+    .select("id_lugar")
+    .eq("verificado", true);
+
+  const resultado = lugares.map((lugar) => ({
+    id: lugar.id,
+    nombre: lugar.nombre,
+    visitas: visitas.filter((v) => v.id_lugar === lugar.id).length,
+  }));
+
+  resultado.sort((a, b) => b.visitas - a.visitas);
 
   return { data: resultado };
 };

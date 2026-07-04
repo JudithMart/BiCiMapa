@@ -1,21 +1,24 @@
-
-
 import { FaUserGroup } from "react-icons/fa6";
 import { GrUserNew } from "react-icons/gr";
 import { LiaPlaceOfWorshipSolid } from "react-icons/lia";
 import { RiDiscountPercentFill } from "react-icons/ri";
 import { MdOutlineAutoGraph } from "react-icons/md";
-import ChallengeSummaryCard from "./ChallengeSummaryCard";
-import ChallengeUsersList from "./ChallengeUsersList";
-import AdminCard from "./AdminCard";
 
-function AdminDashboard({ stats, challengeUsers }) {
+import AdminCard from "./AdminCard";
+import ChallengeUsersList from "./ChallengeUsersList";
+import VisitsByPlace from "./VisitsByPlace";
+
+function AdminDashboard({
+  stats,
+  challengeUsers,
+  visitsByPlace,
+}) {
   return (
-    <div className="w-full px-6 py-6">
+    <div className="w-full px-6 py-24">
 
       {/* Cards */}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-5">
+      <div className="flex flex-wrap gap-8">
 
         <AdminCard
           icono={<FaUserGroup />}
@@ -49,15 +52,19 @@ function AdminDashboard({ stats, challengeUsers }) {
 
       </div>
 
-      {/* Dashboard */}
+      {/* Contenido */}
 
-      <div className="grid lg:grid-cols-3 gap-6 mt-8">
+      <div className="mt-8 grid lg:grid-cols-3 gap-6">
 
         <div className="lg:col-span-2">
-          <ChallengeSummaryCard challengeUsers={challengeUsers} />
+          <VisitsByPlace
+            visitsByPlace={visitsByPlace}
+          />
         </div>
 
-        <ChallengeUsersList challengeUsers={challengeUsers} />
+        <ChallengeUsersList
+          challengeUsers={challengeUsers}
+        />
 
       </div>
 
