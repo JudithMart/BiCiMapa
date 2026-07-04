@@ -1,10 +1,10 @@
 //admin_promotion.service.js
 import React, { useEffect, useState } from "react";
-import ButtonPink from "../../shared/components/ButtonPink";
-import AdminFormModal from "./AdminFormModal";
-import PlaceForm from "./Form/PlaceForm";
-import Search from "./Search";
-import AdminTable from "./AdminTable";
+import ButtonPink from "../../../shared/components/ButtonPink";
+import AdminFormModal from "../AdminFormModal";
+import PlaceForm from "../Form/PlaceForm";
+import Search from "../Search";
+import AdminTable from "../AdminTable";
 import { IoQrCodeOutline } from "react-icons/io5";
 import { IoMdAddCircleOutline } from "react-icons/io";
 import {
@@ -16,9 +16,9 @@ import {
   getLastToken,
   generateNewToken,
   getAllPlaces,
-} from "../../services/admin_promotion.service";
-import PromotionForm from "./Form/PromotionForm";
-import AdminModalQR from "./AdminModalQR";
+} from "../../../services/admin_promotion.service";
+import PromotionForm from "../Form/PromotionForm";
+import AdminModalQR from "../AdminModalQR";
 
 function AdminPromotion({ promociones }) {
   const [selectedPlace, setSelectedPlace] = useState(null);

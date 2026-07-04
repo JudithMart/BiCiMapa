@@ -8,19 +8,19 @@ import {
   createRoute,
   clearPlacesFromRoute,
   addPlaceToRoute,
-} from "../../services/admin_bicitas.service";
-import RoutesBicitasForm from "./Form/RoutesBicitasForm";
-import ButtonPink from "../../shared/components/ButtonPink";
-import AdminFormModal from "./AdminFormModal";
-import Search from "./Search";
-import AdminTable from "./AdminTable";
-import AdminForm from "./Form/PlaceForm";
-import { createSlug } from "../utils/slug";
+} from "../../../services/admin_bicitas.service";
+import RoutesBicitasForm from "../Form/RoutesBicitasForm";
+import ButtonPink from "../../../shared/components/ButtonPink";
+import AdminFormModal from "../AdminFormModal";
+import Search from "../Search";
+import AdminTable from "../AdminTable";
+import AdminForm from "../Form/PlaceForm";
+import { createSlug } from "../../utils/slug";
 import {
   createPlace,
   getAllPlaces,
   uploadPlaceImage,
-} from "../../services/admin_places.service";
+} from "../../../services/admin_places.service";
 
 function AdminBicitasRoutes({ rutas }) {
   const [selectedPlace, setSelectedPlace] = useState(null);

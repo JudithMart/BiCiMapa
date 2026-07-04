@@ -144,25 +144,6 @@ console.log(error);
         </p>
       ),
     },
-
-    // {
-    //   header: "Latitud",
-    //   accessor: "latitud",
-    //   render: (place) => (
-    //     <p className=" max-w-[50px] text-xs truncate" title={place.latitud}>
-    //       {place.latitud}
-    //     </p>
-    //   ),
-    // },
-    // {
-    //   header: "Longitud",
-    //   accessor: "longitud",
-    //   render: (place) => (
-    //     <p className=" max-w-[50px] text-xs truncate" title={place.longitud}>
-    //       {place.longitud}
-    //     </p>
-    //   ),
-    // },
     {
       header: "Convenio",
       accessor: "es_convenio",

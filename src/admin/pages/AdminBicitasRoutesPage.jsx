@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from 'react'
-import AdminBicitasRoutes from '../components/AdminBicitasRoutes'
-import {getAllRoutes } from '../../services/admin_bicitas.service'
+import React, { useEffect, useState } from "react";
+import { getAllRoutes } from "../../services/admin_bicitas.service";
+import AdminBicitasRoutes from "../components/BicitasRoute/AdminBicitasRoutes";
 
 function AdminBicitasRoutesPage() {
+  const [rutas, setRutas] = useState([]);
 
- const [rutas, setRutas] = useState([]);
-
-   useEffect(() => {
+  useEffect(() => {
     const fetchRutas = async () => {
       const { data, error } = await getAllRoutes();
       if (error) {
@@ -19,11 +18,11 @@ function AdminBicitasRoutesPage() {
     fetchRutas();
   }, []);
 
-
-
   return (
-    <div><AdminBicitasRoutes rutas={rutas} /></div>
-  )
+    <div>
+      <AdminBicitasRoutes rutas={rutas} />
+    </div>
+  );
 }
 
-export default AdminBicitasRoutesPage
+export default AdminBicitasRoutesPage;

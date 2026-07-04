@@ -1,14 +1,14 @@
 // src/admin/components/AdminUser.jsx
 import React, { useState } from "react";
-import AdminTable from "./AdminTable";
+import AdminTable from "../AdminTable";
 import {
   togglePremium,
   deactivateUser,
   updateUser,
-} from "../../services/admin_user.service";
-import AdminFormModal from "./AdminFormModal";
-import UserForm from "./Form/UserForm";
-import Search from "./Search";
+} from "../../../services/admin_user.service";
+import AdminFormModal from "../AdminFormModal";
+import UserForm from "../Form/UserForm";
+import Search from "../Search";
 
 function AdminUser({ usuarios }) {
   const [selectedUser, setSelectedUser] = useState(null);

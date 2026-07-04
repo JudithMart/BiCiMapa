@@ -12,6 +12,7 @@ import Progress from "./Progress";
 
 function ProfileC({
   nombre,
+  descripcion_reto,
   lugares_visitados,
   lugares_reto,
   fecha_expiracion,
@@ -49,7 +50,10 @@ function ProfileC({
   const porcentaje = Math.min((completadas / total) * 100, 100);
   // Procesar el nombre para mostrarlo en partes y el último apellido en color
   const nombreParts = (nombre || "").trim().split(/\s+/);
-  let nombre1 = "", nombre2 = "", apellido1 = "", apellido2 = "";
+  let nombre1 = "",
+    nombre2 = "",
+    apellido1 = "",
+    apellido2 = "";
   if (nombreParts.length >= 4) {
     [nombre1, nombre2, apellido1, apellido2] = nombreParts;
   } else if (nombreParts.length === 3) {
@@ -74,9 +78,7 @@ function ProfileC({
       >
         <IoLogOutOutline className="text-primary" size={24} />
       </button>
-      <div
-        className="py-8  mt-1 w-full bg-[#ffffff]/75 flex items-center rounded-b-2xl shadow-lg "
-      >
+      <div className="py-8  mt-1 w-full bg-[#ffffff]/75 flex items-center rounded-b-2xl shadow-lg ">
         <div className="rounded-full ml-5 w-24 aspect-square overflow-hidden flex items-center justify-center  shadow-md">
           <img
             className="object-cover w-full h-full"
@@ -88,9 +90,7 @@ function ProfileC({
           <p className="text-texto ml-3 text-2xl font-bold">
             {/* Mostrar nombres y apellidos, el último en color primario */}
             {nombre1} {nombre2} {apellido1}
-            {apellido2 && (
-              <span className="text-primary"> {apellido2}</span>
-            )}
+            {apellido2 && <span className="text-primary"> {apellido2}</span>}
           </p>
         </div>
       </div>
@@ -169,57 +169,22 @@ function ProfileC({
             colorTexto="primary"
             tamanoTexto="base"
           />
-          {/* <div className="flex gap-20 ">
-            <p className="text-texto font-bold ">Recorrido</p>
-            <p className="text-primary font-normal ">
-              {completadas} de {total} lugares visitados
-            </p>
-          </div> */}
-          {/* Barra de progreo */}
-          {/* <div className="relative w-full bg-gray-200 rounded-full h-4 mt-4">
-            <div
-              className="bg-primary/60 h-4 rounded-full"
-              style={{
-                width: `${porcentaje}%`,
-              }}
-            ></div> */}
-            {/* Icono de la bici avanzando */}
-            {/* <div
-              className="absolute bottom-0 -translate-y-1/2"
-              style={{
-                left: `calc(${porcentaje}% - 16px)`,
-                transform: "translateX(-50%)",
-              }}
-            >
-              <LuBike size={32} className="text-primary drop-shadow-lg" />
-            </div>
-          </div>
-          {total - completadas === 0 ? (
-            <p className="font-light text-texto mt-3 text-sm text-center">
-              Felicidades completaste el reto ve a{" "}
-              <span className="text-primary font-semibold">BiCitas</span> y
-              reclama tu premio
-            </p>
-          ) : (
-            <p className="font-light text-texto mt-3 text-sm">
-              Visita{" "}
-              <span className="font-semibold">
-                {" "}
-                {total - completadas} lugares más
-              </span>{" "}
-              y obten una promo en
-              <span className="text-primary font-semibold "> BiCitas</span>
-            </p>
-          )} */}
         </div>
         {fecha_expiracion && (
-          <p className="text-sm text-center text-gray-500 mt-2">
-            Tienes{" "}
-            <span className="text-primary font-bold">
-              {getDaysLeft(fecha_expiracion)} días
-            </span>{" "}
-            restantes para completar el reto.
-          </p>
+          <div>
+            <p className="text-sm text-center text-gray-500 mt-2">
+              Tienes{" "}
+              <span className="text-primary font-bold">
+                {getDaysLeft(fecha_expiracion)} días
+              </span>{" "}
+              restantes para completar el reto.
+            </p>
+            {descripcion_reto && (
+              <p className="text-base font-semibold text-center text-gray-600 mt-2 px-4">
+                {descripcion_reto}
+              </p>
+            )}
+          </div>
         )}
         {/* Lugares */}
         <div className="flex flex-col gap-y-2 mt-2">

@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
 import ProfileC from "../components/ProfileC";
 import { useAuth } from "../../context/AuthContext";
-import { getUserProgress, getRetoActivo, getRetoLugares } from "../../services/reto.service";
+import {  getRetoActivo, getRetoLugares } from "../../services/reto.service";
 import {getVisitedLugares} from "../../services/visita.service";
 import { getVisitasValidas } from "../../services/user_premium.service";
 
 function Profile() {
   const { userAuth, userData } = useAuth();
-  const [userProgress, setUserProgress] = useState(null);
   const [retoActivo, setRetoActivo] = useState(null);
   const [lugaresVisitados, setLugaresVisitados] = useState([]);
   const [retoLugares, setRetoLugares] = useState([]);
@@ -33,23 +32,6 @@ function Profile() {
     fetchRetoActivo();
   }, []);
 
-// UseEffect para obtener el progreso del usuario cada vez que cambia el userAuth
-
-  useEffect(() => {
-    const fetchUserProgress = async () => {
-      if (userAuth?.id) {
-        const { data, error } = await getUserProgress(userAuth?.id);
-        if (error) {
-          console.error(error);
-          return;
-        }
-
-        setUserProgress(data); 
-      }
-    };
-
-    fetchUserProgress();
-  }, [userAuth?.id]);
 
 // UseEffect para obtener los lugares visitados por el usuario cada vez que cambia el userAuth
 
@@ -92,8 +74,7 @@ function Profile() {
       <ProfileC
         id_usuario={userAuth?.id}
         nombre={userAuth?.user_metadata?.nombre}
-        visitas_completadas={userProgress?.visitas_completadas}
-        visitas_restantes={retoActivo?.visitas_requeridas}
+        descripcion_reto={retoActivo?.descripcion}
         lugares_visitados={visitasValidas}
         lugares_reto={retoLugares}
         fecha_expiracion={userData?.fecha_expiracion}

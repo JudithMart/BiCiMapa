@@ -52,8 +52,8 @@ export default function AdminNavbar() {
       icon: <LuFlag size={18} />,
     },
     {
-      label: "Progreso",
-      path: "/bicitas_historicas_manager/bicitas/progreso",
+      label: "Novedades",
+      path: "/bicitas_historicas_manager/bicitas/novedades",
       icon: <LuChartNoAxesColumn size={18} />,
     },
   ];

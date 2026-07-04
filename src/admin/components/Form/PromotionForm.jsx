@@ -1,7 +1,7 @@
 //promotionForm.jsx
 import React from "react";
 import ButtonPink from "../../../shared/components/ButtonPink";
-import AdminLugarSelector from "../AdminLugarSelector";
+import AdminLugarSelector from "../Promotion/AdminLugarSelector";
 
 
 function PromotionForm({ form, setForm, onSave, lugares }) {

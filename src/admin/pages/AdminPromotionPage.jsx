@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import AdminPromotion from "../components/AdminPromotion";
+import AdminPromotion from "../components/Promotion/AdminPromotion";
 import {getAllPromotions } from "../../services/admin_promotion.service";
 
 function AdminPromotionPage() {
