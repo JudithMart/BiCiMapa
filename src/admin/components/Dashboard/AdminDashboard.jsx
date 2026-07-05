@@ -8,18 +8,13 @@ import AdminCard from "./AdminCard";
 import ChallengeUsersList from "./ChallengeUsersList";
 import VisitsByPlace from "./VisitsByPlace";
 
-function AdminDashboard({
-  stats,
-  challengeUsers,
-  visitsByPlace,
-}) {
+function AdminDashboard({ stats, challengeUsers, visitsByPlace }) {
   return (
-    <div className="w-full px-6 py-24">
+   <div className="w-full px-8 py-6">
 
       {/* Cards */}
 
-      <div className="flex flex-wrap gap-8">
-
+      <div className="flex flex-wrap gap-8  ">
         <AdminCard
           icono={<FaUserGroup />}
           descripcion="Usuarios"
@@ -49,25 +44,18 @@ function AdminDashboard({
           descripcion="Visitas"
           datos={stats.totalVisitas}
         />
-
+      
+          <ChallengeUsersList challengeUsers={challengeUsers} />
+     
       </div>
 
       {/* Contenido */}
 
-      <div className="mt-8 grid lg:grid-cols-3 gap-6">
-
-        <div className="lg:col-span-2">
-          <VisitsByPlace
-            visitsByPlace={visitsByPlace}
-          />
+      <div className="grid grid-cols-12  h-22 ">
+        <div className="col-span-7 h-full">
+          <VisitsByPlace visitsByPlace={visitsByPlace} />
         </div>
-
-        <ChallengeUsersList
-          challengeUsers={challengeUsers}
-        />
-
       </div>
-
     </div>
   );
 }

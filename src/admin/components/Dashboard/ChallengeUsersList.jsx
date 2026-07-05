@@ -1,9 +1,13 @@
 function ChallengeUsersList({ challengeUsers }) {
   return (
-    <div className="bg-white rounded-3xl shadow-md p-6 h-full">
-      <h2 className="font-bold text-xl mb-5">Usuarios del reto</h2>
+    <div
+      className="rounded-[30px] bg-white/85 border border-primary shadow-md h-[340px] flex flex-col"
+    >
+      <h2 className="px-6 pt-6 pb-4 font-bold text-texto text-xl mb-5">
+        Usuarios del reto
+      </h2>
 
-      <div className="space-y-4 max-h-[520px] overflow-y-auto">
+      <div className="flex-1 min-h-0 overflow-y-auto px-6 pb-6 space-y-4">
         {challengeUsers.map((user) => {
           const porcentaje = Math.round(
             (user.visitas_completadas / user.reto_mensual.visitas_requeridas) *
@@ -12,28 +16,18 @@ function ChallengeUsersList({ challengeUsers }) {
 
           return (
             <div key={user.usuario.id} className="border rounded-2xl p-4">
-              <div className="flex justify-between">
-                <div>
-                  <p className="font-semibold">{user.usuario.nombre}</p>
+              <div className="flex flex-col px-2 ">
+                <p className="font-semibold text-sm text-texto">
+                  {user.usuario.nombre}
+                </p>
 
-                  <p className="text-xs text-gray-500">
-                    {user.usuario.telefono}
-                  </p>
-                </div>
-
-                <span
-                  className={`text-xs px-3 py-1 rounded-full ${
-                    user.completado
-                      ? "bg-green-100 text-green-700"
-                      : "bg-yellow-100 text-yellow-700"
-                  }`}
-                >
-                  {user.completado ? "Completado" : "En progreso"}
-                </span>
+                <p className="text-xs font-sans text-gray-500">
+                  {user.usuario.telefono}
+                </p>
               </div>
 
-              <div className="mt-4">
-                <div className="flex justify-between text-sm">
+              <div className="mt-2">
+                <div className="flex justify-between text-xs font-sans">
                   <span>
                     {user.visitas_completadas}/
                     {user.reto_mensual.visitas_requeridas}
