@@ -91,42 +91,7 @@ function PlaceForm({ form, setForm, onSave }) {
           className="font-sans w-full px-3 py-2 rounded-lg  mt-1 border   bg-gray-300 border-colorAdmin_gray  focus:outline-none focus:ring-2 focus:ring-primary"
         />
       </div>
-      {/* Input latitud */}
-      {/* <div className="mt-5 w-full flex flex-col justify-start pl-6 px-5">
-        <p className=" text-texto font-semibold text-base md:text-lg lg:text-xl ">
-          Latitud
-        </p>
-        <input
-          type="text"
-          placeholder="Ingrese la latitud del lugar"
-          value={form.latitud}
-          onChange={(e) => {
-            setForm({
-              ...form,
-              latitud: e.target.value,
-            });
-          }}
-          className="font-sans w-full px-3 py-2 rounded-lg  mt-1 border   bg-gray-300 border-colorAdmin_gray  focus:outline-none focus:ring-2 focus:ring-primary"
-        />
-      </div> */}
-      {/* Input longitud */}
-      {/* <div className="mt-5 w-full flex flex-col justify-start pl-6 px-5">
-        <p className=" text-texto font-semibold text-base md:text-lg lg:text-xl ">
-          Longitud
-        </p>
-        <input
-          type="text"
-          placeholder="Ingrese la longitud del lugar"
-          value={form.longitud}
-          onChange={(e) => {
-            setForm({
-              ...form,
-              longitud: e.target.value,
-            });
-          }}
-          className="font-sans w-full px-3 py-2 rounded-lg  mt-1 border   bg-gray-300 border-colorAdmin_gray  focus:outline-none focus:ring-2 focus:ring-primary"
-        />
-      </div> */}
+
       {/* LOCACIÓN */}
       <LocationSearch form={form} setForm={setForm} />
       {/* SELECCION DE ESTADO ACTIVO O INACTIVO */}
@@ -181,7 +146,7 @@ function PlaceForm({ form, setForm, onSave }) {
             <p className="font-medium">Mostrar en el mapa</p>
 
             <p className="text-xs text-gray-600">
-              Si se desactiva, solo aparecerá al iniciar una ruta.
+              Si se desactiva, aparecerá solo en ruta.
             </p>
           </div>
 
@@ -194,7 +159,7 @@ function PlaceForm({ form, setForm, onSave }) {
               })
             }
             className={`relative w-12 h-6 rounded-full transition
-      ${form.visible_mapa ? "bg-green-500" : "bg-gray-400"}`}
+      ${form.visible_mapa ? "bg-green-500" : "bg-red-500"}`}
           >
             <span
               className={`absolute top-1 w-4 h-4 bg-white rounded-full transition

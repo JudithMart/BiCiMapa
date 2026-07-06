@@ -45,8 +45,8 @@ export const getChallengeProgress = async () => {
   const { data: usuarios } = await supabase
     .from("usuario")
     .select("id,nombre,telefono")
-    // .eq("es_premium", true)
-    // .eq("rol", "user");
+    .eq("es_premium", true)
+    .eq("rol", "user");
 
   const { data: visitas } = await supabase
     .from("visita")
@@ -85,7 +85,7 @@ export const getVisitsByPlace = async () => {
     .from("lugar")
     .select("id,nombre")
     .eq("activo", true)
-    // .eq("es_convenio", true);
+    .eq("es_convenio", true);
 
   const { data: visitas } = await supabase
     .from("visita")

@@ -10,12 +10,12 @@ function PlaceCard({ lugar, index, total, onMoveUp, onMoveDown, onDelete }) {
         <p className="text-xs text-gray-500 mt-1">Orden #{lugar.orden}</p>
 
         {lugar.visible_mapa ? (
-          <span className="text-[11px] px-2 py-0.5 rounded-full bg-green-100 text-green-700">
-            Visible en ruta
-          </span>
-        ) : (
           <span className="text-[11px] px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700">
             Visible en mapa
+          </span>
+        ) : (
+          <span className="text-[11px] px-2 py-0.5 rounded-full bg-green-100 text-green-700">
+            Visible en ruta
           </span>
         )}
       </div>

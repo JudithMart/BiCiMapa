@@ -14,7 +14,7 @@ function AdminCard({ icono, descripcion, datos, tiempo }) {
         <p className=" uppercase text-gray-500 text-sm tracking-widest font-semibold">
           {descripcion}
         </p>
-        <p className=" mt-1 text-primarytext-4xl font-bold font-sans">
+        <p className=" mt-1 text-primary text-4xl font-bold font-sans">
           {datos}
         </p>
       </div>

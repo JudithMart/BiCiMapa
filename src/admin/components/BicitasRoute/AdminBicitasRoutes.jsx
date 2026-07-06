@@ -15,7 +15,7 @@ import AdminFormModal from "../AdminFormModal";
 import Search from "../Search";
 import AdminTable from "../AdminTable";
 import AdminForm from "../Form/PlaceForm";
-import { createSlug } from "../../utils/slug";
+import { createUniqueSlug } from "../../utils/slug";
 import {
   createPlace,
   getAllPlaces,
@@ -59,6 +59,7 @@ function AdminBicitasRoutes({ rutas }) {
     activo: true,
     es_convenio: false,
     id_tipo: 1,
+    visible_mapa: false,
   });
 
   const handleEdit = (route) => {
@@ -74,7 +75,7 @@ function AdminBicitasRoutes({ rutas }) {
           id: item.lugar.id,
           nombre: item.lugar.nombre,
           orden: item.orden,
-          visible_mapa: item.lugar.visible_mapa,
+          visible_mapa: item.lugar.visible_mapa ?? false,
         })) || [],
     });
     setOpenModal(true);
@@ -148,6 +149,7 @@ function AdminBicitasRoutes({ rutas }) {
       activo: true,
       es_convenio: false,
       id_tipo: 1,
+      visible_mapa: false,
     });
 
     setOpenLugarModal(true);
@@ -162,13 +164,20 @@ function AdminBicitasRoutes({ rutas }) {
     }
 
     delete values.imagen;
-    values.slug = createSlug(values.nombre);
+    values.slug = createUniqueSlug(
+      values.nombre,
+      lugares.map((lugar) => lugar.slug),
+    );
 
     const { data, error } = await createPlace(values);
 
     if (error) {
-      console.error(error);
-      alert("Error al guardar");
+      console.error("Error al guardar lugar:", error);
+      alert(
+        error?.code === "23505"
+          ? "Ya existe un lugar con ese nombre. Prueba con otro nombre."
+          : "Error al guardar",
+      );
       return;
     }
 

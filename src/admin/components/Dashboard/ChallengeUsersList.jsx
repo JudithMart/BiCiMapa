@@ -1,13 +1,13 @@
 function ChallengeUsersList({ challengeUsers }) {
   return (
     <div
-      className="rounded-[30px] bg-white/85 border border-primary shadow-md h-[340px] flex flex-col"
+      className="w-full xl:w-[320px] rounded-[30px] bg-white/85 border border-primary shadow-md h-[520px] flex flex-col xl:h-[620px]"
     >
       <h2 className="px-6 pt-6 pb-4 font-bold text-texto text-xl mb-5">
         Usuarios del reto
       </h2>
 
-      <div className="flex-1 min-h-0 overflow-y-auto px-6 pb-6 space-y-4">
+      <div className="flex-1  overflow-y-auto px-6 pb-6 space-y-4">
         {challengeUsers.map((user) => {
           const porcentaje = Math.round(
             (user.visitas_completadas / user.reto_mensual.visitas_requeridas) *
@@ -43,7 +43,7 @@ function ChallengeUsersList({ challengeUsers }) {
                         ? "bg-green-500"
                         : porcentaje >= 60
                           ? "bg-yellow-500"
-                          : "bg-red-500"
+                          : "bg-primary"
                     }`}
                     style={{
                       width: `${Math.min(porcentaje, 100)}%`,

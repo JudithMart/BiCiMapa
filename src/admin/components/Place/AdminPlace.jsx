@@ -6,7 +6,7 @@ import PlaceForm from "../Form/PlaceForm";
 import Search from "../Search";
 import AdminTable from "../AdminTable";
 import { IoMdAddCircleOutline } from "react-icons/io";
-import { createSlug } from "../../utils/slug";
+import { createUniqueSlug } from "../../utils/slug";
 import {
   toggleConvenio,
   updatePlace,
@@ -29,7 +29,7 @@ function AdminPlace({ lugares }) {
     longitud: "",
     es_convenio: false,
     activo: true,
-    visible_mapa: true,
+    visible_mapa: false,
   });
 
   const handleEdit = (place) => {
@@ -44,7 +44,7 @@ function AdminPlace({ lugares }) {
       es_convenio: place.es_convenio || false,
       activo: place.activo,
       id_tipo: place.id_tipo,
-       visible_mapa: place.visible_mapa ?? true,
+       visible_mapa: place.visible_mapa ?? false,
     });
     setOpenModal(true);
   };
@@ -60,7 +60,10 @@ function AdminPlace({ lugares }) {
 
     delete values.imagen;
 
-    values.slug = createSlug(values.nombre);
+    values.slug = createUniqueSlug(
+      values.nombre,
+      lugares.map((lugar) => lugar.slug),
+    );
 
     let error;
 
@@ -71,8 +74,12 @@ function AdminPlace({ lugares }) {
     }
 
     if (error) {
-      console.error(error);
-      alert("Error al guardar");
+      console.error("Error al guardar lugar:", error);
+      alert(
+        error?.code === "23505"
+          ? "Ya existe un lugar con ese nombre. Prueba con otro nombre."
+          : "Error al guardar",
+      );
       return;
     }
 
@@ -117,7 +124,7 @@ console.log(error);
           <div>
             <p className="text-xs text-center font-medium">{place.nombre}</p>
             <p className="text-xs text-center text-gray-500 uppercase">
-              {place.tipo.nombre}
+              {place.tipo?.nombre || "Sin tipo"}
             </p>
           </div>
         </div>
@@ -217,6 +224,7 @@ console.log(error);
                 activo: true,
                 es_convenio: false,
                 id_tipo: 1,
+                visible_mapa: false,
               });
 
               setOpenModal(true);

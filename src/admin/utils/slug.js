@@ -9,3 +9,29 @@ export const createSlug = (text) => {
     .replace(/\s+/g, "-")             
     .replace(/-+/g, "-");             
 };
+
+export const createUniqueSlug = (text, existingSlugs = []) => {
+  const baseSlug = createSlug(text);
+
+  if (!baseSlug) return baseSlug;
+
+  const normalizedExistingSlugs = new Set(
+    existingSlugs
+      .filter(Boolean)
+      .map((slug) => slug.toLowerCase()),
+  );
+
+  if (!normalizedExistingSlugs.has(baseSlug)) {
+    return baseSlug;
+  }
+
+  let suffix = 2;
+  let uniqueSlug = `${baseSlug}-${suffix}`;
+
+  while (normalizedExistingSlugs.has(uniqueSlug)) {
+    suffix += 1;
+    uniqueSlug = `${baseSlug}-${suffix}`;
+  }
+
+  return uniqueSlug;
+};

@@ -10,52 +10,75 @@ import VisitsByPlace from "./VisitsByPlace";
 
 function AdminDashboard({ stats, challengeUsers, visitsByPlace }) {
   return (
-   <div className="w-full px-8 py-6">
+    <div className="w-full px-4 lg:px-8 py-6">
 
-      {/* Cards */}
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
 
-      <div className="flex flex-wrap gap-8  ">
-        <AdminCard
-          icono={<FaUserGroup />}
-          descripcion="Usuarios"
-          datos={stats.totalUsuarios}
-        />
+        {/* Panel izquierdo */}
+        <div className="xl:col-span-8">
 
-        <AdminCard
-          icono={<GrUserNew />}
-          descripcion="Premium"
-          datos={stats.premiumUsuarios}
-        />
+          {/* Cards superiores */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-        <AdminCard
-          icono={<LiaPlaceOfWorshipSolid />}
-          descripcion="Lugares"
-          datos={stats.totalLugares}
-        />
+            <AdminCard
+              icono={<FaUserGroup />}
+              descripcion="Usuarios"
+              datos={stats.totalUsuarios}
+            />
 
-        <AdminCard
-          icono={<RiDiscountPercentFill />}
-          descripcion="Promociones"
-          datos={stats.promocionesActivas}
-        />
+            <AdminCard
+              icono={<GrUserNew />}
+              descripcion="Premium"
+              datos={stats.premiumUsuarios}
+            />
 
-        <AdminCard
-          icono={<MdOutlineAutoGraph />}
-          descripcion="Visitas"
-          datos={stats.totalVisitas}
-        />
-      
-          <ChallengeUsersList challengeUsers={challengeUsers} />
-     
-      </div>
+            <AdminCard
+              icono={<LiaPlaceOfWorshipSolid />}
+              descripcion="Lugares"
+              datos={stats.totalLugares}
+            />
 
-      {/* Contenido */}
+          </div>
 
-      <div className="grid grid-cols-12  h-22 ">
-        <div className="col-span-7 h-full">
-          <VisitsByPlace visitsByPlace={visitsByPlace} />
+          {/* Cards inferiores */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6 w-full lg:w-[70%]">
+
+            <AdminCard
+              icono={<RiDiscountPercentFill />}
+              descripcion="Promociones"
+              datos={stats.promocionesActivas}
+            />
+
+            <AdminCard
+              icono={<MdOutlineAutoGraph />}
+              descripcion="Visitas"
+              datos={stats.totalVisitas}
+            />
+
+          </div>
+
+          {/* Tabla */}
+          <div className="mt-8">
+
+            <VisitsByPlace
+              visitsByPlace={visitsByPlace}
+            />
+
+          </div>
+
         </div>
+
+        {/* Panel derecho */}
+        <div className="xl:col-span-4">
+
+          <ChallengeUsersList
+            challengeUsers={challengeUsers}
+          />
+
+        </div>
+
       </div>
+
     </div>
   );
 }

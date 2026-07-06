@@ -1,9 +1,9 @@
 function VisitsByPlace({ visitsByPlace = [] }) {
   return (
-    <div className="bg-white/90 border border-primary shadow-md rounded-3xl  h-[360px]  flex flex-col">
+    <div className="xl:h-[360px] bg-white/90 border border-primary shadow-md rounded-3xl w-ful max-w-[600px]  h-[320px]  flex flex-col">
       <h2 className="font-bold text-xl mb-6 text-texto px-6 pt-6 pb-4 ">Visitas por lugar</h2>
 
-      <div className="flex-1 overflow-y-auto px-6 pb-6 min-h-0">
+      <div className="flex-1 overflow-y-auto px-6 pb-6 ">
         {visitsByPlace.map((item) => (
           <div
             key={item.id}

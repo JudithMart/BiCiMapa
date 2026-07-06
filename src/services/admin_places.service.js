@@ -29,8 +29,6 @@ export const deletePlace = async (id) => {
     .select()
     .single();
 
-  console.log("DELETE DATA:", data);
-  console.log("DELETE ERROR:", error);
 
   return { data, error };
 };

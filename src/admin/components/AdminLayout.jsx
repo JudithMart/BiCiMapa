@@ -6,18 +6,19 @@ import AdminNavbar from "./AdminNavbar";
 export default function AdminLayout() {
   return (
     <div
-      className="min-h-screen bg-cover bg-center "
+      className="h-screen overflow-hidden bg-cover bg-center"
       style={{
-        backgroundImage:
-          "url('/Fondos/FondoBicis.jpeg')",
+        backgroundImage: "url('/Fondos/FondoBicis.jpeg')",
       }}
     >
-      <div className="flex min-h-screen">
+      <div className="flex h-full overflow-hidden">
         <AdminNavbar />
 
         <main
-          className="
+          className="  overflow-y-auto
             flex-1
+            h-full
+            
             p-6
             md:ml-0
             mt-16 md:mt-0

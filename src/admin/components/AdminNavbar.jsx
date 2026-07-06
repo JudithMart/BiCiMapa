@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import {
   LuLayoutDashboard,
@@ -11,11 +11,24 @@ import {
   LuRoute,
   LuFlag,
   LuChartNoAxesColumn,
+  LuLogOut,
 } from "react-icons/lu";
+import { useAuth } from "../../context/AuthContext";
+import { logoutUser } from "../../services/auth.service";
 
 export default function AdminNavbar() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const { setUserAuth, setUserData } = useAuth();
+
+  const handleLogout = async () => {
+    await logoutUser();
+    setUserAuth(null);
+    setUserData(null);
+    setOpen(false);
+    navigate("/mapa", { replace: true });
+  };
 
   const menuItems = [
     {
@@ -185,6 +198,15 @@ export default function AdminNavbar() {
             </div>
 
           </div>
+
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="mt-8 flex items-center gap-4 px-5 py-4 rounded-full text-left transition hover:bg-white/10"
+          >
+            <LuLogOut size={20} className="text-primary" />
+            <span>Cerrar sesión</span>
+          </button>
 
         </div>
       </nav>
