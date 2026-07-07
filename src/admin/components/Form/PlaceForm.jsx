@@ -4,6 +4,7 @@ import ButtonPink from "../../../shared/components/ButtonPink";
 import { placeTypes } from "../../../config/placeTypes";
 import { uploadPlaceImage } from "../../../services/admin_places.service";
 import LocationSearch from "../Place/LocationSearch";
+import AdminLocationMap from "../Place/AdminLocationMap";
 
 function PlaceForm({ form, setForm, onSave }) {
   return (
@@ -94,6 +95,7 @@ function PlaceForm({ form, setForm, onSave }) {
 
       {/* LOCACIÓN */}
       <LocationSearch form={form} setForm={setForm} />
+      <AdminLocationMap form={form} setForm={setForm} />
       {/* SELECCION DE ESTADO ACTIVO O INACTIVO */}
       <div className="mt-5 w-full flex flex-col justify-start pl-6 px-5">
         <p className=" text-texto font-semibold text-base md:text-lg lg:text-xl ">

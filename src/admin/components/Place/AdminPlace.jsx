@@ -225,6 +225,7 @@ console.log(error);
                 es_convenio: false,
                 id_tipo: 1,
                 visible_mapa: false,
+                
               });
 
               setOpenModal(true);

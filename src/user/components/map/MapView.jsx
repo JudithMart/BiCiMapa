@@ -541,6 +541,10 @@ function MapView() {
     fetchNovedad();
   }, []);
 
+  //------------
+  //MAPA BUSCAR LUGARES 
+  
+
 
   return (
     <>
