@@ -183,6 +183,14 @@ export const drawBicitasRoute = async ({
 export const drawProgressRoute = ({ map, traveled, remaining, color }) => {
   if (!map.isStyleLoaded()) return;
 
+  // FIX (bug reportado): la capa "route" (ruta completa animada al inicio)
+  // nunca se borraba al empezar a trackear el progreso, así que se quedaba
+  // pintada por debajo/encima de "route-traveled"/"route-remaining" y por
+  // eso visualmente NUNCA se veía el desvanecido. La quitamos una sola vez,
+  // apenas arranca el tracking de progreso.
+  if (map.getLayer("route")) map.removeLayer("route");
+  if (map.getSource("route")) map.removeSource("route");
+
   const traveledData = {
     type: "Feature",
     geometry: {
@@ -309,4 +317,3 @@ export const drawSingleBicitasRoute = async ({
     },
   });
 };
-

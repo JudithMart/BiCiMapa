@@ -59,18 +59,6 @@ function AdminLocationMap({ form, setForm }) {
         ref={mapContainerRef}
         className="mt-3 h-[280px] w-full overflow-hidden rounded-2xl border border-colorAdmin_gray shadow-sm"
       />
-
-      {/* {form.latitud && form.longitud && (
-        <div className="mt-3 rounded-lg bg-green-50 p-3 text-sm">
-          <p>
-            <strong>Latitud:</strong> {form.latitud}
-          </p>
-
-          <p>
-            <strong>Longitud:</strong> {form.longitud}
-          </p>
-        </div>
-      )} */}
     </div>
   );
 }
