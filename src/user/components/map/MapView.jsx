@@ -392,8 +392,8 @@ function MapView() {
       type: "fill",
       source: "centro-morelia",
       paint: {
-        "fill-color": "#FCEAEA",
-        "fill-opacity": 0.40,
+        "fill-color": "#F6D6D6",
+        "fill-opacity": 0.25,
       },
     });
 
@@ -403,8 +403,8 @@ function MapView() {
       type: "line",
       source: "centro-morelia",
       paint: {
-        "line-color": "#FCEAEA",
-        "line-width": 1,
+        "line-color": "#FDF4F3",
+        "line-width": 3,
       },
     });
   };
