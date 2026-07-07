@@ -43,7 +43,9 @@ export const getPlaces = async () => {
   const { data, error } = await supabase
     .from("lugar")
     .select("*, tipo(*), promocion(*)")
-    .eq("visible_mapa", true);  
+    .eq("visible_mapa", true)
+    .eq("activo", true);
+
   
   return { places: data, error };
 };
