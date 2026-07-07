@@ -1,4 +1,4 @@
-// useMapInitialization.js
+// user/components/map/hooks/useMapInitialization.js
 import { useEffect } from "react";
 import mapboxgl from "mapbox-gl";
 
