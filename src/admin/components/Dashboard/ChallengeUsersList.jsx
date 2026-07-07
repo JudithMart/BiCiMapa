@@ -1,7 +1,7 @@
 function ChallengeUsersList({ challengeUsers }) {
   return (
     <div
-      className="w-full xl:w-[320px] rounded-[30px] bg-white/85 border border-primary shadow-md h-[520px] flex flex-col xl:h-[620px]"
+      className="w-full xl:w-[320px] rounded-[30px] bg-white/85 border border-primary shadow-md h-[500px] flex flex-col xl:h-[545px]"
     >
       <h2 className="px-6 pt-6 pb-4 font-bold text-texto text-xl mb-5">
         Usuarios del reto
