@@ -1,5 +1,5 @@
 
-/*
+/* auth.service.js
 Funciones para:
 - Registro de usuarios
 - Inicio de sesión
@@ -52,7 +52,7 @@ export const getUsuario = async (id) => {
 //Cambiar redirectTo: "https://tudominio.com/update-password"
 export const resetPassword = async (email) => {
   return await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: "http://localhost:5173/editar-contrasena",
+    redirectTo: "http://bicimapa.vercel.app/editar-contrasena",
   });
 };
 

@@ -4,6 +4,7 @@ import { GiDutchBike } from "react-icons/gi";
 import { IoBeerOutline } from "react-icons/io5";
 import { MdLocalHotel } from "react-icons/md";
 import { CiStar } from "react-icons/ci";
+import { GrLocationPin } from "react-icons/gr";
 
 export const placeTypes = {
   1: {
@@ -33,6 +34,10 @@ export const placeTypes = {
   7:{
     icon: CiStar,
     label: "Turístico",
+  },
+  8:{
+    icon: GrLocationPin ,
+    label: "Sin tipo",
   },
 
 

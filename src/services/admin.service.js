@@ -1,21 +1,104 @@
+// src/services/admin.service.js
 import { supabase } from "../lib/supabase";
 
-export const activatePremium = async (userId) => {
-  const today = new Date();
+//DATOS PARA DASHBOARD ADMIN
+export const getDashboardStats = async () => {
+  const [usuarios, premium, lugares, promociones, visitas] = await Promise.all([
+    supabase.from("usuario").select("*", { count: "exact", head: true }),
 
-  const expiration = new Date();
-  expiration.setDate(today.getDate() + 30);
+    supabase
+      .from("usuario")
+      .select("*", { count: "exact", head: true })
+      .eq("es_premium", true),
 
-  const { data, error } = await supabase
-  .from("usuario")
-  .update({
-    es_premium: true,
-    fecha_inicio_membresia: new Date(),
-    fecha_expiracion: new Date(
-      Date.now() + 30 * 24 * 60 * 60 * 1000
-    ),
-  })
-  .eq("id", userId);
+    supabase.from("lugar").select("*", { count: "exact", head: true }),
 
-  return { data, error };
+    supabase
+      .from("promocion")
+      .select("*", { count: "exact", head: true })
+      .eq("activa", true),
+
+    supabase.from("visita").select("*", { count: "exact", head: true }),
+  ]);
+
+  return {
+    totalUsuarios: usuarios.count || 0,
+    premiumUsuarios: premium.count || 0,
+    totalLugares: lugares.count || 0,
+    promocionesActivas: promociones.count || 0,
+    totalVisitas: visitas.count || 0,
+  };
+};
+
+export const getChallengeProgress = async () => {
+  const { data: reto } = await supabase
+    .from("reto_mensual")
+    .select("*")
+    .eq("activo", true)
+    .single();
+
+  const { data: lugares } = await supabase
+    .from("reto_lugares")
+    .select("id_lugar")
+    .eq("id_reto", reto.id);
+
+  const { data: usuarios } = await supabase
+    .from("usuario")
+    .select("id,nombre,telefono")
+    .eq("es_premium", true)
+    .eq("rol", "user");
+
+  const { data: visitas } = await supabase
+    .from("visita")
+    .select("id_usuario,id_lugar")
+    .eq("verificado", true);
+
+  const lugaresReto = lugares.map((l) => l.id_lugar);
+
+  const resultado = usuarios.map((usuario) => {
+    const visitasUsuario = visitas.filter((v) => v.id_usuario === usuario.id);
+
+    const lugaresVisitados = [
+      ...new Set(
+        visitasUsuario
+          .filter((v) => lugaresReto.includes(v.id_lugar))
+          .map((v) => v.id_lugar),
+      ),
+    ];
+
+    return {
+      usuario,
+
+      reto_mensual: reto,
+
+      visitas_completadas: lugaresVisitados.length,
+
+      completado: lugaresVisitados.length >= reto.visitas_requeridas,
+    };
+  });
+
+  return { data: resultado };
+};
+
+export const getVisitsByPlace = async () => {
+  const { data: lugares } = await supabase
+    .from("lugar")
+    .select("id,nombre")
+    .eq("activo", true)
+    .eq("es_convenio", true);
+
+  const { data: visitas } = await supabase
+    .from("visita")
+    .select("id_lugar")
+    .eq("verificado", true);
+
+  const resultado = lugares.map((lugar) => ({
+    id: lugar.id,
+    nombre: lugar.nombre,
+    visitas: visitas.filter((v) => v.id_lugar === lugar.id).length,
+  }));
+
+  resultado.sort((a, b) => b.visitas - a.visitas);
+
+  return { data: resultado };
 };

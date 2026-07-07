@@ -1,3 +1,4 @@
+// Login.jsx
 import React from 'react'
 import LoginC from '../shared/components/LoginC';
 
@@ -11,4 +12,4 @@ function Login({ onClose, onShowRegister, onAuthSuccess }) {
   );
 }
 
-export default Login
+export default Login 

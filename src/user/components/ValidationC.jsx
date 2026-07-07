@@ -23,7 +23,7 @@ function ValidationC({
     if (tipo === "success") {
       setTimeout(() => {
         setMensaje("");
-        navigate("/profile");
+        navigate("/perfil");
       }, 1800);
     } else {
       setTimeout(() => setMensaje("") , 2000);
