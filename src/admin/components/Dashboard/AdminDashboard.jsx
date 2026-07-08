@@ -8,7 +8,7 @@ import ChallengeUsersList from "./ChallengeUsersList";
 import VisitsByPlace from "./VisitsByPlace";
 function AdminDashboard({ stats, challengeUsers, visitsByPlace }) {
   return (
-    <div className="w-full px-4 md:px-6 xl:px-8 py-2 2xl:px-52 ">
+    <div className="w-full px-4 md:px-6 xl:px-8 py-2 2xl:px-44 ">
       {" "}
       {/* Primera fila */}{" "}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3 gap-6">

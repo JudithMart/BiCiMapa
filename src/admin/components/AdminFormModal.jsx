@@ -5,7 +5,7 @@ function AdminFormModal({ open, onClose, children }) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+    <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/40 backdrop-blur-sm">
       <div
         className=" relative bg-colorAdmin_gray  rounded-3xl shadow-xl w-[90%] max-w-2xl max-h-[90vh] overflow-y-auto
 "

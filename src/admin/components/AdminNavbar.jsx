@@ -100,39 +100,31 @@ export default function AdminNavbar() {
 
       <nav
         className={`
-        bg-colorAdmin_gray
-        text-white
-        shadow-lg
-        flex
-        flex-col
-        py-10
+        bg-colorAdmin_gray text-white shadow-lg flex flex-col py-10 fixed md:relative top-0 left-0  z-50
+ h-dvh w-72   rounded-r-[50px] transform transition-transform duration-300
 
-        fixed md:relative
-        top-0 left-0
-        z-50
-
-        h-screen
-        w-72
-
-        rounded-r-[50px]
-
-        transform transition-transform duration-300
-
-        ${open ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
+        ${open ? "translate-x-0" : "-translate-x-full md:translate-x-0  "}
       `}
       >
-        <div className="flex justify-center">
-          <img
-            src="/Logos/logoB4.png"
-            alt="Logo"
-            className="w-28 mb-10"
-          />
+        <div className="flex gap-10  px-8  mb-10">
+          <div>
+            {" "}
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="     "
+              aria-label="Cerrar sesión"
+            >
+              <LuLogOut size={22} className="text-primary" />
+            </button>
+          </div>
+          <div className="flex items-center justify-center ">
+            <img src="/Logos/logoB4.png" alt="Logo" className="w-28" />
+          </div>
         </div>
 
-        <div className="flex flex-col gap-3 px-5">
-
+        <div className="flex flex-col gap-3 px-5 ">
           {menuItems.map((item) => {
-
             const active = location.pathname === item.path;
 
             return (
@@ -145,11 +137,7 @@ export default function AdminNavbar() {
                 px-5 py-4 rounded-full
                 transition
 
-                ${
-                  active
-                    ? "bg-primary shadow-lg md:w-72"
-                    : "hover:bg-white/10"
-                }
+                ${active ? "bg-primary shadow-lg md:w-72 " : "hover:bg-white/10"}
               `}
               >
                 {item.icon}
@@ -159,18 +147,14 @@ export default function AdminNavbar() {
           })}
 
           <div className="mt-6">
-
             <div className="flex items-center gap-3 px-5 text-texto font-extrabold uppercase text-base">
-              <LuBike  className="text-primary" />
+              <LuBike className="text-primary" />
               BiCitas
             </div>
 
             <div className="mt-3 ml-5 flex flex-col gap-2">
-
               {bicitasItems.map((item) => {
-
-                const active =
-                  location.pathname === item.path;
+                const active = location.pathname === item.path;
 
                 return (
                   <Link
@@ -183,11 +167,7 @@ export default function AdminNavbar() {
                     rounded-full
                     transition
 
-                    ${
-                      active
-                        ? "bg-primary"
-                        : "hover:bg-white/10"
-                    }
+                    ${active ? "bg-primary" : "hover:bg-white/10"}
                   `}
                   >
                     {item.icon}
@@ -196,18 +176,7 @@ export default function AdminNavbar() {
                 );
               })}
             </div>
-
           </div>
-
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="mt-8 flex items-center gap-4 px-5 py-4 rounded-full text-left transition hover:bg-white/10"
-          >
-            <LuLogOut size={20} className="text-primary" />
-            <span>Cerrar sesión</span>
-          </button>
-
         </div>
       </nav>
     </>
