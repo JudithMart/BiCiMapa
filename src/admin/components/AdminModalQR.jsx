@@ -4,6 +4,24 @@ import QRCode from "react-qr-code";
 import { toPng } from "html-to-image";
 import { FiCopy, FiDownload, FiRefreshCcw } from "react-icons/fi";
 
+const Button = ({ icon, text, color, onClick }) => (
+  <button
+    onClick={onClick}
+    className={`
+            flex items-center justify-center 
+            rounded-xl
+            font-semibold
+            py-2 px-2 gap-3
+            transition
+           
+            ${color}
+        `}
+  >
+    {icon}
+    {text}
+  </button>
+);
+
 export default function AdminModalQR({
   open,
   token,
@@ -11,10 +29,10 @@ export default function AdminModalQR({
   onClose,
   onGenerateNew,
 }) {
-  if (!open || !token) return null;
-
   const qrRef = useRef(null);
   const downloadRef = useRef(null);
+
+  if (!open || !token) return null;
 
   const handleCopyToken = async () => {
     try {
@@ -46,24 +64,6 @@ export default function AdminModalQR({
       console.error(err);
     }
   };
-
-  const Button = ({ icon, text, color, onClick }) => (
-    <button
-      onClick={onClick}
-      className={`
-            flex items-center justify-center 
-            rounded-xl
-            font-semibold
-            py-2 px-2 gap-3
-            transition
-           
-            ${color}
-        `}
-    >
-      {icon}
-      {text}
-    </button>
-  );
   return (
     <>
       {" "}
@@ -127,11 +127,6 @@ export default function AdminModalQR({
               <b>Creado: </b>
 
               {new Date(token.creado_en).toLocaleString()}
-            </p>
-            <p className="text-texto text-lg font-sans">
-              <b>Expira: </b>
-
-              {new Date(token.expira_en).toLocaleString()}
             </p>
           </div>
           <div className="flex justify-center gap-4 mt-6">

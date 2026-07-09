@@ -12,8 +12,7 @@ export const getAllPromotions = async () => {
         id,
         token,
         activo,
-        creado_en,
-        expira_en
+        creado_en
     )
 `,
     )
@@ -79,7 +78,6 @@ export const createToken = async (promotion) => {
     id_lugar: promotion.id_lugar,
     id_promocion: promotion.id,
     token,
-    expira_en: new Date(Date.now() + 86400000).toISOString(),
     activo: true,
     usado: false,
     metodo: "qr"
@@ -91,7 +89,6 @@ export const createToken = async (promotion) => {
       id_lugar: promotion.id_lugar,
       id_promocion: promotion.id,
       token,
-      expira_en: new Date(Date.now() + 86400000).toISOString(),
       activo: true,
       usado: false,
       metodo: "qr",

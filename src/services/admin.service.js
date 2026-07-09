@@ -44,19 +44,29 @@ export const getChallengeProgress = async () => {
 
   const { data: usuarios } = await supabase
     .from("usuario")
-    .select("id,nombre,telefono")
+    .select("id,nombre,telefono,fecha_inicio_membresia")
     .eq("es_premium", true)
     .eq("rol", "user");
 
   const { data: visitas } = await supabase
     .from("visita")
-    .select("id_usuario,id_lugar")
+    .select("id_usuario,id_lugar,fecha_visita")
     .eq("verificado", true);
 
   const lugaresReto = lugares.map((l) => l.id_lugar);
 
   const resultado = usuarios.map((usuario) => {
-    const visitasUsuario = visitas.filter((v) => v.id_usuario === usuario.id);
+    const fechaInicio = usuario.fecha_inicio_membresia
+      ? new Date(usuario.fecha_inicio_membresia)
+      : null;
+
+    const visitasUsuario = visitas.filter((v) => {
+      if (v.id_usuario !== usuario.id) return false;
+
+      if (!fechaInicio) return false;
+
+      return new Date(v.fecha_visita) >= fechaInicio;
+    });
 
     const lugaresVisitados = [
       ...new Set(
