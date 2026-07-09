@@ -12,7 +12,7 @@ function AdminChallengePage() {
         useEffect(() => {
         const loadPlaces = async () => {
           const { data } = await getAllPlaces();
-          setLugares(data || []);
+            setLugares((data || []).filter((lugar) => lugar.visible_mapa === true));
         }
         loadPlaces();
         }, []);

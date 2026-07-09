@@ -66,7 +66,7 @@ function ProfileC({
 
   return (
     <div
-      className="relative flex items-center flex-col w-full h-screen bg-cover bg-center "
+      className="relative flex flex-col w-full h-dvh bg-cover bg-center overflow-hidden"
       style={{ backgroundImage: "url('/Fondos/FondoCafe.png')" }}
     >
       {/* Botón de cerrar sesión */}
@@ -94,7 +94,7 @@ function ProfileC({
           </p>
         </div>
       </div>
-      <div className=" relative flex flex-col justify-center px-3 py-5 w-full  ">
+      <div className="mt-5 relative flex flex-col justify-center px-3 py-5 w-full flex-1 min-h-0 overflow-y-auto pb-24">
         {!es_premium && (
           <div
             className="
@@ -180,7 +180,8 @@ function ProfileC({
               restantes para completar el reto.
             </p>
             {descripcion_reto && (
-              <p className="text-base font-semibold text-center text-gray-600 mt-2 px-4">
+
+              <p className="text-base font-semibold italic text-center text-[#6F4E37] mt-2  bg-white">
                 {descripcion_reto}
               </p>
             )}
@@ -188,7 +189,7 @@ function ProfileC({
         )}
         {/* Lugares */}
         <div className="flex flex-col gap-y-2 mt-2">
-          <p className="text-texto font-bold text-lg ">Lugares</p>
+          {/* <p className="text-texto font-thin text-lg ">Lugares</p> */}
 
           {lugaresCombinados.length > 0 ? (
             lugaresCombinados.map((lugar, idx) => (

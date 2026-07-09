@@ -58,18 +58,7 @@ if (promocionData.id_lugar !== tokenData.id_lugar) {
     message: "El QR no pertenece a este lugar",
   };
 }
-  // 2. Revisar expiración
-  const ahora = new Date();
-  const expira = new Date(tokenData.expira_en);
-
-  if (ahora > expira) {
-    return {
-      success: false,
-      message: "Token expirado",
-    };
-  }
-
-  // 3. Registrar visita
+  // 2. Registrar visita
   const { data: visita, error: visitaError } = await supabase
     .from("visita")
     .insert({
@@ -88,7 +77,7 @@ if (promocionData.id_lugar !== tokenData.id_lugar) {
     };
   }
 
-  // 4. Marcar token usado
+  // 3. Marcar token usado
   await supabase
     .from("token_lugar")
     .update({

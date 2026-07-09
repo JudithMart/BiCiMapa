@@ -49,7 +49,7 @@ function ValidationC({
       className="w-full min-h-screen overflow-y-auto flex flex-col  justify-center px-5 pt-14 pb-36 bg-cover bg-center"
       style={{ backgroundImage: "url('/Fondos/FondoCafe.png')" }}
     >
-      <p className="text-xs mb-2 text-center text-red-600 italic">
+      <p className="text-xs font-bold mb-2 text-center text-red-600 italic">
        *Las promociones pueden modificarse dependiendo del lugar
       </p>
       <div className="w-full h-full max-w-sm bg-primary/80 rounded-[30px] shadow-2xl p-5  ">
@@ -90,7 +90,7 @@ function ValidationC({
         <div className="mt-3">
           <input
             type="text"
-            className="w-full rounded-xl px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary text-center"
+            className="w-full font-sans rounded-xl px-3 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary text-center"
             placeholder="Ingresa el token"
             onChange={(e) => setCodigo(e.target.value)}
           />
