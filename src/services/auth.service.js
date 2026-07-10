@@ -49,10 +49,9 @@ export const getUsuario = async (id) => {
   return { data, error };
 };
 
-//Cambiar redirectTo: "https://tudominio.com/update-password"
 export const resetPassword = async (email) => {
   return await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: "http://bicimapa.vercel.app/editar-contrasena",
+    redirectTo: "https://www.bicitashistoricas.com/editar-contrasena",
   });
 };
 
