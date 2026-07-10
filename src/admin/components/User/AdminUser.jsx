@@ -39,8 +39,8 @@ function AdminUser({ usuarios }) {
     const { error } = await updateUser(selectedUser.id, form);
 
     if (error) {
-      alert("Error");
-
+      console.error(error);
+      alert("Error al guardar: " + error.message);
       return;
     }
 
@@ -50,7 +50,11 @@ function AdminUser({ usuarios }) {
   };
 
   const handlePremium = async (user) => {
-    await togglePremium(user.id, user.es_premium);
+    const { error } = await togglePremium(user.id, user.es_premium);
+    if (error) {
+      alert("No se pudo actualizar el estado premium");
+      return;
+    }
 
     window.location.reload();
   };
@@ -65,7 +69,11 @@ function AdminUser({ usuarios }) {
 
     if (!confirmacion) return;
 
-    await deactivateUser(user.id);
+    const { error } = await deactivateUser(user.id);
+    if (error) {
+      alert("No se pudo desactivar al usuario");
+      return;
+    }
 
     window.location.reload();
   };
@@ -143,16 +151,11 @@ function AdminUser({ usuarios }) {
     },
   ];
 
-const filteredUsers = usuarios.filter((user) => {
-
+  const filteredUsers = usuarios.filter((user) => {
     const text = search.toLowerCase();
 
-    return Object.values(user)
-        .join(" ")
-        .toLowerCase()
-        .includes(text);
-
-});
+    return Object.values(user).join(" ").toLowerCase().includes(text);
+  });
 
   return (
     <>
@@ -163,7 +166,6 @@ const filteredUsers = usuarios.filter((user) => {
           placeholder="Buscar usuario..."
         />
       </div>
-
       <div className="pt-10">
         <AdminTable
           columns={columns}
