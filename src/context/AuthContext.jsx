@@ -45,18 +45,22 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  useEffect(() => {
+useEffect(() => {
     refreshUser();
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event) => {
+    } = supabase.auth.onAuthStateChange((event) => {
+
       if (
         event === "SIGNED_IN" ||
         event === "TOKEN_REFRESHED" ||
         event === "USER_UPDATED"
       ) {
-        await refreshUser();
+    
+        setTimeout(() => {
+          refreshUser();
+        }, 0);
       }
 
       if (event === "SIGNED_OUT") {
