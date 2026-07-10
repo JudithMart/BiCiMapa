@@ -2,6 +2,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { getCurrentUser, getUsuario } from "../services/auth.service";
 import { validatePremiumStatus } from "../services/user_premium.service";
+import { supabase } from "../lib/supabase";
 
 const AuthContext = createContext();
 
@@ -46,8 +47,26 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     refreshUser();
-  }, []);
 
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event) => {
+      if (
+        event === "SIGNED_IN" ||
+        event === "TOKEN_REFRESHED" ||
+        event === "USER_UPDATED"
+      ) {
+        await refreshUser();
+      }
+
+      if (event === "SIGNED_OUT") {
+        setUserAuth(null);
+        setUserData(null);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
   return (
     <AuthContext.Provider
       value={{
