@@ -49,7 +49,6 @@ export const getUsuario = async (id) => {
   return { data, error };
 };
 
-
 export const resetPassword = async (email) => {
   return await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: "https://www.bicitashistoricas.com/editar-contrasena",
