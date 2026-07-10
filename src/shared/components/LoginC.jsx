@@ -119,6 +119,7 @@ function LoginC({ onClose, onShowRegister, onAuthSuccess }) {
     } else {
       setUserAuth(user);
 
+      await refreshUser();
       const { data} = await getUsuario(user.id);
 
       if (!data.activo) {
@@ -131,7 +132,7 @@ function LoginC({ onClose, onShowRegister, onAuthSuccess }) {
         return;
       }
 
-      await refreshUser();
+      
       setMensaje("Inicio de sesión exitoso");
 
       onAuthSuccess?.();

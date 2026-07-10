@@ -1,4 +1,3 @@
-
 /* auth.service.js
 Funciones para:
 - Registro de usuarios
@@ -7,24 +6,31 @@ Funciones para:
 - Obtener usuario actual
 */
 
-import { supabase } from '../lib/supabase';
+import { supabase } from "../lib/supabase";
 
 export const registerUser = async (email, password, nombre, telefono) => {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
+      emailRedirectTo: "https://www.bicitashistoricas.com/",
       data: {
         nombre,
-        telefono
-      }
-    }
+        telefono,
+      },
+    },
   });
-  return { user: data?.user, error };
+  return {
+    user: data?.user,
+    error,
+  };
 };
 
 export const loginUser = async (email, password) => {
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password,});
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
   return { user: data?.user, error };
 };
 
