@@ -13,13 +13,10 @@ export const usePlaceMarkers = ({
   
 }) => {
   useEffect(() => {
-   
-
     if (!mapRef.current) return;
 
-    markersRef.current.forEach((marker) => marker.remove());
-
-    markersRef.current = [];
+    // Array local de ESTA ejecución del efecto (no el de la ejecución anterior).
+    const createdMarkers = [];
 
     places.forEach((place) => {
       const el = document.createElement("div");
@@ -86,7 +83,22 @@ export const usePlaceMarkers = ({
         .setLngLat([place.longitud, place.latitud])
         .addTo(mapRef.current);
 
-      markersRef.current.push(marker);
+      createdMarkers.push({ marker, root });
     });
+
+    markersRef.current = createdMarkers;
+
+    // Cleanup: se ejecuta automáticamente cuando `places` cambia (antes de
+    // crear los markers nuevos) o cuando el componente se desmonta.
+    // OJO: no podemos llamar root.unmount() de forma síncrona aquí, porque
+    // este cleanup puede caer en medio de un render de la app principal
+    // (React lanza "Attempted to synchronously unmount a root while React
+    // was already rendering"). Lo diferimos al siguiente tick.
+    return () => {
+      createdMarkers.forEach(({ marker, root }) => {
+        marker.remove();
+        setTimeout(() => root.unmount(), 0);
+      });
+    };
   }, [places]);
 };
