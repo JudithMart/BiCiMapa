@@ -112,3 +112,33 @@ export const getVisitsByPlace = async () => {
 
   return { data: resultado };
 };
+
+// Funcion aun no probada, no se si funciona correctamente, pero la idea es que devuelva los lugares visitados por un usuario y la fecha de la ultima visita a cada lugar.
+
+export const getPlacesVisitedByUser = async (userId) => {
+  const { data: visitas } = await supabase
+    .from("visita")
+    .select("id_lugar,fecha_visita")
+    .eq("id_usuario", userId)
+    .eq("verificado", true);
+
+  const { data: lugares } = await supabase
+    .from("lugar")
+    .select("id,nombre,descripcion,imagen")
+    .in("id", visitas.map((v) => v.id_lugar));
+
+  const resultado = lugares.map((lugar) => {
+    const visitasLugar = visitas.filter((v) => v.id_lugar === lugar.id);
+
+    return {
+      ...lugar,
+      visitas: visitasLugar.length,
+      ultima_visita: visitasLugar.reduce((latest, current) => {
+        const currentDate = new Date(current.fecha_visita);
+        return !latest || currentDate > latest ? currentDate : latest;
+      }, null),
+    };
+  });
+
+  return { data: resultado };
+}

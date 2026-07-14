@@ -1,10 +1,11 @@
 import { supabase } from "../lib/supabase";
 
-// CRUD USUARIOS 
+// CRUD USUARIOS
 export const getAllUsers = async () => {
   const { data, error } = await supabase
     .from("usuario")
-    .select(`
+    .select(
+      `
       id,
       nombre,
       telefono,
@@ -14,7 +15,8 @@ export const getAllUsers = async () => {
       fecha_expiracion,
       activo,
       created_at
-    `)
+    `,
+    )
     .order("created_at", { ascending: false });
 
   return { data, error };
@@ -44,10 +46,7 @@ export const deactivateUser = async (id) => {
   return { data, error };
 };
 
-export const togglePremium = async (
-  userId,
-  currentPremium
-) => {
+export const togglePremium = async (userId, currentPremium) => {
   const values = currentPremium
     ? {
         es_premium: false,
@@ -57,9 +56,7 @@ export const togglePremium = async (
     : {
         es_premium: true,
         fecha_inicio_membresia: new Date(),
-        fecha_expiracion: new Date(
-          Date.now() + 30 * 24 * 60 * 60 * 1000
-        ),
+        fecha_expiracion: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
       };
 
   const { data, error } = await supabase
@@ -69,5 +66,12 @@ export const togglePremium = async (
     .select()
     .single();
 
+  if (!currentPremium && !error) {
+    await supabase.from("historial_premium").insert({
+      id_usuario: userId,
+      fecha_inicio: values.fecha_inicio_membresia,
+      fecha_fin: values.fecha_expiracion,
+    });
+  }
   return { data, error };
 };

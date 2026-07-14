@@ -3,13 +3,33 @@ import { GrUserNew } from "react-icons/gr";
 import { LiaPlaceOfWorshipSolid } from "react-icons/lia";
 import { RiDiscountPercentFill } from "react-icons/ri";
 import { MdOutlineAutoGraph } from "react-icons/md";
+import { IoDocumentTextOutline } from "react-icons/io5";
 import AdminCard from "./AdminCard";
 import ChallengeUsersList from "./ChallengeUsersList";
 import VisitsByPlace from "./VisitsByPlace";
-function AdminDashboard({ stats, challengeUsers, visitsByPlace }) {
+
+function AdminDashboard({
+  stats,
+  challengeUsers,
+  visitsByPlace,
+  onDownloadMonthlyReport,
+  downloadingReport,
+}) {
   return (
     <div className="w-full px-4 md:px-6 xl:px-8 py-2 2xl:px-44 ">
-      {" "}
+      {/* Header con botón de reporte */}
+      <div className="flex justify-end mb-4">
+        <button
+          onClick={onDownloadMonthlyReport}
+          disabled={downloadingReport}
+          className="flex items-center gap-2 rounded-xl bg-primary text-white px-4 py-2 text-sm font-semibold disabled:opacity-40"
+        >
+          <IoDocumentTextOutline />
+          {downloadingReport
+            ? "Generando..."
+            : "Descargar reporte mensual (PDF)"}
+        </button>
+      </div>{" "}
       {/* Primera fila */}{" "}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3 gap-6">
         {" "}
