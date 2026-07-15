@@ -6,19 +6,30 @@ function ChallengeUsersList({ challengeUsers }) {
   const [selectedUser, setSelectedUser] = useState(null);
   const [visits, setVisits] = useState([]);
   const [loadingVisits, setLoadingVisits] = useState(false);
+  const [visitsError, setVisitsError] = useState(null);
 
   const handleSelectUser = async (usuario) => {
     setSelectedUser(usuario);
     setLoadingVisits(true);
+    setVisitsError(null);
 
-    const { data } = await getPlacesVisitedByUser(usuario.id);
-    setVisits(data || []);
+    const { data, error } = await getPlacesVisitedByUser(usuario.id);
+
+    if (error) {
+      console.error(error);
+      setVisitsError("No se pudieron cargar las visitas de este usuario.");
+      setVisits([]);
+    } else {
+      setVisits(data || []);
+    }
+
     setLoadingVisits(false);
   };
 
   const handleCloseModal = () => {
     setSelectedUser(null);
     setVisits([]);
+    setVisitsError(null);
   };
   return (
     <div className="w-full xl:w-[320px] rounded-[30px] bg-white/85 border border-primary shadow-md h-[500px] flex flex-col xl:h-[545px]">
@@ -82,6 +93,7 @@ function ChallengeUsersList({ challengeUsers }) {
         user={selectedUser}
         visits={visits}
         loading={loadingVisits}
+        error={visitsError}
         onClose={handleCloseModal}
       />
     </div>

@@ -113,32 +113,63 @@ export const getVisitsByPlace = async () => {
   return { data: resultado };
 };
 
-// Funcion aun no probada, no se si funciona correctamente, pero la idea es que devuelva los lugares visitados por un usuario y la fecha de la ultima visita a cada lugar.
 
+// visita a cada lugar.
 export const getPlacesVisitedByUser = async (userId) => {
-  const { data: visitas } = await supabase
+  const { data: visitas, error: visitasError } = await supabase
     .from("visita")
     .select("id_lugar,fecha_visita")
     .eq("id_usuario", userId)
     .eq("verificado", true);
-
-  const { data: lugares } = await supabase
+ 
+  if (visitasError) {
+    console.error("Error obteniendo visitas:", visitasError);
+    return { data: null, error: visitasError };
+  }
+ 
+  if (!visitas || visitas.length === 0) {
+    return { data: [], error: null };
+  }
+ 
+  const { data: lugares, error: lugaresError } = await supabase
     .from("lugar")
-    .select("id,nombre,descripcion,imagen")
-    .in("id", visitas.map((v) => v.id_lugar));
-
+    .select("id,nombre,descripcion,imagen_url")
+    .in(
+      "id",
+      visitas.map((v) => v.id_lugar),
+    );
+ 
+  if (lugaresError) {
+    console.error("Error obteniendo lugares:", lugaresError);
+    return { data: null, error: lugaresError };
+  }
+ 
+  const ahora = new Date();
+  const inicioMes = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
+  const finMes = new Date(ahora.getFullYear(), ahora.getMonth() + 1, 1);
+ 
   const resultado = lugares.map((lugar) => {
     const visitasLugar = visitas.filter((v) => v.id_lugar === lugar.id);
-
+ 
+    const visitasMes = visitasLugar.filter((v) => {
+      const fecha = new Date(v.fecha_visita);
+      return fecha >= inicioMes && fecha < finMes;
+    });
+ 
     return {
       ...lugar,
-      visitas: visitasLugar.length,
+      visitas_totales: visitasLugar.length,
+      visitas_mes: visitasMes.length,
       ultima_visita: visitasLugar.reduce((latest, current) => {
         const currentDate = new Date(current.fecha_visita);
         return !latest || currentDate > latest ? currentDate : latest;
       }, null),
     };
   });
-
-  return { data: resultado };
-}
+ 
+  // Ordenar por más visitado primero, útil para el reporte a los lugares con convenio
+  resultado.sort((a, b) => b.visitas_totales - a.visitas_totales);
+ 
+  return { data: resultado, error: null };
+};
+ 
