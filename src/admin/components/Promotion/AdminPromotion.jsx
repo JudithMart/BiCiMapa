@@ -85,7 +85,22 @@ function AdminPromotion({ promociones }) {
   };
 
   const handleGenerateNewToken = async () => {
-    const { data } = await generateNewToken(selectedPromotion);
+    const confirmacion = window.confirm(
+      `¿Generar un nuevo QR para ${selectedPromotion?.lugar?.nombre || "este lugar"}? ` +
+        "El QR/token anterior dejará de funcionar de inmediato, aunque siga impreso o pegado en el lugar.",
+    );
+
+    if (!confirmacion) return;
+
+    const { data, error } = await generateNewToken(selectedPromotion);
+
+    if (error || !data) {
+      console.error(error);
+      alert(
+        "No se pudo generar el nuevo token/QR. Revisa la consola para más detalle.",
+      );
+      return;
+    }
 
     setSelectedToken(data);
 
@@ -117,27 +132,29 @@ function AdminPromotion({ promociones }) {
     window.location.reload();
   };
 
- const handleDelete = async (place) => {
-  const confirmacion = window.confirm(
-    `¿Eliminar la promoción de ${place.lugar?.nombre}?`
-  );
+  const handleDelete = async (place) => {
+    const confirmacion = window.confirm(
+      `¿Eliminar la promoción de ${place.lugar?.nombre}?`,
+    );
 
-  if (!confirmacion) return;
+    if (!confirmacion) return;
 
-  const { error, softDeleted } = await deletePromotion(place.id);
+    const { error, softDeleted } = await deletePromotion(place.id);
 
-  if (error) {
-    console.error(error);
-    alert("Error al eliminar la promoción");
-    return;
-  }
+    if (error) {
+      console.error(error);
+      alert("Error al eliminar la promoción");
+      return;
+    }
 
-  if (softDeleted) {
-    alert("Esta promoción tiene visitas registradas, así que se desactivó en lugar de eliminarse.");
-  }
+    if (softDeleted) {
+      alert(
+        "Esta promoción tiene visitas registradas, así que se desactivó en lugar de eliminarse.",
+      );
+    }
 
-  window.location.reload();
-};
+    window.location.reload();
+  };
 
   const columns = [
     {

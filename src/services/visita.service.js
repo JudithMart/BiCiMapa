@@ -82,6 +82,37 @@ export const validarToken = async ({ token, id_usuario, id_promocion }) => {
     };
   }
 
+
+  const veinticuatroHorasAtras = new Date(
+    Date.now() - 24 * 60 * 60 * 1000,
+  ).toISOString();
+ 
+  const { data: visitaReciente, error: cooldownError } = await supabase
+    .from("visita")
+    .select("id")
+    .eq("id_usuario", id_usuario)
+    .eq("id_lugar", tokenData.id_lugar)
+    .eq("verificado", true)
+    .gte("fecha_visita", veinticuatroHorasAtras)
+    .limit(1)
+    .maybeSingle();
+ 
+  if (cooldownError) {
+    return {
+      success: false,
+      message: "Error al validar la visita",
+    };
+  }
+ 
+  if (visitaReciente) {
+    return {
+      success: false,
+      message:
+        "Ya registraste una visita a este lugar en las últimas 24 horas. Intenta de nuevo más tarde.",
+    };
+  }
+ 
+
   // 4. Registrar visita
   const { data: visita, error: visitaError } = await supabase
     .from("visita")

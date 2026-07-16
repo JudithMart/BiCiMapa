@@ -5,22 +5,36 @@ import { supabase } from "../lib/supabase";
 export const getDashboardStats = async () => {
   const [usuarios, premium, lugares, promociones, visitas] = await Promise.all([
     supabase.from("usuario").select("*", { count: "exact", head: true }),
-
+ 
     supabase
       .from("usuario")
       .select("*", { count: "exact", head: true })
       .eq("es_premium", true),
-
+ 
     supabase.from("lugar").select("*", { count: "exact", head: true }),
-
+ 
     supabase
       .from("promocion")
       .select("*", { count: "exact", head: true })
       .eq("activa", true),
-
-    supabase.from("visita").select("*", { count: "exact", head: true }),
+ 
+    // FIX #8: antes contaba TODAS las visitas (incluso no verificadas),
+    // mientras que getVisitsByPlace solo cuenta verificado=true. Ahora
+    // ambos usan el mismo criterio.
+    supabase
+      .from("visita")
+      .select("*", { count: "exact", head: true })
+      .eq("verificado", true),
   ]);
-
+ 
+  // FIX #6: si alguna de las 5 queries falló, avisamos en consola en vez
+  // de mostrar silenciosamente un 0 que parece dato real.
+  [usuarios, premium, lugares, promociones, visitas].forEach((r, i) => {
+    if (r.error) {
+      console.error(`getDashboardStats: error en query #${i}`, r.error);
+    }
+  });
+ 
   return {
     totalUsuarios: usuarios.count || 0,
     premiumUsuarios: premium.count || 0,
@@ -31,9 +45,7 @@ export const getDashboardStats = async () => {
 };
 
 export const getChallengeProgress = async () => {
-  // FIX: .single() exige exactamente 1 fila y truena con 406 si hay 0
-  // (o más de 1). .maybeSingle() regresa null en vez de error si no hay
-  // ningún reto_mensual activo en este momento.
+
   const { data: reto, error: retoError } = await supabase
     .from("reto_mensual")
     .select("*")
@@ -44,9 +56,7 @@ export const getChallengeProgress = async () => {
     console.error("Error obteniendo reto activo:", retoError);
     return { data: [], error: retoError };
   }
- 
-  // No hay ningún reto mensual activo ahora mismo: no es un error,
-  // simplemente no hay nada que mostrar en "Usuarios del reto".
+
   if (!reto) {
     return { data: [], error: null };
   }
@@ -185,4 +195,5 @@ export const getPlacesVisitedByUser = async (userId) => {
  
   return { data: resultado, error: null };
 };
+ 
  
