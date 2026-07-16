@@ -7,10 +7,18 @@ import {
 import React, { useEffect, useState } from "react";
 import LoadingScreen from "../../user/components/LoadingScreen";
 
+import {
+  getVisitsByPlaceMonthly,
+  getPremiumUsersReport,
+} from "../../services/admin_reports.service";
+
+import { generateGeneralMonthlyReportPDF } from "../utils/Generategeneralmonthlyreportpdf";
+
 function AdminDashboardPage() {
   const [stats, setStats] = useState(null);
   const [challengeUsers, setChallengeUsers] = useState([]);
   const [visitsByPlace, setVisitsByPlace] = useState([]);
+  const [downloadingReport, setDownloadingReport] = useState(false);
 
   useEffect(() => {
     loadDashboard();
@@ -28,6 +36,20 @@ function AdminDashboardPage() {
     setVisitsByPlace(places.data);
   };
 
+  const handleDownloadMonthlyReport = async () => {
+    setDownloadingReport(true);
+
+    const [{ data: visitsMonthly }, { data: premiumReport }] =
+      await Promise.all([getVisitsByPlaceMonthly(), getPremiumUsersReport()]);
+
+    generateGeneralMonthlyReportPDF({
+      visitsByPlace: visitsMonthly || [],
+      premiumUsersReport: premiumReport || [],
+    });
+
+    setDownloadingReport(false);
+  };
+
   if (!stats) return <LoadingScreen />;
   return (
     <div>
@@ -35,6 +57,8 @@ function AdminDashboardPage() {
         stats={stats}
         challengeUsers={challengeUsers}
         visitsByPlace={visitsByPlace}
+        onDownloadMonthlyReport={handleDownloadMonthlyReport}
+        downloadingReport={downloadingReport}
       />
     </div>
   );

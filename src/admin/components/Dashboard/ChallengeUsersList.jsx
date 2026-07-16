@@ -1,13 +1,43 @@
+import { useState } from "react";
+import { getPlacesVisitedByUser } from "../../../services/admin.service";
+import UserVisit from "./UserVisit";
+
 function ChallengeUsersList({ challengeUsers }) {
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [visits, setVisits] = useState([]);
+  const [loadingVisits, setLoadingVisits] = useState(false);
+  const [visitsError, setVisitsError] = useState(null);
+
+  const handleSelectUser = async (usuario) => {
+    setSelectedUser(usuario);
+    setLoadingVisits(true);
+    setVisitsError(null);
+
+    const { data, error } = await getPlacesVisitedByUser(usuario.id);
+
+    if (error) {
+      console.error(error);
+      setVisitsError("No se pudieron cargar las visitas de este usuario.");
+      setVisits([]);
+    } else {
+      setVisits(data || []);
+    }
+
+    setLoadingVisits(false);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedUser(null);
+    setVisits([]);
+    setVisitsError(null);
+  };
   return (
-    <div
-      className="w-full xl:w-[320px] rounded-[30px] bg-white/85 border border-primary shadow-md h-[500px] flex flex-col xl:h-[545px]"
-    >
+    <div className="w-full xl:w-[320px] rounded-[30px] bg-white/85 border border-primary shadow-md h-[500px] flex flex-col xl:h-[545px]">
       <h2 className="px-6 pt-6 pb-4 font-bold text-texto text-xl mb-5">
         Usuarios del reto
       </h2>
 
-      <div className="flex-1  overflow-y-auto px-6 pb-6 space-y-4">
+      <div className="flex-1    overflow-y-auto px-6 pb-6 space-y-4">
         {challengeUsers.map((user) => {
           const porcentaje = Math.round(
             (user.visitas_completadas / user.reto_mensual.visitas_requeridas) *
@@ -15,7 +45,11 @@ function ChallengeUsersList({ challengeUsers }) {
           );
 
           return (
-            <div key={user.usuario.id} className="border rounded-2xl p-4">
+            <button
+              onClick={() => handleSelectUser(user.usuario)}
+              key={user.usuario.id}
+              className=" text-start border rounded-2xl p-4 w-full "
+            >
               <div className="flex flex-col px-2 ">
                 <p className="font-semibold text-sm text-texto">
                   {user.usuario.nombre}
@@ -51,10 +85,17 @@ function ChallengeUsersList({ challengeUsers }) {
                   />
                 </div>
               </div>
-            </div>
+            </button>
           );
         })}
       </div>
+      <UserVisit
+        user={selectedUser}
+        visits={visits}
+        loading={loadingVisits}
+        error={visitsError}
+        onClose={handleCloseModal}
+      />
     </div>
   );
 }

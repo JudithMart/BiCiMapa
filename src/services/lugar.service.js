@@ -44,16 +44,24 @@ export const getPlaces = async () => {
     .from("lugar")
     .select("*, tipo(*), promocion(*)")
     .eq("visible_mapa", true)
-    .eq("activo", true);
+    .eq("activo", true)
 
-  
+    .eq("promocion.activa", true);
+ 
   return { places: data, error };
 };
-
+ 
 export const getPlaceById = async (id) => {
-  const { data, error } = await supabase.from("lugar").select("*").eq("id", id);
-  return { place: data[0], error };
+  const { data, error } = await supabase
+    .from("lugar")
+    .select("*, tipo(*), promocion(*)")
+    .eq("id", id)
+    .eq("promocion.activa", true)
+    .maybeSingle();
+ 
+  return { place: data, error };
 };
+ 
 
 export const updatePlace = async (
   id,
