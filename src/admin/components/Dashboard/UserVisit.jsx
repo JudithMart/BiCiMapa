@@ -1,17 +1,6 @@
 import { IoClose } from "react-icons/io5";
 
-/**
- * Modal que muestra el detalle de lugares visitados por un usuario.
- *
- * Props:
- * - user: objeto usuario (nombre, telefono, ...) o null si está cerrado
- * - visits: array de LUGARES agregados que regresa getPlacesVisitedByUser:
- *   [{ id, nombre, descripcion, imagen_url, visitas_totales, visitas_mes,
- *      ultima_visita }, ...]  -- ultima_visita es un Date o null
- * - loading: boolean mientras se cargan las visitas
- * - error: mensaje de error si la query falló
- * - onClose: cierra el modal
- */
+
 function UserVisit({ user, visits, loading, error, onClose }) {
   if (!user) return null;
 

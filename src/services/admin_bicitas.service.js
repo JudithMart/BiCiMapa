@@ -31,7 +31,7 @@ export const updateRoute = async (id, values) => {
 export const toggleRoute = async (id, activo) => {
   const { data, error } = await supabase
     .from("ruta")
-    .update({ activa: activo })
+    .update({ activa: !activo })
     .eq("id", id)
     .select()   
     .single();

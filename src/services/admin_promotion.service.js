@@ -32,12 +32,27 @@ export const updatePromotion = async (id, values) => {
 };
 
 export const deletePromotion = async (id) => {
+  // Intentamos borrar tokens sin historial de visitas primero
+  await supabase.from("token_lugar").delete().eq("id_promocion", id);
+
   const { data, error } = await supabase
     .from("promocion")
     .delete()
     .eq("id", id)
     .select()
     .maybeSingle();
+
+  // Si falla por FK (tiene visitas asociadas), la desactivamos en vez de borrarla
+  if (error?.code === "23503") {
+    const { data: updated, error: updateError } = await supabase
+      .from("promocion")
+      .update({ activa: false })
+      .eq("id", id)
+      .select()
+      .maybeSingle();
+
+    return { data: updated, error: updateError, softDeleted: true };
+  }
 
   return { data, error };
 };

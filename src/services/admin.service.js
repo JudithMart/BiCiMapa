@@ -31,43 +31,57 @@ export const getDashboardStats = async () => {
 };
 
 export const getChallengeProgress = async () => {
-  const { data: reto } = await supabase
+  // FIX: .single() exige exactamente 1 fila y truena con 406 si hay 0
+  // (o más de 1). .maybeSingle() regresa null en vez de error si no hay
+  // ningún reto_mensual activo en este momento.
+  const { data: reto, error: retoError } = await supabase
     .from("reto_mensual")
     .select("*")
     .eq("activo", true)
-    .single();
-
+    .maybeSingle();
+ 
+  if (retoError) {
+    console.error("Error obteniendo reto activo:", retoError);
+    return { data: [], error: retoError };
+  }
+ 
+  // No hay ningún reto mensual activo ahora mismo: no es un error,
+  // simplemente no hay nada que mostrar en "Usuarios del reto".
+  if (!reto) {
+    return { data: [], error: null };
+  }
+ 
   const { data: lugares } = await supabase
     .from("reto_lugares")
     .select("id_lugar")
     .eq("id_reto", reto.id);
-
+ 
   const { data: usuarios } = await supabase
     .from("usuario")
     .select("id,nombre,telefono,fecha_inicio_membresia")
     .eq("es_premium", true)
     .eq("rol", "user");
-
+ 
   const { data: visitas } = await supabase
     .from("visita")
     .select("id_usuario,id_lugar,fecha_visita")
     .eq("verificado", true);
-
+ 
   const lugaresReto = lugares.map((l) => l.id_lugar);
-
+ 
   const resultado = usuarios.map((usuario) => {
     const fechaInicio = usuario.fecha_inicio_membresia
       ? new Date(usuario.fecha_inicio_membresia)
       : null;
-
+ 
     const visitasUsuario = visitas.filter((v) => {
       if (v.id_usuario !== usuario.id) return false;
-
+ 
       if (!fechaInicio) return false;
-
+ 
       return new Date(v.fecha_visita) >= fechaInicio;
     });
-
+ 
     const lugaresVisitados = [
       ...new Set(
         visitasUsuario
@@ -75,19 +89,19 @@ export const getChallengeProgress = async () => {
           .map((v) => v.id_lugar),
       ),
     ];
-
+ 
     return {
       usuario,
-
+ 
       reto_mensual: reto,
-
+ 
       visitas_completadas: lugaresVisitados.length,
-
+ 
       completado: lugaresVisitados.length >= reto.visitas_requeridas,
     };
   });
-
-  return { data: resultado };
+ 
+  return { data: resultado, error: null };
 };
 
 export const getVisitsByPlace = async () => {
@@ -167,7 +181,6 @@ export const getPlacesVisitedByUser = async (userId) => {
     };
   });
  
-  // Ordenar por más visitado primero, útil para el reporte a los lugares con convenio
   resultado.sort((a, b) => b.visitas_totales - a.visitas_totales);
  
   return { data: resultado, error: null };

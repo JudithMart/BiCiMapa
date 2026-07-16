@@ -60,7 +60,7 @@ function AdminPromotion({ promociones }) {
   };
 
   const handleActivo = async (place) => {
-    await togglePromotion(place.id, place.activo);
+    await togglePromotion(place.id, place.activa);
 
     window.location.reload();
   };
@@ -117,15 +117,27 @@ function AdminPromotion({ promociones }) {
     window.location.reload();
   };
 
-  const handleDelete = async (place) => {
-    const confirmacion = window.confirm(`¿Eliminar a ${promociones.nombre}?`);
+ const handleDelete = async (place) => {
+  const confirmacion = window.confirm(
+    `¿Eliminar la promoción de ${place.lugar?.nombre}?`
+  );
 
-    if (!confirmacion) return;
+  if (!confirmacion) return;
 
-    const { error } = await deletePromotion(place.id);
+  const { error, softDeleted } = await deletePromotion(place.id);
 
-    console.log(error);
-  };
+  if (error) {
+    console.error(error);
+    alert("Error al eliminar la promoción");
+    return;
+  }
+
+  if (softDeleted) {
+    alert("Esta promoción tiene visitas registradas, así que se desactivó en lugar de eliminarse.");
+  }
+
+  window.location.reload();
+};
 
   const columns = [
     {

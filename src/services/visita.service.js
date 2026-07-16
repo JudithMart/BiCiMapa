@@ -1,5 +1,5 @@
 import { supabase } from "../lib/supabase";
-7;
+
 // Lugares visitados por el usuario
 export const getVisitedLugares = async (userId) => {
   return await supabase
@@ -36,6 +36,8 @@ export const validarToken = async ({ token, id_usuario, id_promocion }) => {
     };
   }
 
+  // 2. Validar que el token pertenezca EXACTAMENTE a la promoción que se
+  // está canjeando (no solo al mismo lugar).
   if (tokenData.id_promocion !== id_promocion) {
     return {
       success: false,
@@ -43,9 +45,12 @@ export const validarToken = async ({ token, id_usuario, id_promocion }) => {
     };
   }
 
+  // 3. Validar que la promoción y el lugar sigan activos.
+  // Antes esto no se checaba: si desactivabas una promoción o un lugar,
+  // un token viejo seguía canjeándose sin problema.
   const { data: promocionData, error: promocionError } = await supabase
     .from("promocion")
-    .select("id_lugar")
+    .select("id_lugar, activa, lugar(activo)")
     .eq("id", id_promocion)
     .single();
 
@@ -56,13 +61,28 @@ export const validarToken = async ({ token, id_usuario, id_promocion }) => {
     };
   }
 
+  if (!promocionData.activa) {
+    return {
+      success: false,
+      message: "Esta promoción ya no está disponible",
+    };
+  }
+
+  if (!promocionData.lugar?.activo) {
+    return {
+      success: false,
+      message: "Este lugar ya no está disponible",
+    };
+  }
+
   if (promocionData.id_lugar !== tokenData.id_lugar) {
     return {
       success: false,
       message: "El QR no pertenece a este lugar",
     };
   }
-  // 2. Registrar visita
+
+  // 4. Registrar visita
   const { data: visita, error: visitaError } = await supabase
     .from("visita")
     .insert({
@@ -81,7 +101,7 @@ export const validarToken = async ({ token, id_usuario, id_promocion }) => {
     };
   }
 
-  // 3. Marcar token usado
+  // 5. Marcar token usado
   await supabase
     .from("token_lugar")
     .update({

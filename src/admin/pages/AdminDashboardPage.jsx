@@ -12,7 +12,7 @@ import {
   getPremiumUsersReport,
 } from "../../services/admin_reports.service";
 
-import { generateGeneralMonthlyReportPDF } from "../utils/generateGeneralMonthlyReportPDF";
+import { generateGeneralMonthlyReportPDF } from "../utils/Generategeneralmonthlyreportpdf";
 
 function AdminDashboardPage() {
   const [stats, setStats] = useState(null);
