@@ -27,11 +27,11 @@ function AdminDashboard({
           <IoDocumentTextOutline />
           {downloadingReport
             ? "Generando..."
-            : "Descargar reporte mensual (PDF)"}
+            : "Descargar reporte mensual"}
         </button>
       </div>{" "}
       {/* Primera fila */}{" "}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3 gap-14">
         {" "}
         <AdminCard
           icono={<FaUserGroup />}

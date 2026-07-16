@@ -66,12 +66,23 @@ export const togglePremium = async (userId, currentPremium) => {
     .select()
     .single();
 
-  if (!currentPremium && !error) {
+  if (!currentPremium) {
     await supabase.from("historial_premium").insert({
       id_usuario: userId,
       fecha_inicio: values.fecha_inicio_membresia,
-      fecha_fin: values.fecha_expiracion,
+      fecha_fin: null,
     });
+  }
+
+  // Terminó Premium
+  if (currentPremium) {
+    await supabase
+      .from("historial_premium")
+      .update({
+        fecha_fin: new Date().toISOString(),
+      })
+      .eq("id_usuario", userId)
+      .is("fecha_fin", null);
   }
   return { data, error };
 };
