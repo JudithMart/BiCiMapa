@@ -57,8 +57,25 @@ export const getChallengeProgress = async () => {
     return { data: [], error: retoError };
   }
 
+ const { data: usuarios } = await supabase
+    .from("usuario")
+    .select("id,nombre,telefono,fecha_inicio_membresia")
+    .eq("es_premium", true)
+    .eq("rol", "user");
+
+  // Si no hay reto, devolver solo la lista de usuarios
   if (!reto) {
-    return { data: [], error: null };
+    return {
+      data: usuarios.map((usuario) => ({
+        usuario,
+        reto_mensual: {
+          visitas_requeridas: 0,
+          nombre: "Sin reto activo",
+        },
+        visitas_completadas: 0,
+        completado: false,
+      })),
+    };
   }
  
   const { data: lugares } = await supabase
@@ -66,11 +83,7 @@ export const getChallengeProgress = async () => {
     .select("id_lugar")
     .eq("id_reto", reto.id);
  
-  const { data: usuarios } = await supabase
-    .from("usuario")
-    .select("id,nombre,telefono,fecha_inicio_membresia")
-    .eq("es_premium", true)
-    .eq("rol", "user");
+
  
   const { data: visitas } = await supabase
     .from("visita")

@@ -39,11 +39,14 @@ function ChallengeUsersList({ challengeUsers }) {
 
       <div className="flex-1    overflow-y-auto px-6 pb-6 space-y-4">
         {challengeUsers.map((user) => {
-          const porcentaje = Math.round(
-            (user.visitas_completadas / user.reto_mensual.visitas_requeridas) *
-              100,
-          );
-
+          const porcentaje =
+            user.reto_mensual.visitas_requeridas > 0
+              ? Math.round(
+                  (user.visitas_completadas /
+                    user.reto_mensual.visitas_requeridas) *
+                    100,
+                )
+              : 0;
           return (
             <button
               onClick={() => handleSelectUser(user.usuario)}
