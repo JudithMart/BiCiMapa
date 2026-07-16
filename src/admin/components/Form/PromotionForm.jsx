@@ -67,11 +67,11 @@ function PromotionForm({ form, setForm, onSave, lugares }) {
           Estado
         </p>
         <select
-          value={String(form.activo)}
+          value={String(form.activa)}
           onChange={(e) =>
             setForm({
               ...form,
-              activo: e.target.value === "true",
+              activa: e.target.value === "true",
             })
           }
           className="font-sans w-full px-3 py-2 rounded-lg  mt-1 border   bg-gray-300 border-colorAdmin_gray  focus:outline-none focus:ring-2 focus:ring-primary"

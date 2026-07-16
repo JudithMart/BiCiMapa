@@ -32,12 +32,27 @@ export const updatePromotion = async (id, values) => {
 };
 
 export const deletePromotion = async (id) => {
+  // Intentamos borrar tokens sin historial de visitas primero
+  await supabase.from("token_lugar").delete().eq("id_promocion", id);
+
   const { data, error } = await supabase
     .from("promocion")
     .delete()
     .eq("id", id)
     .select()
     .maybeSingle();
+
+  // Si falla por FK (tiene visitas asociadas), la desactivamos en vez de borrarla
+  if (error?.code === "23503") {
+    const { data: updated, error: updateError } = await supabase
+      .from("promocion")
+      .update({ activa: false })
+      .eq("id", id)
+      .select()
+      .maybeSingle();
+
+    return { data: updated, error: updateError, softDeleted: true };
+  }
 
   return { data, error };
 };
@@ -71,17 +86,7 @@ export const createPromotion = async (values) => {
 };
 
 export const createToken = async (promotion) => {
-
   const token = crypto.randomUUID().replace(/-/g, "").slice(0, 12);
-
-  console.log({
-    id_lugar: promotion.id_lugar,
-    id_promocion: promotion.id,
-    token,
-    activo: true,
-    usado: false,
-    metodo: "qr"
-  });
 
   const { data, error } = await supabase
     .from("token_lugar")
@@ -92,15 +97,18 @@ export const createToken = async (promotion) => {
       activo: true,
       usado: false,
       metodo: "qr",
+      expira_en: null,
     })
     .select()
     .single();
 
-  console.log("ERROR", error);
-  console.log("DATA", data);
+  if (error) {
+    console.error("Error creando token:", error);
+  }
 
   return { data, error };
 };
+
 export const getLastToken = async (idPromocion) => {
   const { data, error } = await supabase
     .from("token_lugar")
@@ -110,36 +118,37 @@ export const getLastToken = async (idPromocion) => {
     .order("creado_en", { ascending: false })
     .limit(1)
     .maybeSingle();
-    console.log("DATA", data);
 
   return { data, error };
 };
 
-export const generateNewToken = async(promotion)=>{
+export const generateNewToken = async (promotion) => {
+  const { error: deactivateError } = await supabase
+    .from("token_lugar")
+    .update({ activo: false })
+    .eq("id_promocion", promotion.id)
+    .eq("activo", true);
 
-    await supabase
-        .from("token_lugar")
-        .update({
-            activo:false
-        })
-        .eq("id_promocion",promotion.id)
-        .eq("activo",true);
+  if (deactivateError) {
+    console.error("Error desactivando token anterior:", deactivateError);
+  }
 
-    return createToken(promotion);
-
-}
+  return createToken(promotion);
+};
 
 // END CRUD PROMOCIONES
 
 export const getAllPlaces = async () => {
   return await supabase
     .from("lugar")
-    .select(`
+    .select(
+      `
       id,
       nombre,
       slogan,
       imagen_url
-    `)
+    `,
+    )
     .eq("activo", true)
     .eq("es_convenio", true)
     .order("nombre");

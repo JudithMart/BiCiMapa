@@ -1,10 +1,11 @@
-import { supabase } from '../lib/supabase';
-7
+import { supabase } from "../lib/supabase";
+
 // Lugares visitados por el usuario
 export const getVisitedLugares = async (userId) => {
   return await supabase
     .from("visita")
-    .select(`
+    .select(
+      `
       id_lugar,
       fecha_visita,
       lugar (
@@ -12,18 +13,14 @@ export const getVisitedLugares = async (userId) => {
         nombre,
         imagen_url
       )
-    `)
+    `,
+    )
     .eq("id_usuario", userId)
     .eq("verificado", true);
 };
 
 // Registrar visita manual (token)
-export const validarToken = async ({
-  token,
-  id_usuario,
-  id_promocion,
-}) => {
-
+export const validarToken = async ({ token, id_usuario, id_promocion }) => {
   // 1. Buscar token
   const { data: tokenData, error: tokenError } = await supabase
     .from("token_lugar")
@@ -39,26 +36,83 @@ export const validarToken = async ({
     };
   }
 
+  // 2. Validar que el token pertenezca EXACTAMENTE a la promoción que se
+
+  if (tokenData.id_promocion !== id_promocion) {
+    return {
+      success: false,
+      message: "Este código no corresponde a esta promoción",
+    };
+  }
+
+  // 3. Validar que la promoción y el lugar sigan activos.
+  
   const { data: promocionData, error: promocionError } = await supabase
-  .from("promocion")
-  .select("id_lugar")
-  .eq("id", id_promocion)
-  .single();
+    .from("promocion")
+    .select("id_lugar, activa, lugar(activo)")
+    .eq("id", id_promocion)
+    .single();
 
-if (promocionError || !promocionData) {
-  return {
-    success: false,
-    message: "Promoción inválida",
-  };
-}
+  if (promocionError || !promocionData) {
+    return {
+      success: false,
+      message: "Promoción inválida",
+    };
+  }
 
-if (promocionData.id_lugar !== tokenData.id_lugar) {
-  return {
-    success: false,
-    message: "El QR no pertenece a este lugar",
-  };
-}
-  // 2. Registrar visita
+  if (!promocionData.activa) {
+    return {
+      success: false,
+      message: "Esta promoción ya no está disponible",
+    };
+  }
+
+  if (!promocionData.lugar?.activo) {
+    return {
+      success: false,
+      message: "Este lugar ya no está disponible",
+    };
+  }
+
+  if (promocionData.id_lugar !== tokenData.id_lugar) {
+    return {
+      success: false,
+      message: "El QR no pertenece a este lugar",
+    };
+  }
+
+
+  const veinticuatroHorasAtras = new Date(
+    Date.now() - 24 * 60 * 60 * 1000,
+  ).toISOString();
+ 
+  const { data: visitaReciente, error: cooldownError } = await supabase
+    .from("visita")
+    .select("id")
+    .eq("id_usuario", id_usuario)
+    .eq("id_lugar", tokenData.id_lugar)
+    .eq("verificado", true)
+    .gte("fecha_visita", veinticuatroHorasAtras)
+    .limit(1)
+    .maybeSingle();
+ 
+  if (cooldownError) {
+    return {
+      success: false,
+      message: "Error al validar la visita",
+    };
+  }
+ 
+  if (visitaReciente) {
+    return {
+      success: false,
+      message:
+        "Ya registraste una visita a este lugar en las últimas 24 horas. Intenta de nuevo más tarde.",
+    };
+  }
+ 
+
+  // 4. Registrar visita
   const { data: visita, error: visitaError } = await supabase
     .from("visita")
     .insert({
@@ -77,7 +131,7 @@ if (promocionData.id_lugar !== tokenData.id_lugar) {
     };
   }
 
-  // 3. Marcar token usado
+  // 5. Marcar token usado
   await supabase
     .from("token_lugar")
     .update({
