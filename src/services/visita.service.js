@@ -37,7 +37,7 @@ export const validarToken = async ({ token, id_usuario, id_promocion }) => {
   }
 
   // 2. Validar que el token pertenezca EXACTAMENTE a la promoción que se
-  // está canjeando (no solo al mismo lugar).
+
   if (tokenData.id_promocion !== id_promocion) {
     return {
       success: false,
@@ -46,8 +46,7 @@ export const validarToken = async ({ token, id_usuario, id_promocion }) => {
   }
 
   // 3. Validar que la promoción y el lugar sigan activos.
-  // Antes esto no se checaba: si desactivabas una promoción o un lugar,
-  // un token viejo seguía canjeándose sin problema.
+  
   const { data: promocionData, error: promocionError } = await supabase
     .from("promocion")
     .select("id_lugar, activa, lugar(activo)")
