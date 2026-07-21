@@ -24,7 +24,7 @@ export const useUserLocation = ({
   routeColorRef,
   setBicitasProgress,
   advanceRoute,
- 
+
   finishRuta,
   lastClosestIndexRef,
   bikeIconRef,
@@ -58,153 +58,172 @@ export const useUserLocation = ({
     if (navigator.geolocation) {
       watchId = navigator.geolocation.watchPosition(
         async (position) => {
-          const { latitude, longitude } = position.coords;
+          try {
+            const { latitude, longitude } = position.coords;
 
-          const newCoords = [longitude, latitude];
+            const newCoords = [longitude, latitude];
 
-          const prev = userLocationRef.current;
+            const prev = userLocationRef.current;
 
-          if (prev) {
-            const dx = longitude - prev[0];
-            const dy = latitude - prev[1];
+            if (prev) {
+              const dx = longitude - prev[0];
+              const dy = latitude - prev[1];
 
-            angle = (Math.atan2(dy, dx) * 180) / Math.PI;
-          }
+              angle = (Math.atan2(dy, dx) * 180) / Math.PI;
+            }
 
-          userLocationRef.current = newCoords;
+            userLocationRef.current = newCoords;
 
-          if (!prev || distanceInMeters(prev, newCoords) > 5) {
-            setUserLocation?.(newCoords);
-          }
+            if (!prev || distanceInMeters(prev, newCoords) > 5) {
+              setUserLocation?.(newCoords);
+            }
 
-          const lugarActual = bicitasProgressRef?.current?.lugarActual;
+            const lugarActual = bicitasProgressRef?.current?.lugarActual;
 
-          if (lugarActual?.longitud != null && lugarActual?.latitud != null) {
-            const destino = [lugarActual.longitud, lugarActual.latitud];
-            const distancia = distanceInMeters(newCoords, destino);
+            if (lugarActual?.longitud != null && lugarActual?.latitud != null) {
+              const destino = [lugarActual.longitud, lugarActual.latitud];
+              const distancia = distanceInMeters(newCoords, destino);
 
-            if (distancia < 25) {
-              if (bicitasProgressRef.current?.procesando) return;
+              if (distancia < 25) {
+                if (bicitasProgressRef.current?.procesando) return;
+                if (!bicitasProgressRef.current) return;
 
-              bicitasProgressRef.current.procesando = true;
+                bicitasProgressRef.current.procesando = true;
 
-              setLlegaste(true);
+                setLlegaste(true);
 
-              setArrivedPlace?.(lugarActual);
-              const progreso = bicitasProgressRef.current;
+                setArrivedPlace?.(lugarActual);
+                const progreso = bicitasProgressRef.current;
 
-              const siguiente = progreso.puntoActual + 1;
+                if (!progreso?.ruta?.ruta_lugar) {
+                  // NUEVO
+                  bicitasProgressRef.current.procesando = false;
+                  return;
+                }
+                const siguiente = progreso.puntoActual + 1;
 
-              const total = progreso.ruta.ruta_lugar.length;
+                const total = progreso.ruta.ruta_lugar.length;
 
-              if (siguiente > total) {
-                await finishRuta(progreso.usuarioRutaId);
+                if (siguiente > total) {
+                  await finishRuta(progreso.usuarioRutaId);
 
-                setBicitasProgress(null);
+                  setBicitasProgress(null);
+
+                  setLlegaste(false);
+                  clearRoutes(mapRef.current);
+                  clearBicitasMarker();
+
+                  routeCoordinatesRef.current = null;
+
+if (bicitasProgressRef.current) { // NUEVO
+    bicitasProgressRef.current.procesando = false;
+  }
+
+                  console.log(JSON.stringify(routeCoordinatesRef.current));
+
+                  return;
+                }
+
+                await advanceRoute(progreso.usuarioRutaId, siguiente);
+
+                const siguienteLugar = progreso.ruta.ruta_lugar.find(
+                  (r) => r.orden === siguiente,
+                )?.lugar;
+
+                const nuevo = {
+                  ...progreso,
+                  puntoActual: siguiente,
+                  lugarActual: siguienteLugar,
+                };
+
+                bicitasProgressRef.current = nuevo;
+
+                setBicitasProgress(nuevo);
 
                 setLlegaste(false);
-                clearRoutes(mapRef.current);
-                clearBicitasMarker();
 
-                routeCoordinatesRef.current = null;
-
-                return;
+                setTimeout(() => {
+                  bicitasProgressRef.current.procesando = false;
+                }, 3000);
               }
-
-              await advanceRoute(progreso.usuarioRutaId, siguiente);
-
-              const siguienteLugar = progreso.ruta.ruta_lugar.find(
-                (r) => r.orden === siguiente,
-              )?.lugar;
-
-              const nuevo = {
-                ...progreso,
-                puntoActual: siguiente,
-                lugarActual: siguienteLugar,
-              };
-
-              bicitasProgressRef.current = nuevo;
-
-              setBicitasProgress(nuevo);
-
-       
-
-              setLlegaste(false);
-
-              setTimeout(() => {
-                bicitasProgressRef.current.procesando = false;
-              }, 3000);
             }
-          }
 
-          //agregado
-          if (routeCoordinatesRef.current?.length) {
-            const closestIndex = findClosestPointIndex(
-              newCoords,
-              routeCoordinatesRef.current,
-            );
-
-            const avanzoSuficiente =
-              closestIndex - lastClosestIndexRef.current >= 2;
-
-            if (avanzoSuficiente) {
-              lastClosestIndexRef.current = closestIndex;
-
-              const traveled = routeCoordinatesRef.current.slice(
-                0,
-                closestIndex + 1,
+            //agregado
+            if (routeCoordinatesRef.current?.length) {
+              const closestIndex = findClosestPointIndex(
+                newCoords,
+                routeCoordinatesRef.current,
+                lastClosestIndexRef.current,
               );
+  const umbral = routeCoordinatesRef.current.length <= 20 ? 1 : 2;
 
-              const remaining = routeCoordinatesRef.current.slice(closestIndex);
+console.log("closestIndex:", closestIndex, "lastClosest:", lastClosestIndexRef.current); // NUEVO
+              const avanzoSuficiente =
+                closestIndex - lastClosestIndexRef.current >= umbral;
+console.log("avanzoSuficiente:", avanzoSuficiente);
+              if (avanzoSuficiente) {
+                lastClosestIndexRef.current = closestIndex;
 
-              drawProgressRoute({
-                map: mapRef.current,
-                traveled,
-                remaining,
-                color: routeColorRef.current,
+                const traveled = routeCoordinatesRef.current.slice(
+                  0,
+                  closestIndex + 1,
+                );
+
+                const remaining =
+                  routeCoordinatesRef.current.slice(closestIndex);
+console.log("llamando drawProgressRoute, traveled:", traveled.length, "remaining:", remaining.length); // NUEVO
+
+                drawProgressRoute({
+                  map: mapRef.current,
+                  traveled,
+                  remaining,
+                  color: routeColorRef.current,
+                });
+              }else {
+  console.log("routeCoordinatesRef.current no tiene .length:", routeCoordinatesRef.current); }
+            }
+
+            if (userMarkerRef.current) {
+              userMarkerRef.current.setLngLat(newCoords);
+
+              if (bikeIconRef.current) {
+                bikeIconRef.current.style.transform = `rotate(${angle + 90}deg)`;
+                bikeIconRef.current.style.transition = "transform .3s";
+              }
+            } else {
+              const bikeDiv = document.createElement("div");
+
+              bikeDiv.className =
+                "text-white text-sm bg-[#B57A86] rounded-full p-2 shadow-lg";
+
+              const root = createRoot(bikeDiv);
+
+              root.render(<MdDirectionsBike />);
+
+              bikeIconRef.current = bikeDiv;
+
+              const wrapper = document.createElement("div");
+              wrapper.appendChild(bikeDiv);
+
+              userMarkerRef.current = new mapboxgl.Marker(wrapper)
+                .setLngLat(newCoords)
+                .addTo(mapRef.current);
+            }
+            if (
+              !prev ||
+              Math.abs(prev[0] - longitude) > 0.0001 ||
+              Math.abs(prev[1] - latitude) > 0.0001
+            ) {
+              mapRef.current.easeTo({
+                center: [longitude, latitude],
+                duration: 500,
               });
             }
+            setLocationStatus?.("ready");
+            setLocationReady(true);
+          } catch (err) {
+            console.error("Error en watchPosition callback:", err); // NUEVO
           }
-
-
-          if (userMarkerRef.current) {
-            userMarkerRef.current.setLngLat(newCoords);
-
-            if (bikeIconRef.current) {
-              bikeIconRef.current.style.transform = `rotate(${angle + 90}deg)`;
-              bikeIconRef.current.style.transition = "transform .3s";
-            }
-          } else {
-            const bikeDiv = document.createElement("div");
-
-            bikeDiv.className =
-              "text-white text-sm bg-[#B57A86] rounded-full p-2 shadow-lg";
-
-            const root = createRoot(bikeDiv);
-
-            root.render(<MdDirectionsBike />);
-
-            bikeIconRef.current = bikeDiv;
-
-            const wrapper = document.createElement("div");
-            wrapper.appendChild(bikeDiv);
-
-            userMarkerRef.current = new mapboxgl.Marker(wrapper)
-              .setLngLat(newCoords)
-              .addTo(mapRef.current);
-          }
-          if (
-            !prev ||
-            Math.abs(prev[0] - longitude) > 0.0001 ||
-            Math.abs(prev[1] - latitude) > 0.0001
-          ) {
-            mapRef.current.easeTo({
-              center: [longitude, latitude],
-              duration: 500,
-            });
-          }
-          setLocationStatus?.("ready");
-          setLocationReady(true);
         },
 
         (error) => {

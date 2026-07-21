@@ -301,6 +301,7 @@ function MapView() {
       end: [place.longitud, place.latitud],
       color: place.tipo?.color_hex,
       routeCoordinatesRef,
+       lastClosestIndexRef
     });
   };
   //------------

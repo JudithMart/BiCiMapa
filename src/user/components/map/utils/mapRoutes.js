@@ -75,8 +75,9 @@ export const drawRoute = async ({
   end,
   color,
   routeCoordinatesRef,
+   lastClosestIndexRef,
 }) => {
-  const url = `https://api.mapbox.com/directions/v5/mapbox/cycling/${start.join(",")};${end.join(",")}?geometries=geojson&access_token=${mapboxgl.accessToken}`;
+ const url = `https://api.mapbox.com/directions/v5/mapbox/cycling/${start.join(",")};${end.join(",")}?geometries=geojson&overview=full&access_token=${mapboxgl.accessToken}`;
 
   const res = await fetch(url);
   const data = await res.json();
@@ -85,7 +86,8 @@ export const drawRoute = async ({
 
   const route = data.routes[0].geometry;
 
-  routeCoordinatesRef.current = route;
+  routeCoordinatesRef.current = route.coordinates;
+  if (lastClosestIndexRef) lastClosestIndexRef.current = 0;
 
   animateRoute({
     map,
@@ -138,8 +140,7 @@ export const drawBicitasRoute = async ({
 
     const coordsString = coordinates.map((coord) => coord.join(",")).join(";");
 
-    const url = `https://api.mapbox.com/directions/v5/mapbox/cycling/${coordsString}?geometries=geojson&access_token=${mapboxgl.accessToken}`;
-
+    const url = `https://api.mapbox.com/directions/v5/mapbox/cycling/${coordsString}?geometries=geojson&overview=full&access_token=${mapboxgl.accessToken}`;
     const res = await fetch(url);
     const data = await res.json();
 
@@ -181,13 +182,10 @@ export const drawBicitasRoute = async ({
   }
 };
 export const drawProgressRoute = ({ map, traveled, remaining, color }) => {
+ console.log("drawProgressRoute ejecutándose, isStyleLoaded:", map.isStyleLoaded()); // NUEVO
   if (!map.isStyleLoaded()) return;
 
-  // FIX (bug reportado): la capa "route" (ruta completa animada al inicio)
-  // nunca se borraba al empezar a trackear el progreso, así que se quedaba
-  // pintada por debajo/encima de "route-traveled"/"route-remaining" y por
-  // eso visualmente NUNCA se veía el desvanecido. La quitamos una sola vez,
-  // apenas arranca el tracking de progreso.
+
   if (map.getLayer("route")) map.removeLayer("route");
   if (map.getSource("route")) map.removeSource("route");
 
@@ -253,9 +251,9 @@ export const drawSingleBicitasRoute = async ({
 }) => {
   const end = [lugar.longitud, lugar.latitud];
 
-  const url = `https://api.mapbox.com/directions/v5/mapbox/cycling/${start.join(
-    ",",
-  )};${end.join(",")}?geometries=geojson&access_token=${mapboxgl.accessToken}`;
+ const url = `https://api.mapbox.com/directions/v5/mapbox/cycling/${start.join(
+  ",",
+)};${end.join(",")}?geometries=geojson&overview=full&access_token=${mapboxgl.accessToken}`;
 
   const res = await fetch(url);
   const data = await res.json();
