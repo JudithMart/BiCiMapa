@@ -23,6 +23,7 @@ function AdminFeatures({ novedades }) {
     fecha_inicio: "",
     fecha_fin: "",
     activa: true,
+    url: "",
   });
 
   const handleEdit = (feature) => {
@@ -30,9 +31,12 @@ function AdminFeatures({ novedades }) {
     setForm({
       titulo: feature.titulo || "",
       descripcion: feature.descripcion || "",
-      fecha_inicio: feature.fecha_inicio ? feature.fecha_inicio.slice(0, 10) : "",
+      fecha_inicio: feature.fecha_inicio
+        ? feature.fecha_inicio.slice(0, 10)
+        : "",
       fecha_fin: feature.fecha_fin ? feature.fecha_fin.slice(0, 10) : "",
       activa: feature.activa ?? true,
+      url: feature.url || "",
     });
     setOpenModal(true);
   };
@@ -44,6 +48,7 @@ function AdminFeatures({ novedades }) {
       fecha_inicio: currentForm.fecha_inicio,
       fecha_fin: currentForm.fecha_fin,
       activa: currentForm.activa,
+      url: currentForm.url,
     };
 
     let error;
@@ -77,7 +82,9 @@ function AdminFeatures({ novedades }) {
   };
 
   const handleDelete = async (feature) => {
-    const confirmacion = window.confirm(`¿Eliminar la novedad ${feature.titulo}?`);
+    const confirmacion = window.confirm(
+      `¿Eliminar la novedad ${feature.titulo}?`,
+    );
 
     if (!confirmacion) return;
 
@@ -120,7 +127,10 @@ function AdminFeatures({ novedades }) {
       header: "Fecha inicio",
       accessor: "fecha_inicio",
       render: (feature) => (
-        <p className="max-w-[100px] text-xs truncate" title={feature.fecha_inicio}>
+        <p
+          className="max-w-[100px] text-xs truncate"
+          title={feature.fecha_inicio}
+        >
           {feature.fecha_inicio ? feature.fecha_inicio.slice(0, 10) : "-"}
         </p>
       ),
@@ -131,6 +141,15 @@ function AdminFeatures({ novedades }) {
       render: (feature) => (
         <p className="max-w-[100px] text-xs truncate" title={feature.fecha_fin}>
           {feature.fecha_fin ? feature.fecha_fin.slice(0, 10) : "-"}
+        </p>
+      ),
+    },
+    {
+      header: "Link",
+      accessor: "url",
+      render: (feature) => (
+        <p className="text-xs  font-extralight text-blue-500 truncate max-w-[100px]">
+          {feature.url || "Sin link"}
         </p>
       ),
     },
@@ -207,10 +226,14 @@ function AdminFeatures({ novedades }) {
         onClose={() => setOpenModal(false)}
         onSave={handleSaveFeature}
       >
-        <FeaturesForm form={form} setForm={setForm} onSave={handleSaveFeature} />
+        <FeaturesForm
+          form={form}
+          setForm={setForm}
+          onSave={handleSaveFeature}
+        />
       </AdminFormModal>
     </>
   );
 }
 
-export default AdminFeatures
+export default AdminFeatures;

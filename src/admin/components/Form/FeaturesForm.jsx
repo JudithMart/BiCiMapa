@@ -77,6 +77,25 @@ function FeaturesForm({ form, setForm, onSave }) {
           className="font-sans w-full px-3 py-2 rounded-lg mt-1 border bg-gray-300 border-colorAdmin_gray focus:outline-none focus:ring-2 focus:ring-primary"
         />
       </div>
+ <div className="mt-5 w-full flex flex-col justify-start pl-6 px-5">
+        <p className="text-texto font-semibold text-base md:text-lg lg:text-xl">
+         Link
+        </p>
+
+        <textarea
+          rows={4}
+          value={form.url}
+          onChange={(e) => {
+            setForm({
+              ...form,
+              url: e.target.value,
+            });
+          }}
+          className="font-sans w-full px-3 py-1 rounded-lg mt-1 border bg-gray-300 border-colorAdmin_gray resize-none focus:outline-none focus:ring-2 focus:ring-primary"
+          placeholder="Ingrese el link..."
+        />
+      </div>
+      
 
       <div className="mt-5 w-full flex flex-col justify-start pl-6 px-5">
         <p className="text-texto font-semibold text-base md:text-lg lg:text-xl">
