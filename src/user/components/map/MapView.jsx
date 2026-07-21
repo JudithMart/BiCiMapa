@@ -40,6 +40,8 @@ import ModalFeatures from "../ModalFeatures.jsx";
 
 import { useMemo } from "react";
 import centroMorelia from "../../../assets/geojson/centroMorelia";
+import ArrivalToast from "../Route/ArrivalToast.jsx";
+import RouteProgressWidget from "../Route/RouteProgressWidget.jsx";
 
 const allende = {
   name: "Allende 527",
@@ -55,6 +57,7 @@ function MapView() {
   const [userLocation, setUserLocation] = useState(null);
   const bicitasProgressRef = useRef(null);
   const [llegaste, setLlegaste] = useState(false);
+  const [arrivedPlace, setArrivedPlace] = useState(null);
 
   const [search, setSearch] = useState("");
   const [selectedType, setSelectedType] = useState(null);
@@ -92,24 +95,18 @@ function MapView() {
   ];
 
   const visiblePlaces = useMemo(() => {
-  return places.filter(place => {
-    if (!place) return false;
+    return places.filter((place) => {
+      if (!place) return false;
 
-    const searchOk = (
-      place.nombre ||
-      place.tipo?.label ||
-      ""
-    )
-      .toLowerCase()
-      .includes(search.toLowerCase());
+      const searchOk = (place.nombre || place.tipo?.label || "")
+        .toLowerCase()
+        .includes(search.toLowerCase());
 
-    const typeOk =
-      selectedType === null ||
-      place.id_tipo === selectedType;
+      const typeOk = selectedType === null || place.id_tipo === selectedType;
 
-    return searchOk && typeOk;
-  });
-}, [places, search, selectedType]);
+      return searchOk && typeOk;
+    });
+  }, [places, search, selectedType]);
 
   const markersRef = useRef([]);
   const userLocationRef = useRef(null);
@@ -127,6 +124,8 @@ function MapView() {
 
   const [mapReady, setMapReady] = useState(false);
   const [locationReady, setLocationReady] = useState(false);
+
+  const lastDrawnPointRef = useRef(null); // NUEVO
 
   const getIcon = (type) => {
     const Icon = placeTypes[type]?.icon;
@@ -155,7 +154,7 @@ function MapView() {
   useEffect(() => {
     const fetchRutas = async () => {
       const { rutas, error } = await getRutas();
-    
+
       if (error) {
         console.error(error);
         return;
@@ -232,7 +231,31 @@ function MapView() {
     fetchBicitasInfo();
   }, [bicitasProgress, userLocation]);
   //------------
+  // NUEVO: dibuja (o redibuja) la ruta al punto actual cada vez que cambia
+  
+  useEffect(() => {
+    const autoDrawRoute = async () => {
+      if (!bicitasProgress?.lugarActual) return;
+      if (!userLocationRef.current) return;
+      if (!mapRef.current || !mapReady) return;
 
+      const puntoKey = `${bicitasProgress.usuarioRutaId}-${bicitasProgress.puntoActual}`;
+
+      if (lastDrawnPointRef.current === puntoKey) return; // ya está pintado
+
+      lastDrawnPointRef.current = puntoKey;
+      lastClosestIndexRef.current = 0;
+
+      await drawSingleBicitasRoute({
+        map: mapRef.current,
+        start: userLocationRef.current,
+        lugar: bicitasProgress.lugarActual,
+        routeCoordinatesRef,
+      });
+    };
+
+    autoDrawRoute();
+  }, [bicitasProgress, userLocation, mapReady]);
   // Estado para el usuario
   //--------
   const { userData } = useAuth();
@@ -246,8 +269,6 @@ function MapView() {
   //------------
   // Actualizar isFavorite cuando cambie el usuario o el lugar seleccionado
   useEffect(() => {
-   
-
     const checkFavorite = async () => {
       if (userData?.id && selectedPlace?.id) {
         const { favorito } = await isFavorito(userData.id, selectedPlace.id);
@@ -328,14 +349,14 @@ function MapView() {
       lugarActual: lugarActual.lugar,
     });
 
-    lastClosestIndexRef.current=0;
+    // lastClosestIndexRef.current = 0;
 
-    await drawSingleBicitasRoute({
-      map: mapRef.current,
-      start: userLocationRef.current,
-      lugar: lugarActual.lugar,
-      routeCoordinatesRef,
-    });
+    // await drawSingleBicitasRoute({
+    //   map: mapRef.current,
+    //   start: userLocationRef.current,
+    //   lugar: lugarActual.lugar,
+    //   routeCoordinatesRef,
+    // });
   };
 
   //------------
@@ -374,47 +395,47 @@ function MapView() {
   //------------
   //CENTRO DE MORELIA
   useEffect(() => {
-  if (!mapRef.current) return;
+    if (!mapRef.current) return;
 
-  const map = mapRef.current;
+    const map = mapRef.current;
 
-  const addCentro = () => {
-    if (map.getSource("centro-morelia")) return;
+    const addCentro = () => {
+      if (map.getSource("centro-morelia")) return;
 
-    map.addSource("centro-morelia", {
-      type: "geojson",
-      data: centroMorelia,
-    });
+      map.addSource("centro-morelia", {
+        type: "geojson",
+        data: centroMorelia,
+      });
 
-    // relleno
-    map.addLayer({
-      id: "centro-morelia-fill",
-      type: "fill",
-      source: "centro-morelia",
-      paint: {
-        "fill-color": "#F6D6D6",
-        "fill-opacity": 0.25,
-      },
-    });
+      // relleno
+      map.addLayer({
+        id: "centro-morelia-fill",
+        type: "fill",
+        source: "centro-morelia",
+        paint: {
+          "fill-color": "#F6D6D6",
+          "fill-opacity": 0.25,
+        },
+      });
 
-    // borde
-    map.addLayer({
-      id: "centro-morelia-outline",
-      type: "line",
-      source: "centro-morelia",
-      paint: {
-        "line-color": "#FDF4F3",
-        "line-width": 3,
-      },
-    });
-  };
+      // borde
+      map.addLayer({
+        id: "centro-morelia-outline",
+        type: "line",
+        source: "centro-morelia",
+        paint: {
+          "line-color": "#FDF4F3",
+          "line-width": 3,
+        },
+      });
+    };
 
-  if (map.isStyleLoaded()) {
-    addCentro();
-  } else {
-    map.once("load", addCentro);
-  }
-}, [mapReady]);
+    if (map.isStyleLoaded()) {
+      addCentro();
+    } else {
+      map.once("load", addCentro);
+    }
+  }, [mapReady]);
   //------------
   useBicitasMarker({
     mapRef,
@@ -466,6 +487,7 @@ function MapView() {
     finishRuta,
     lastClosestIndexRef,
     bikeIconRef,
+    setArrivedPlace,
   });
   //------------
   usePlaceMarkers({
@@ -477,7 +499,6 @@ function MapView() {
   });
 
   //------------
-
 
   useEffect(() => {
     const fetchPlaces = async () => {
@@ -542,9 +563,7 @@ function MapView() {
   }, []);
 
   //------------
-  //MAPA BUSCAR LUGARES 
-  
-
+  //MAPA BUSCAR LUGARES
 
   return (
     <>
@@ -675,8 +694,6 @@ function MapView() {
         <LoadingScreen status={mapReady ? locationStatus : "waiting"} />
       )} */}
 
-   
-
       {/*Modal Features */}
       {showNovedad && novedades && (
         <div
@@ -740,6 +757,21 @@ function MapView() {
           </div>
         </>
       )}
+
+      {/* WIDGET DE PROGRESO — visible siempre que haya ruta activa y la card grande esté cerrada */}
+      {bicitasProgress && !showBicitasCard && (
+        <RouteProgressWidget
+          bicitasProgress={bicitasProgress}
+          onClick={() => setShowBicitasCard(true)}
+        />
+      )}
+
+      {/* TOAST DE LLEGADA */}
+      <ArrivalToast
+        arrivedPlace={arrivedPlace}
+        nextPlaceName={bicitasProgress?.lugarActual?.nombre}
+        onDone={() => setArrivedPlace(null)}
+      />
       {/* CARD BiCitas */}
       {showBicitasCard && (
         <div

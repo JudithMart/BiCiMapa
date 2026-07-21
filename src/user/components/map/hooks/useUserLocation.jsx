@@ -24,10 +24,11 @@ export const useUserLocation = ({
   routeColorRef,
   setBicitasProgress,
   advanceRoute,
-  drawSingleBicitasRoute,
+ 
   finishRuta,
   lastClosestIndexRef,
   bikeIconRef,
+  setArrivedPlace,
 }) => {
   const distanceInMeters = (origin, destination) => {
     const toRadians = (value) => (value * Math.PI) / 180;
@@ -89,6 +90,7 @@ export const useUserLocation = ({
 
               setLlegaste(true);
 
+              setArrivedPlace?.(lugarActual);
               const progreso = bicitasProgressRef.current;
 
               const siguiente = progreso.puntoActual + 1;
@@ -125,15 +127,15 @@ export const useUserLocation = ({
 
               setBicitasProgress(nuevo);
 
-              await drawSingleBicitasRoute({
-                map: mapRef.current,
+              // await drawSingleBicitasRoute({
+              //   map: mapRef.current,
 
-                start: newCoords,
+              //   start: newCoords,
 
-                lugar: siguienteLugar,
+              //   lugar: siguienteLugar,
 
-                routeCoordinatesRef,
-              });
+              //   routeCoordinatesRef,
+              // });
 
               setLlegaste(false);
 
@@ -143,7 +145,7 @@ export const useUserLocation = ({
             }
           }
 
-          //agregado 
+          //agregado
           if (routeCoordinatesRef.current?.length) {
             const closestIndex = findClosestPointIndex(
               newCoords,
@@ -161,8 +163,7 @@ export const useUserLocation = ({
                 closestIndex + 1,
               );
 
-              const remaining =
-                routeCoordinatesRef.current.slice(closestIndex);
+              const remaining = routeCoordinatesRef.current.slice(closestIndex);
 
               drawProgressRoute({
                 map: mapRef.current,
@@ -202,93 +203,92 @@ export const useUserLocation = ({
           //   });
           // }
 
-
           // mover marcador
-//           if (userMarkerRef.current) {
-//             userMarkerRef.current.setLngLat(newCoords);
-//           } else {
-//             if (userMarkerRef.current) {
-//               userMarkerRef.current.setLngLat(newCoords);
+          //           if (userMarkerRef.current) {
+          //             userMarkerRef.current.setLngLat(newCoords);
+          //           } else {
+          //             if (userMarkerRef.current) {
+          //               userMarkerRef.current.setLngLat(newCoords);
 
-//               if (bikeIconRef.current) {
-//                 bikeIconRef.current.style.transform = `rotate(${angle + 90}deg)`;
+          //               if (bikeIconRef.current) {
+          //                 bikeIconRef.current.style.transform = `rotate(${angle + 90}deg)`;
 
-//                 bikeIconRef.current.style.transition = "transform .3s";
-//               }
-//             } else {
-//               const bikeDiv = document.createElement("div");
+          //                 bikeIconRef.current.style.transition = "transform .3s";
+          //               }
+          //             } else {
+          //               const bikeDiv = document.createElement("div");
 
-//               bikeDiv.className =
-//                 "text-white text-sm bg-[#B57A86] rounded-full p-2 shadow-lg";
+          //               bikeDiv.className =
+          //                 "text-white text-sm bg-[#B57A86] rounded-full p-2 shadow-lg";
 
-//               const root = createRoot(bikeDiv);
+          //               const root = createRoot(bikeDiv);
 
-//               root.render(<MdDirectionsBike />);
+          //               root.render(<MdDirectionsBike />);
 
-//               bikeIconRef.current = bikeDiv;
+          //               bikeIconRef.current = bikeDiv;
 
-//               const wrapper = document.createElement("div");
-//               wrapper.appendChild(bikeDiv);
+          //               const wrapper = document.createElement("div");
+          //               wrapper.appendChild(bikeDiv);
 
-//               userMarkerRef.current = new mapboxgl.Marker(wrapper)
-//                 .setLngLat(newCoords)
-//                 .addTo(mapRef.current);
-//             }
-//           }
-//           if (
-//             !prev ||
-//             Math.abs(prev[0] - longitude) > 0.0001 ||
-//             Math.abs(prev[1] - latitude) > 0.0001
-//           ) {
-//             mapRef.current.easeTo({
-//               center: [longitude, latitude],
-//               duration: 500,
-//             });
-//           }
-//           setLocationStatus?.("ready");
-//           setLocationReady(true);
-//         },
+          //               userMarkerRef.current = new mapboxgl.Marker(wrapper)
+          //                 .setLngLat(newCoords)
+          //                 .addTo(mapRef.current);
+          //             }
+          //           }
+          //           if (
+          //             !prev ||
+          //             Math.abs(prev[0] - longitude) > 0.0001 ||
+          //             Math.abs(prev[1] - latitude) > 0.0001
+          //           ) {
+          //             mapRef.current.easeTo({
+          //               center: [longitude, latitude],
+          //               duration: 500,
+          //             });
+          //           }
+          //           setLocationStatus?.("ready");
+          //           setLocationReady(true);
+          //         },
 
-//         (error) => {
-//           if (error?.code === error.PERMISSION_DENIED || error?.code === 1) {
-//             setLocationStatus?.("permission-denied");
-//           } else {
-//             setLocationStatus?.("unavailable");
-//           }
-//         },
-//         {
-//           enableHighAccuracy: true,
-//           maximumAge: 1000,
-//           timeout: 10000,
-//         },
-//       );
-//     } else {
-//       setLocationStatus?.("unavailable");
-//     }
+          //         (error) => {
+          //           if (error?.code === error.PERMISSION_DENIED || error?.code === 1) {
+          //             setLocationStatus?.("permission-denied");
+          //           } else {
+          //             setLocationStatus?.("unavailable");
+          //           }
+          //         },
+          //         {
+          //           enableHighAccuracy: true,
+          //           maximumAge: 1000,
+          //           timeout: 10000,
+          //         },
+          //       );
+          //     } else {
+          //       setLocationStatus?.("unavailable");
+          //     }
 
-//     return () => {
-//       if (watchId) {
-//         navigator.geolocation.clearWatch(watchId);
-//       }
-//     };
-//   }, [
-//     mapRef,
-//     mapReady,
-//     bicitasProgressRef,
-//     setLlegaste,
-//     setUserLocation,
-//     routeCoordinatesRef,
-//     userLocationRef,
-//     userMarkerRef,
-//     routeColorRef,
-//     setLocationReady,
-//     setLocationStatus,
-//     advanceRoute,
-//     drawSingleBicitasRoute,
-//     finishRuta,
-//     setBicitasProgress,
-//   ]);
-// };
+          //     return () => {
+          //       if (watchId) {
+          //         navigator.geolocation.clearWatch(watchId);
+          //       }
+          //     };
+          //   }, [
+          //     mapRef,
+          //     mapReady,
+          //     bicitasProgressRef,
+          //     setLlegaste,
+          //     setUserLocation,
+          //     routeCoordinatesRef,
+          //     userLocationRef,
+          //     userMarkerRef,
+          //     routeColorRef,
+          //     setLocationReady,
+          //     setLocationStatus,
+          //     advanceRoute,
+          //     drawSingleBicitasRoute,
+          //     finishRuta,
+          //     setBicitasProgress,
+          //   ]);
+          // };
 
           if (userMarkerRef.current) {
             userMarkerRef.current.setLngLat(newCoords);
@@ -365,7 +365,7 @@ export const useUserLocation = ({
     setLocationReady,
     setLocationStatus,
     advanceRoute,
-    drawSingleBicitasRoute,
+
     finishRuta,
     setBicitasProgress,
   ]);
