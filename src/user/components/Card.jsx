@@ -25,6 +25,7 @@ function Card({
   favorite,
   slug,
   es_convenio,
+   description
 }) {
   const [showLoginMsg, setShowLoginMsg] = useState(false);
   const navigate = useNavigate();
@@ -190,13 +191,15 @@ function Card({
           </div>
           <div className="flex flex-col ">
             <p className="text-texto font-normal text-base">{promotion}</p>
-            {/* LOGICA DEL TIEMPO */}
-            <p className="text-gray-500 font-light text-[12px]">
-              Tiempo: 3 días
-            </p>
+           
+           
           </div>
         </div>
       )}
+       <p className="text-gray-600  text-base mt-1 leading-snug line-clamp-4">
+            {description}
+          </p>
+
       <div
         className={`z-10 py-5 gap-1 -mt-8 shadow-sm flex justify-center`}
       >
