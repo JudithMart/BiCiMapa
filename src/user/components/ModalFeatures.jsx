@@ -23,13 +23,19 @@ function ModalFeatures({ novedades, onRouteClickDirection }) {
          bg-[#EDD1A1]/20 border-2 border-[#EBCB8B]"
       >
         {/* Titulo de novedades  */}
-        <p className="text-base font-bold text-texto uppercase">
+        <p className="text-lg font-bold text-texto uppercase">
           {novedades?.titulo }
         </p>
         {/* Descripcion de novedades */}
-        <p className="text-sm font-light text-texto">
+        <p className="text-base font-light text-texto">
           {novedades?.descripcion }
         </p>
+        <button
+          className=" mt-4 text-sm font-light text-green-800 underline hover:text-green-800/80 transition-colors"
+          onClick={() => window.open(novedades?.url, "_blank")}
+        >
+          Conocer más
+        </button>
       </div>
 
       <ButtonPink
