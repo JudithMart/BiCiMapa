@@ -115,9 +115,10 @@ export const useUserLocation = ({
 
                   routeCoordinatesRef.current = null;
 
-if (bicitasProgressRef.current) { // NUEVO
-    bicitasProgressRef.current.procesando = false;
-  }
+                  if (bicitasProgressRef.current) {
+                    // NUEVO
+                    bicitasProgressRef.current.procesando = false;
+                  }
 
                   console.log(JSON.stringify(routeCoordinatesRef.current));
 
@@ -150,37 +151,68 @@ if (bicitasProgressRef.current) { // NUEVO
 
             //agregado
             if (routeCoordinatesRef.current?.length) {
-              const closestIndex = findClosestPointIndex(
-                newCoords,
-                routeCoordinatesRef.current,
-                lastClosestIndexRef.current,
-              );
-  const umbral = routeCoordinatesRef.current.length <= 20 ? 1 : 2;
+              const accuracy = position.coords.accuracy;
 
-console.log("closestIndex:", closestIndex, "lastClosest:", lastClosestIndexRef.current); // NUEVO
-              const avanzoSuficiente =
-                closestIndex - lastClosestIndexRef.current >= umbral;
-console.log("avanzoSuficiente:", avanzoSuficiente);
-              if (avanzoSuficiente) {
-                lastClosestIndexRef.current = closestIndex;
+              // Ignora lecturas de GPS poco confiables (evita anclar el progreso
+              // en un punto equivocado por un salto malo de posición)
+              const lecturaConfiable = !accuracy || accuracy <= 30;
 
-                const traveled = routeCoordinatesRef.current.slice(
-                  0,
-                  closestIndex + 1,
+              if (lecturaConfiable) {
+                const closestIndex = findClosestPointIndex(
+                  newCoords,
+                  routeCoordinatesRef.current,
+                  lastClosestIndexRef.current,
                 );
 
-                const remaining =
-                  routeCoordinatesRef.current.slice(closestIndex);
-console.log("llamando drawProgressRoute, traveled:", traveled.length, "remaining:", remaining.length); // NUEVO
+                const puntoAnterior =
+                  routeCoordinatesRef.current[lastClosestIndexRef.current];
+                const puntoNuevo = routeCoordinatesRef.current[closestIndex];
 
-                drawProgressRoute({
-                  map: mapRef.current,
-                  traveled,
-                  remaining,
-                  color: routeColorRef.current,
-                });
-              }else {
-  console.log("routeCoordinatesRef.current no tiene .length:", routeCoordinatesRef.current); }
+                const distanciaAvance =
+                  puntoAnterior && puntoNuevo
+                    ? distanceInMeters(puntoAnterior, puntoNuevo)
+                    : 0;
+
+                const distanciaMinima = 6; // metros — filtra el jitter normal del GPS
+                const saltoMaximo = 150; // metros — evita anclar en un punto erróneo lejano
+
+                const avanzoSuficiente =
+                  closestIndex > lastClosestIndexRef.current &&
+                  distanciaAvance >= distanciaMinima &&
+                  distanciaAvance <= saltoMaximo;
+
+                console.log(
+                  "accuracy:",
+                  accuracy,
+                  "distanciaAvance:",
+                  distanciaAvance,
+                  "avanzoSuficiente:",
+                  avanzoSuficiente,
+                ); // NUEVO, temporal
+
+                if (avanzoSuficiente) {
+                  lastClosestIndexRef.current = closestIndex;
+
+                  const traveled = routeCoordinatesRef.current.slice(
+                    0,
+                    closestIndex + 1,
+                  );
+                  const remaining =
+                    routeCoordinatesRef.current.slice(closestIndex);
+
+                  drawProgressRoute({
+                    map: mapRef.current,
+                    traveled,
+                    remaining,
+                    color: routeColorRef.current,
+                  });
+                }
+              } else {
+                console.log(
+                  "Lectura GPS descartada por baja precisión:",
+                  accuracy,
+                ); // NUEVO, temporal
+              }
             }
 
             if (userMarkerRef.current) {
@@ -222,7 +254,7 @@ console.log("llamando drawProgressRoute, traveled:", traveled.length, "remaining
             setLocationStatus?.("ready");
             setLocationReady(true);
           } catch (err) {
-            console.error("Error en watchPosition callback:", err); // NUEVO
+            console.error("Error en watchPosition callback:", err); 
           }
         },
 
