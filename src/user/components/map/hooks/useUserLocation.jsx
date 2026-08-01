@@ -150,6 +150,7 @@ export const useUserLocation = ({
             }
 
             //agregado
+        
             if (routeCoordinatesRef.current?.length) {
               const accuracy = position.coords.accuracy;
 

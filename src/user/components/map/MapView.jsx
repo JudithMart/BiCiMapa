@@ -14,6 +14,7 @@ import {
   createRuta,
   advanceRoute,
   finishRuta,
+  cancelRuta,
 } from "../../../services/bicitas.service";
 import { getNovedadActiva } from "../../../services/new_features.service";
 
@@ -26,6 +27,7 @@ import {
   drawRoute,
   drawSingleBicitasRoute,
   clearRoutes,
+  clearBicitasMarker,
 } from "./utils/mapRoutes";
 
 import { calculateRouteInfo } from "./utils/calculateRouteInfo";
@@ -232,7 +234,7 @@ function MapView() {
   }, [bicitasProgress, userLocation]);
   //------------
   // NUEVO: dibuja (o redibuja) la ruta al punto actual cada vez que cambia
-  
+
   useEffect(() => {
     const autoDrawRoute = async () => {
       if (!bicitasProgress?.lugarActual) return;
@@ -301,7 +303,7 @@ function MapView() {
       end: [place.longitud, place.latitud],
       color: place.tipo?.color_hex,
       routeCoordinatesRef,
-       lastClosestIndexRef
+      lastClosestIndexRef,
     });
   };
   //------------
@@ -349,15 +351,44 @@ function MapView() {
 
       lugarActual: lugarActual.lugar,
     });
+  };
 
-    // lastClosestIndexRef.current = 0;
+  //------------
+  const handleCancelRuta = async () => {
+    if (!bicitasProgress?.usuarioRutaId) return;
 
-    // await drawSingleBicitasRoute({
-    //   map: mapRef.current,
-    //   start: userLocationRef.current,
-    //   lugar: lugarActual.lugar,
-    //   routeCoordinatesRef,
-    // });
+    const confirmado = window.confirm(
+      "¿Seguro que quieres cancelar esta ruta? Perderás tu avance actual.",
+    );
+
+    if (!confirmado) return;
+
+    const { error } = await cancelRuta(bicitasProgress.usuarioRutaId);
+
+    if (error) {
+      console.error(error);
+      alert("No se pudo cancelar la ruta, intenta de nuevo.");
+      return;
+    }
+
+    // Limpiar estado local
+    setBicitasProgress(null);
+    setActiveRuta(null);
+    setLlegaste(false);
+    setArrivedPlace(null);
+    setShowBicitasCard(false);
+    setSelectedRuta(null);
+
+    // Limpiar mapa
+    clearRoutes(mapRef.current);
+    clearBicitasMarker();
+    routeCoordinatesRef.current = null;
+    lastClosestIndexRef.current = 0;
+    lastDrawnPointRef.current = null;
+
+    // Refrescar lista de rutas disponibles (ahora sin ninguna "activa")
+    const all = await getRutas();
+    setRutas(all.rutas || []);
   };
 
   //------------
@@ -764,6 +795,7 @@ function MapView() {
         <RouteProgressWidget
           bicitasProgress={bicitasProgress}
           onClick={() => setShowBicitasCard(true)}
+           onCancel={handleCancelRuta}
         />
       )}
 

@@ -166,3 +166,18 @@ export const finishRuta = async (idUsuarioRuta) => {
 
   return { data, error };
 };
+
+// Cancelar ruta activa (sin marcarla como completada)
+export const cancelRuta = async (idUsuarioRuta) => {
+  const { data, error } = await supabase
+    .from("usuario_ruta_bicitas")
+    .update({
+      activo: false,
+      fecha_fin: new Date().toISOString(),
+    })
+    .eq("id", idUsuarioRuta)
+    .select()
+    .single();
+
+  return { data, error };
+};
