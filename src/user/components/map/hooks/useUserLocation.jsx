@@ -29,6 +29,7 @@ export const useUserLocation = ({
   lastClosestIndexRef,
   bikeIconRef,
   setArrivedPlace,
+  lastProgressCoordsRef
 }) => {
   const distanceInMeters = (origin, destination) => {
     const toRadians = (value) => (value * Math.PI) / 180;
@@ -150,15 +151,24 @@ export const useUserLocation = ({
             }
 
             //agregado
-        
+
             if (routeCoordinatesRef.current?.length) {
               const accuracy = position.coords.accuracy;
-
-              // Ignora lecturas de GPS poco confiables (evita anclar el progreso
-              // en un punto equivocado por un salto malo de posición)
               const lecturaConfiable = !accuracy || accuracy <= 30;
 
-              if (lecturaConfiable) {
+              const movimientoMinimoParaEvaluar = 8;
+
+              const distanciaMovimientoReal = lastProgressCoordsRef.current
+                ? distanceInMeters(lastProgressCoordsRef.current, newCoords)
+                : movimientoMinimoParaEvaluar; // primera lectura: asume el mínimo
+
+              const seMovioLoSuficiente =
+                !lastProgressCoordsRef.current ||
+                distanciaMovimientoReal >= movimientoMinimoParaEvaluar;
+
+              if (lecturaConfiable && seMovioLoSuficiente) {
+                lastProgressCoordsRef.current = newCoords;
+
                 const closestIndex = findClosestPointIndex(
                   newCoords,
                   routeCoordinatesRef.current,
@@ -174,8 +184,12 @@ export const useUserLocation = ({
                     ? distanceInMeters(puntoAnterior, puntoNuevo)
                     : 0;
 
-                const distanciaMinima = 6; // metros — filtra el jitter normal del GPS
-                const saltoMaximo = 150; // metros — evita anclar en un punto erróneo lejano
+                const distanciaMinima = 6;
+
+                // NUEVO: el tope ya no es fijo — no puede avanzar en la ruta más de
+                // ~3x lo que realmente te moviste (margen para curvas), con un piso
+                // de 30m para no ser demasiado estricto en el primer movimiento.
+                const saltoMaximo = Math.max(30, distanciaMovimientoReal * 3);
 
                 const avanzoSuficiente =
                   closestIndex > lastClosestIndexRef.current &&
@@ -183,10 +197,12 @@ export const useUserLocation = ({
                   distanciaAvance <= saltoMaximo;
 
                 console.log(
-                  "accuracy:",
-                  accuracy,
+                  "movReal:",
+                  distanciaMovimientoReal.toFixed(1),
                   "distanciaAvance:",
-                  distanciaAvance,
+                  distanciaAvance.toFixed(1),
+                  "saltoMaximo:",
+                  saltoMaximo.toFixed(1),
                   "avanzoSuficiente:",
                   avanzoSuficiente,
                 ); // NUEVO, temporal
@@ -208,11 +224,11 @@ export const useUserLocation = ({
                     color: routeColorRef.current,
                   });
                 }
-              } else {
+              } else if (!lecturaConfiable) {
                 console.log(
                   "Lectura GPS descartada por baja precisión:",
                   accuracy,
-                ); // NUEVO, temporal
+                );
               }
             }
 
@@ -255,7 +271,7 @@ export const useUserLocation = ({
             setLocationStatus?.("ready");
             setLocationReady(true);
           } catch (err) {
-            console.error("Error en watchPosition callback:", err); 
+            console.error("Error en watchPosition callback:", err);
           }
         },
 

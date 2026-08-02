@@ -68,6 +68,8 @@ function MapView() {
 
   const bikeIconRef = useRef(null);
 
+  const lastProgressCoordsRef = useRef(null);
+
   const [bicitasRouteInfo, setBicitasRouteInfo] = useState({
     minutes: null,
     km: null,
@@ -520,6 +522,7 @@ function MapView() {
     lastClosestIndexRef,
     bikeIconRef,
     setArrivedPlace,
+    lastProgressCoordsRef,
   });
   //------------
   usePlaceMarkers({
